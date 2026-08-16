@@ -9,9 +9,8 @@
     <meta name="theme-color" content="#1a2e1a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="manifest.json" /> <!-- ✅ RUTA RELATIVA -->
 
-    <!-- ===== ESTILOS ===== -->
     <style>
         /* ===== RESET & BASE ===== */
         * {
@@ -478,7 +477,7 @@
 <body>
     <div class="container">
 
-        <!-- BRAND con logo -->
+        <!-- BRAND -->
         <div class="brand">
             <img src="images/logo_tech.png" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
@@ -547,13 +546,13 @@
         //  REGISTRO DE SERVICE WORKER (PWA)
         // ============================================================
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
+            navigator.serviceWorker.register('sw.js')   // ✅ RUTA RELATIVA
                 .then(reg => console.log('✅ SW registrado correctamente', reg))
                 .catch(err => console.log('❌ Error al registrar SW', err));
         }
 
         // ============================================================
-        //  INDICADOR ABIERTO/CERRADO (con estado "casi cerrando")
+        //  INDICADOR ABIERTO/CERRADO
         // ============================================================
         function actualizarEstado() {
             const now = new Date();
@@ -872,6 +871,5 @@
             window.open(`https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(mensaje)}`, '_blank');
         });
     </script>
-
 </body>
 </html>
