@@ -4,12 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>Tech Classic Burgers · Pedido</title>
+
+    <!-- ===== META TAGS PARA PWA ===== -->
     <meta name="theme-color" content="#1a2e1a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="manifest.json" />
 
     <style>
+        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -33,6 +36,7 @@
             width: 100%;
         }
 
+        /* ===== BRAND ===== */
         .brand {
             text-align: center;
             margin-bottom: 20px;
@@ -59,6 +63,7 @@
             color: #ffb703;
         }
 
+        /* ===== TARJETA DE ESTADO ABIERTO/CERRADO ===== */
         .status-card {
             background: #1f331f;
             border-radius: 16px;
@@ -111,12 +116,12 @@
             align-items: center;
             opacity: 0;
             transition: opacity 0.3s ease;
-            pointer-events: none;
+            pointer-events: none; /* Evita clics mientras está oculto */
         }
 
         .toast-confirm.show {
             opacity: 1;
-            pointer-events: auto;
+            pointer-events: auto; /* Permite clics en el modal (opcional) */
         }
 
         .toast-confirm .toast-content {
@@ -251,7 +256,7 @@
             transform: scale(0.97);
         }
 
-        /* ===== PRODUCT CARDS (sin cursor:pointer en toda la tarjeta) ===== */
+        /* ===== PRODUCT CARDS ===== */
         .product-grid {
             display: flex;
             flex-direction: column;
@@ -269,7 +274,7 @@
             display: flex;
             gap: 14px;
             align-items: flex-start;
-            /* cursor: pointer;  ELIMINADO */
+            cursor: pointer;
         }
 
         .product-card:hover {
@@ -400,6 +405,7 @@
             gap: 4px;
         }
 
+        /* ===== OCULTAMOS LA ETIQUETA "Cant." ===== */
         .product-extras .qty-wrap label {
             display: none;
         }
@@ -500,6 +506,7 @@
             display: block;
         }
 
+        /* Leyenda de costo de envío */
         .envio-leyenda {
             font-size: 0.85rem;
             color: #ffb703;
@@ -606,7 +613,7 @@
             border-radius: 10px;
         }
 
-        /* ===== MODALES DE CANTIDAD ===== */
+        /* ===== MODAL DE CANTIDAD (para productos) ===== */
         .qty-modal {
             display: none;
             position: fixed;
@@ -671,6 +678,7 @@
             pointer-events: none;
         }
 
+        /* Botón ancho completo (Elijo otra Tech...) */
         .btn-otro-wrapper {
             width: 100%;
             display: flex;
@@ -700,6 +708,7 @@
             transform: scale(0.97);
         }
 
+        /* ===== MODAL DE MEDALLONES EXTRA (1, 2, 3) ===== */
         .med-modal {
             display: none;
             position: fixed;
@@ -789,6 +798,7 @@
             transform: scale(0.97);
         }
 
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             body {
                 font-size: 17px;
@@ -850,6 +860,7 @@
                 font-size: 0.8rem;
                 padding: 6px 10px;
             }
+            /* TOAST RESPONSIVE */
             .toast-confirm .toast-content {
                 font-size: 2.2rem;
                 padding: 30px 24px;
@@ -857,6 +868,7 @@
             .toast-confirm .toast-content .emoji {
                 font-size: 3.2rem;
             }
+
             .qty-grid button {
                 font-size: 1.6rem;
                 max-width: 70px;
@@ -912,10 +924,8 @@
             </div>
         </div>
 
-        <!-- PRODUCTOS (se carga con JS desde Google Sheets) -->
-        <div class="product-grid" id="productGrid">
-            <div style="text-align:center; padding:30px; color:#b8d0b8;">Cargando menú...</div>
-        </div>
+        <!-- PRODUCTOS -->
+        <div class="product-grid" id="productGrid"></div>
 
         <!-- FORMULARIO -->
         <div class="form-section" id="formSection">
@@ -950,6 +960,7 @@
                 <div class="address-field" id="addressField">
                     <label for="direccion">Dirección de entrega</label>
                     <input type="text" id="direccion" placeholder="Calle, número, piso, etc." autocomplete="street-address" />
+                    <!-- LEYENDA DE COSTO DE ENVÍO -->
                     <div class="envio-leyenda">
                         🚚 La entrega tiene un costo adicional de <strong>$3.000</strong> que se suma al total de tu compra.
                     </div>
@@ -974,12 +985,12 @@
 
     </div>
 
-    <!-- ===== TOAST ===== -->
+    <!-- ===== TOAST DE CONFIRMACIÓN (modal centrado) ===== -->
     <div id="toastConfirm" class="toast-confirm">
         <div class="toast-content" id="toastContent"></div>
     </div>
 
-    <!-- ===== MODAL DE CANTIDAD ===== -->
+    <!-- ===== MODAL DE CANTIDAD (para productos) ===== -->
     <div id="qtyModal" class="qty-modal">
         <div class="qty-modal-content">
             <div class="qty-grid">
@@ -1002,7 +1013,7 @@
         </div>
     </div>
 
-    <!-- ===== MODAL DE MEDALLONES EXTRA ===== -->
+    <!-- ===== MODAL DE MEDALLONES EXTRA (1, 2, 3) ===== -->
     <div id="medModal" class="med-modal">
         <div class="med-modal-content">
             <div class="med-modal-title">➕ Medallones extra</div>
@@ -1015,7 +1026,7 @@
         </div>
     </div>
 
-    <!-- ===== MODAL DE RESUMEN ===== -->
+    <!-- ===== MODAL DE RESUMEN DEL PEDIDO ===== -->
     <div id="resumenModal" class="resumen-modal">
         <div class="resumen-modal-content">
             <h3>📋 Revisá tu pedido</h3>
@@ -1030,66 +1041,135 @@
 
     <script>
         // ============================================================
-        //  CONFIGURACIÓN DE GOOGLE SHEETS
+        //  REGISTRO DE SERVICE WORKER (PWA)
         // ============================================================
-        const SHEET_ID = 'TU_SHEET_ID_AQUI';
-        const API_KEY = 'TU_API_KEY_AQUI';
-
-        let PRODUCTS = [];
-
-        async function cargarProductosDesdeSheets() {
-            try {
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Hoja1?key=${API_KEY}`;
-                const response = await fetch(url);
-                const data = await response.json();
-
-                if (!data.values || data.values.length === 0) {
-                    throw new Error('No se encontraron datos en la hoja.');
-                }
-
-                const rows = data.values.slice(1);
-                PRODUCTS = rows.map(row => ({
-                    id: row[0] || 'producto-' + Math.random(),
-                    name: row[1] || 'Producto sin nombre',
-                    price: parseInt(row[2]) || 0,
-                    desc: row[3] || '',
-                    hasExtras: row[4] && row[4].toLowerCase() === 'true',
-                    badge: row[5] || '',
-                    imagen: row[6] || 'images/placeholder.jpg'
-                }));
-
-                PRODUCTS = PRODUCTS.filter(p => p.price > 0);
-
-                if (PRODUCTS.length === 0) {
-                    document.getElementById('productGrid').innerHTML =
-                        '<div style="text-align:center;padding:30px;color:#b8d0b8;">No hay productos cargados. Revisá la planilla.</div>';
-                    return;
-                }
-
-                renderProducts();
-
-            } catch (error) {
-                console.error('Error al cargar productos:', error);
-                document.getElementById('productGrid').innerHTML =
-                    `<div style="text-align:center;padding:30px;color:#ff6b6b;">
-                        ⚠️ Error al cargar el menú.<br>
-                        <span style="font-size:0.8rem;color:#b8d0b8;">${error.message}</span>
-                    </div>`;
-            }
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('✅ SW registrado correctamente', reg))
+                .catch(err => console.log('❌ Error al registrar SW', err));
         }
 
         // ============================================================
-        //  RENDER PRODUCTOS
+        //  INDICADOR ABIERTO/CERRADO
         // ============================================================
+        function actualizarEstado() {
+            const now = new Date();
+            const dia = now.getDay();
+            const hora = now.getHours();
+            const minutos = now.getMinutes();
+            const horaMin = hora + minutos / 60;
+
+            let estado = 'cerrado';
+
+            if (dia === 1) {
+                estado = 'cerrado';
+            } else {
+                if (horaMin >= 20 && horaMin < 23.5) {
+                    estado = 'abierto';
+                } else if (horaMin >= 23.5 && horaMin < 24) {
+                    estado = 'casi';
+                } else {
+                    estado = 'cerrado';
+                }
+            }
+
+            const card = document.getElementById('statusCard');
+            const text = document.getElementById('statusText');
+
+            card.classList.remove('abierto', 'cerrado', 'casi');
+
+            if (estado === 'abierto') {
+                card.classList.add('abierto');
+                text.textContent = '🟢 ABIERTO · hasta las 00:00';
+            } else if (estado === 'casi') {
+                card.classList.add('casi');
+                text.textContent = '🟡 Estamos casi cerrando pero podemos hacer tu pedido !!!';
+            } else {
+                card.classList.add('cerrado');
+                text.textContent = '🔴 CERRADO';
+            }
+        }
+
+        actualizarEstado();
+        setInterval(actualizarEstado, 60000);
+
+        // ============================================================
+        //  TOAST DE CONFIRMACIÓN (cierre automático)
+        // ============================================================
+        var toastTimer = null;
+
+        function mostrarToast(mensaje) {
+            var toast = document.getElementById('toastConfirm');
+            var content = document.getElementById('toastContent');
+            // Mostrar mensaje y emoji en una línea separada
+            content.innerHTML = mensaje + ' <span class="emoji">👍</span>';
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function() {
+                toast.classList.remove('show');
+            }, 2000); // Se cierra automáticamente a los 2 segundos
+        }
+
+        // ============================================================
+        //  DATOS DE PRODUCTOS
+        // ============================================================
+        const PRODUCTS = [{
+            id: 'armatuburger',
+            name: 'Armá tu Burger',
+            price: 12000,
+            desc: '1 medallón 120gr · doble cheddar · salsa Tech. Agregá medallones y toppings.',
+            hasExtras: true,
+            badge: 'BASE',
+            imagen: 'images/arm.jpg'
+        }, {
+            id: 'doblep',
+            name: 'Doble Provoleta',
+            price: 18000,
+            desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.',
+            hasExtras: false,
+            imagen: 'images/pro.jpg'
+        }, {
+            id: 'intense',
+            name: 'Intense',
+            price: 18000,
+            desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.',
+            hasExtras: false,
+            imagen: 'images/int.jpg'
+        }, {
+            id: 'techmex',
+            name: 'Tech Mex',
+            price: 18000,
+            desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.',
+            hasExtras: false,
+            imagen: 'images/mex.jpg'
+        }, {
+            id: 'yankee',
+            name: 'Yankee',
+            price: 16000,
+            desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.',
+            hasExtras: false,
+            imagen: 'images/yan.jpg'
+        }, {
+            id: 'clasica',
+            name: 'Clásica',
+            price: 16000,
+            desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.',
+            hasExtras: false,
+            imagen: 'images/cla.jpg'
+        }];
+
         const TOPPINGS = [
             'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
             'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
         ];
 
-        function renderProducts() {
-            const grid = document.getElementById('productGrid');
-            grid.innerHTML = '';
+        // ============================================================
+        //  RENDER PRODUCTOS
+        // ============================================================
+        const grid = document.getElementById('productGrid');
 
+        function renderProducts() {
+            grid.innerHTML = '';
             PRODUCTS.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'product-card';
@@ -1175,21 +1255,26 @@
             });
         }
 
+        renderProducts();
+
         // ============================================================
-        //  MODALES Y EVENTOS DE CLIC (SOLO EN INPUTS)
+        //  MODALES Y EVENTOS DE CLIC
         // ============================================================
 
+        // ----- Modal de cantidad (productos) -----
         let currentInput = null;
         let currentProductId = null;
         const modal = document.getElementById('qtyModal');
         const modalButtons = modal.querySelectorAll('.qty-grid button');
         const btnOtro = modal.querySelector('.btn-otro-wrapper button');
 
+        // ----- Modal de medallones extra -----
         let currentMedInput = null;
         const medModal = document.getElementById('medModal');
         const medButtons = medModal.querySelectorAll('.med-grid button');
         const medCancelar = document.getElementById('medCancelar');
 
+        // ----- Funciones de apertura/cierre -----
         function openModalForInput(input) {
             if (input) {
                 currentInput = input;
@@ -1216,7 +1301,7 @@
             currentMedInput = null;
         }
 
-        // ===== EVENTO DE CLIC: SOLO REACCIONA EN INPUTS =====
+        // ----- Evento de clic en el grid de productos (delegación) -----
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
 
@@ -1230,15 +1315,20 @@
                 return;
             }
 
-            // Si es un checkbox, no hacer nada
             if (target.matches('input[type="checkbox"]')) {
                 return;
             }
 
-            // Cualquier otro clic en la tarjeta no hace nada
+            const card = target.closest('.product-card');
+            if (card) {
+                const qtyInput = card.querySelector('.qty-input');
+                if (qtyInput) {
+                    openModalForInput(qtyInput);
+                }
+            }
         });
 
-        // ===== BOTONES MODAL CANTIDAD =====
+        // ----- Botones del modal de cantidad (1-9) -----
         modalButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -1246,6 +1336,7 @@
                 if (!isNaN(val) && val >= 1 && val <= 9) {
                     if (currentInput) {
                         currentInput.value = val;
+                        // Mostrar toast de confirmación
                         const product = PRODUCTS.find(p => p.id === currentProductId);
                         if (product) {
                             mostrarToast(val + ' ' + product.name);
@@ -1258,6 +1349,7 @@
             });
         });
 
+        // Botón "Elijo otra Tech..." (asigna 0)
         btnOtro.addEventListener('click', function(e) {
             e.stopPropagation();
             if (currentInput) {
@@ -1268,13 +1360,14 @@
             closeModal();
         });
 
+        // Cerrar modal de cantidad al hacer clic en el fondo
         modal.addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
             }
         });
 
-        // ===== BOTONES MODAL MEDALLONES =====
+        // ----- Botones del modal de medallones (1, 2, 3) -----
         medButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -1290,32 +1383,18 @@
             });
         });
 
+        // Botón Cancelar (cierra sin cambios)
         medCancelar.addEventListener('click', function(e) {
             e.stopPropagation();
             closeMedModal();
         });
 
+        // Cerrar modal de medallones al hacer clic en el fondo
         medModal.addEventListener('click', function(e) {
             if (e.target === this) {
                 closeMedModal();
             }
         });
-
-        // ============================================================
-        //  TOAST
-        // ============================================================
-        var toastTimer = null;
-
-        function mostrarToast(mensaje) {
-            var toast = document.getElementById('toastConfirm');
-            var content = document.getElementById('toastContent');
-            content.innerHTML = mensaje + ' <span class="emoji">👍</span>';
-            toast.classList.add('show');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(function() {
-                toast.classList.remove('show');
-            }, 800);
-        }
 
         // ============================================================
         //  TOTAL Y ENVÍO
@@ -1375,7 +1454,7 @@
         updateTotal();
 
         // ============================================================
-        //  RESUMEN DEL PEDIDO
+        //  MODAL DE RESUMEN DEL PEDIDO
         // ============================================================
         const resumenModal = document.getElementById('resumenModal');
         const resumenDetalle = document.getElementById('resumenDetalle');
@@ -1400,6 +1479,7 @@
                         html += `<span class="cantidad">${cant}x</span> ${product.name}`;
                         html += `<span class="precio">$${subtotal.toLocaleString()}</span>`;
 
+                        // Medallones extra
                         const medInput = document.querySelector(`.med-extra-input[data-product-id="${product.id}"]`);
                         if (medInput) {
                             const mc = parseInt(medInput.value) || 0;
@@ -1410,6 +1490,7 @@
                             }
                         }
 
+                        // Toppings
                         const checks = document.querySelectorAll(`.topping-check[data-product-id="${product.id}"]:checked`);
                         if (checks.length > 0) {
                             const tops = Array.from(checks).map(cb => cb.value).join(', ');
@@ -1426,6 +1507,7 @@
                 return false;
             }
 
+            // Costo de envío
             if (isEntregaSelected()) {
                 total += COSTO_ENVIO;
                 html += `<div class="resumen-item" style="border-bottom:1px solid #2f4a2f;">`;
@@ -1441,6 +1523,7 @@
                 html += `</div>`;
             }
 
+            // Método de pago
             const metodoPago = document.getElementById('metodoPago').value;
             html += `<div class="resumen-item" style="border-bottom:1px solid #2f4a2f;">`;
             html += `💳 Pago: ${metodoPago}`;
@@ -1455,6 +1538,7 @@
             return true;
         }
 
+        // Abrir resumen al hacer clic en "ENVIAR PEDIDO"
         document.getElementById('sendBtn').addEventListener('click', function() {
             const nombre = document.getElementById('nombre').value.trim();
             const telefono = document.getElementById('telefono').value.trim();
@@ -1473,15 +1557,19 @@
             }
         });
 
+        // Cerrar resumen
         btnCancelarResumen.addEventListener('click', function() {
             resumenModal.classList.remove('active');
         });
 
+        // Confirmar y enviar
         btnConfirmarResumen.addEventListener('click', function() {
             resumenModal.classList.remove('active');
+            // Ejecutar el envío por WhatsApp
             enviarPedido();
         });
 
+        // Cerrar resumen al hacer clic en el fondo
         resumenModal.addEventListener('click', function(e) {
             if (e.target === this) {
                 resumenModal.classList.remove('active');
@@ -1489,7 +1577,7 @@
         });
 
         // ============================================================
-        //  ENVÍO POR WHATSAPP
+        //  ENVÍO POR WHATSAPP (función extraída)
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
         const MAPS_URL_LOCAL = 'https://bit.ly/4xOCf1o';
@@ -1559,64 +1647,6 @@
 
             window.open(`https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
-
-        // ============================================================
-        //  INDICADOR ABIERTO/CERRADO
-        // ============================================================
-        function actualizarEstado() {
-            const now = new Date();
-            const dia = now.getDay();
-            const hora = now.getHours();
-            const minutos = now.getMinutes();
-            const horaMin = hora + minutos / 60;
-
-            let estado = 'cerrado';
-
-            if (dia === 1) {
-                estado = 'cerrado';
-            } else {
-                if (horaMin >= 20 && horaMin < 23.5) {
-                    estado = 'abierto';
-                } else if (horaMin >= 23.5 && horaMin < 24) {
-                    estado = 'casi';
-                } else {
-                    estado = 'cerrado';
-                }
-            }
-
-            const card = document.getElementById('statusCard');
-            const text = document.getElementById('statusText');
-
-            card.classList.remove('abierto', 'cerrado', 'casi');
-
-            if (estado === 'abierto') {
-                card.classList.add('abierto');
-                text.textContent = '🟢 ABIERTO · hasta las 00:00';
-            } else if (estado === 'casi') {
-                card.classList.add('casi');
-                text.textContent = '🟡 Estamos casi cerrando pero podemos hacer tu pedido !!!';
-            } else {
-                card.classList.add('cerrado');
-                text.textContent = '🔴 CERRADO';
-            }
-        }
-
-        actualizarEstado();
-        setInterval(actualizarEstado, 60000);
-
-        // ============================================================
-        //  SERVICE WORKER
-        // ============================================================
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('✅ SW registrado correctamente', reg))
-                .catch(err => console.log('❌ Error al registrar SW', err));
-        }
-
-        // ============================================================
-        //  INICIALIZAR
-        // ============================================================
-        cargarProductosDesdeSheets();
     </script>
 </body>
 </html>
