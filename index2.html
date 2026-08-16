@@ -667,7 +667,7 @@
 
     </div>
 
-    <!-- ===== MODAL DE CANTIDAD (botón "Elijo otra Tech..." ancho completo) ===== -->
+    <!-- ===== MODAL DE CANTIDAD ===== -->
     <div id="qtyModal" class="qty-modal">
         <div class="qty-modal-content">
             <div class="qty-grid">
@@ -1022,7 +1022,7 @@
         updateTotal();
 
         // ============================================================
-        //  ENVÍO POR WHATSAPP
+        //  ENVÍO POR WHATSAPP con enlace clickeable
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
         const MAPS_URL = 'https://maps.app.goo.gl/7iPEqgpxnHL7By726';
@@ -1087,7 +1087,7 @@
                 mensaje += `\n📍 *Dirección:* ${direccionInput.value.trim()}`;
                 mensaje += `\n🚚 *Costo envío:* $${COSTO_ENVIO.toLocaleString()}`;
             } else {
-                // Cambio aquí: el texto del enlace ahora es "Retirala en este lugar!"
+                // El enlace es clickeable en WhatsApp porque la URL está presente
                 mensaje += `\n📍 *Retirala en este lugar!* ${MAPS_URL}`;
             }
 
