@@ -540,7 +540,14 @@
             display: block;
         }
 
-        /* ===== OPCIONES DE PAGO CONDICIONALES ===== */
+        /* ===== OPCIONES DE PAGO CON DESTAQUE BLANCO ===== */
+        .pago-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 18px;
+            padding-top: 4px;
+        }
+
         .pago-option {
             display: inline-flex;
             align-items: center;
@@ -549,6 +556,10 @@
             color: #d0e0d0;
             cursor: pointer;
             font-size: 0.9rem;
+            padding: 6px 14px;
+            border-radius: 40px;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+            border: 2px solid transparent;
         }
 
         .pago-option input[type="radio"] {
@@ -558,15 +569,16 @@
             cursor: pointer;
         }
 
-        .pago-option.oculto {
-            display: none !important;
+        /* Destaque blanco cuando está seleccionado */
+        .pago-option:has(input:checked) {
+            background: #ffffff;
+            color: #1a1a1a;
+            border-color: #ffffff;
+            box-shadow: 0 2px 12px rgba(255, 255, 255, 0.25);
         }
 
-        .pago-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px 18px;
-            padding-top: 4px;
+        .pago-option.oculto {
+            display: none !important;
         }
 
         .envio-leyenda {
@@ -966,6 +978,14 @@
                 font-size: 1rem;
                 top: 6px;
                 right: 6px;
+            }
+            .pago-option {
+                font-size: 0.8rem;
+                padding: 4px 10px;
+            }
+            .pago-option input[type="radio"] {
+                width: 16px;
+                height: 16px;
             }
         }
     </style>
@@ -1514,6 +1534,9 @@
                             // Seleccionar Efectivo por defecto si estaba seleccionado
                             const efectivoRadio = document.querySelector('input[name="metodoPago"][value="Efectivo"]');
                             if (efectivoRadio) efectivoRadio.checked = true;
+                            // Disparar evento change para actualizar el estilo
+                            const changeEvent = new Event('change', { bubbles: true });
+                            efectivoRadio.dispatchEvent(changeEvent);
                         }
                     }
                 } else {
@@ -1521,6 +1544,14 @@
                 }
             });
         }
+
+        // Para mantener el destaque visual al cambiar de opción
+        pagoRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                // El CSS con :has se encarga del estilo, pero forzamos un repintado
+                // no es necesario hacer nada adicional
+            });
+        });
 
         formaEnvioSelect.addEventListener('change', function() {
             toggleAddress();
