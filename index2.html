@@ -1085,10 +1085,11 @@
 
             if (isEntregaSelected()) {
                 const direccion = direccionInput.value.trim();
-                // Codificar la dirección para URL
                 const direccionEncoded = encodeURIComponent(direccion);
                 const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${direccionEncoded}`;
-                mensaje += `\n📍 *Dirección de entrega:* ${mapsUrl}`;
+                // Mostrar dirección literal y enlace de ruta
+                mensaje += `\n📍 *Dirección:* ${direccion}`;
+                mensaje += `\n🗺️ *Ver ruta:* ${mapsUrl}`;
                 mensaje += `\n🚚 *Costo envío:* $${COSTO_ENVIO.toLocaleString()}`;
             } else {
                 mensaje += `\n📍 *Retirala en este lugar!* ${MAPS_URL_LOCAL}`;
