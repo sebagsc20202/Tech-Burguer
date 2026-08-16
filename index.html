@@ -28,21 +28,18 @@
             width: 100%;
         }
 
+        /* ===== BRAND ===== */
         .brand {
             text-align: center;
             margin-bottom: 20px;
         }
 
-        .brand h1 {
-            font-size: 2rem;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-            text-transform: uppercase;
-            background: linear-gradient(135deg, #ffb703, #e63946);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 20px rgba(230, 57, 70, 0.3);
+        .brand .logo {
+            max-width: 180px;
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto 6px;
         }
 
         .brand .tagline {
@@ -53,7 +50,10 @@
             margin-top: 4px;
             letter-spacing: 1px;
         }
-        .brand .tagline span { color: #ffb703; }
+
+        .brand .tagline span {
+            color: #ffb703;
+        }
 
         /* ===== PRODUCT CARDS ===== */
         .product-grid {
@@ -75,7 +75,9 @@
             align-items: flex-start;
         }
 
-        .product-card:hover { border-color: #e63946; }
+        .product-card:hover {
+            border-color: #e63946;
+        }
 
         .product-img {
             flex-shrink: 0;
@@ -97,7 +99,10 @@
             display: block;
         }
 
-        .product-info { flex: 1; min-width: 0; }
+        .product-info {
+            flex: 1;
+            min-width: 0;
+        }
 
         .product-header {
             display: flex;
@@ -175,14 +180,19 @@
             outline: none;
         }
 
-        .product-extras input[type="number"]:focus { border-color: #e63946; }
+        .product-extras input[type="number"]:focus {
+            border-color: #e63946;
+        }
 
         .product-extras .qty-wrap {
             display: flex;
             align-items: center;
             gap: 4px;
         }
-        .product-extras .qty-wrap label { color: #b8d0b8; }
+
+        .product-extras .qty-wrap label {
+            color: #b8d0b8;
+        }
 
         .toppings-group {
             display: flex;
@@ -229,7 +239,9 @@
             gap: 8px;
         }
 
-        .form-group { margin-bottom: 14px; }
+        .form-group {
+            margin-bottom: 14px;
+        }
 
         .form-group label {
             display: block;
@@ -255,7 +267,9 @@
         }
 
         .form-group input:focus,
-        .form-group select:focus { border-color: #e63946; }
+        .form-group select:focus {
+            border-color: #e63946;
+        }
 
         .form-group select {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8d0b8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
@@ -264,10 +278,16 @@
             padding-right: 36px;
         }
 
-        .form-group .address-field { display: none; margin-top: 8px; }
-        .form-group .address-field.active { display: block; }
+        .form-group .address-field {
+            display: none;
+            margin-top: 8px;
+        }
 
-        /* Grupos de checkboxes con clases independientes */
+        .form-group .address-field.active {
+            display: block;
+        }
+
+        /* Grupos de checkboxes */
         .checkbox-group {
             display: flex;
             flex-wrap: wrap;
@@ -304,7 +324,11 @@
             border: 1px solid #3a5a3a;
         }
 
-        .total-box .label { color: #b8d0b8; font-size: 0.95rem; }
+        .total-box .label {
+            color: #b8d0b8;
+            font-size: 0.95rem;
+        }
+
         .total-box .amount {
             font-size: 1.6rem;
             font-weight: 900;
@@ -328,8 +352,13 @@
             box-shadow: 0 6px 18px rgba(230, 57, 70, 0.35);
         }
 
-        .btn-send:hover { background: #c92f3b; }
-        .btn-send:active { transform: scale(0.97); }
+        .btn-send:hover {
+            background: #c92f3b;
+        }
+
+        .btn-send:active {
+            transform: scale(0.97);
+        }
 
         .footnote {
             text-align: center;
@@ -340,20 +369,33 @@
             padding-top: 14px;
         }
 
-        .text-muted { color: #8aaa8a; font-size: 0.75rem; }
-        .mt-1 { margin-top: 6px; }
+        .text-muted {
+            color: #8aaa8a;
+            font-size: 0.75rem;
+        }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #1a2e1a; }
-        ::-webkit-scrollbar-thumb { background: #e63946; border-radius: 10px; }
+        .mt-1 {
+            margin-top: 6px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a2e1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e63946;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
 
-        <!-- BRAND -->
+        <!-- BRAND con logo -->
         <div class="brand">
-            <h1>🍔 TECH · CLASSIC</h1>
+            <img src="images/logo_tech.jpg" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
         </div>
 
@@ -366,12 +408,12 @@
 
             <div class="form-group">
                 <label for="nombre">Nombre completo</label>
-                <input type="text" id="nombre" placeholder="Tu nombre" required autocomplete="off" />
+                <input type="text" id="nombre" placeholder="Tu nombre" required autocomplete="name" />
             </div>
 
             <div class="form-group">
                 <label for="telefono">Teléfono (WhatsApp)</label>
-                <input type="tel" id="telefono" placeholder="Ej: 11 2345 6789" required autocomplete="off" />
+                <input type="tel" id="telefono" placeholder="Ej: 351 8692251" required autocomplete="tel" />
             </div>
 
             <!-- PAGO - clase 'pago-checkbox' -->
@@ -394,7 +436,7 @@
                 </div>
                 <div class="address-field" id="addressField">
                     <label for="direccion">Dirección de entrega</label>
-                    <input type="text" id="direccion" placeholder="Calle, número, piso, etc." autocomplete="off" />
+                    <input type="text" id="direccion" placeholder="Calle, número, piso, etc." autocomplete="street-address" />
                 </div>
                 <div class="text-muted mt-1">🚚 Costo de envío: <strong style="color:#ffb703;">$2.500</strong> (se suma si se selecciona "Entrega")</div>
             </div>
@@ -466,7 +508,7 @@
         ];
 
         // ============================================================
-        //  RENDER PRODUCTOS
+        //  RENDER PRODUCTOS (con cantidad inicial 1)
         // ============================================================
         const grid = document.getElementById('productGrid');
 
@@ -513,10 +555,9 @@
                 const qtyInput = document.createElement('input');
                 qtyInput.type = 'number';
                 qtyInput.min = 0;
-                qtyInput.value = 0;
+                qtyInput.value = 1; // <-- inicializado en 1 para autocompletar
                 qtyInput.dataset.productId = p.id;
                 qtyInput.className = 'qty-input';
-                qtyInput.autocomplete = 'off';
                 qtyWrap.appendChild(qtyLabel);
                 qtyWrap.appendChild(qtyInput);
                 extras.appendChild(qtyWrap);
@@ -530,7 +571,6 @@
                     medInput.value = 0;
                     medInput.className = 'med-extra-input';
                     medInput.dataset.productId = p.id;
-                    medInput.autocomplete = 'off';
                     extraMed.appendChild(medInput);
                     extras.appendChild(extraMed);
 
@@ -563,11 +603,9 @@
         renderProducts();
 
         // ============================================================
-        //  TOTAL Y ENVÍO - SIN INTERFERENCIA
-        //  Usamos clases específicas y eventos separados
+        //  TOTAL Y ENVÍO (completamente separados)
         // ============================================================
         const envioCheckboxes = document.querySelectorAll('.envio-checkbox');
-        const pagoCheckboxes = document.querySelectorAll('.pago-checkbox');
         const addressField = document.getElementById('addressField');
         const direccionInput = document.getElementById('direccion');
         const totalDisplay = document.getElementById('totalDisplay');
@@ -588,25 +626,17 @@
             }
         }
 
-        // Solo eventos para los checkboxes de envío
+        // Eventos solo para envío
         envioCheckboxes.forEach(cb => {
-            cb.addEventListener('change', function(e) {
-                toggleAddress();
-                updateTotal();
-                // No tocamos los de pago
-                console.log('Cambio en envío, pago intacto');
-            });
+            cb.addEventListener('change', toggleAddress);
+            cb.addEventListener('change', updateTotal);
         });
 
-        // Eventos para pago: solo actualizan total (aunque no cambie)
-        pagoCheckboxes.forEach(cb => {
-            cb.addEventListener('change', function(e) {
-                updateTotal();
-                console.log('Cambio en pago, envío intacto');
-            });
+        // Eventos solo para pago (no afectan el total, pero actualizan por si acaso)
+        document.querySelectorAll('.pago-checkbox').forEach(cb => {
+            cb.addEventListener('change', updateTotal);
         });
 
-        // Inicializar dirección
         toggleAddress();
 
         function calcularTotal() {
@@ -635,12 +665,13 @@
             }
         });
 
+        // Actualizar total al cargar
         updateTotal();
 
         // ============================================================
         //  ENVÍO POR WHATSAPP (número actualizado)
         // ============================================================
-        const BUSINESS_PHONE = '5493518692251';
+        const BUSINESS_PHONE = '5493518692251'; // 0351-8692251
 
         document.getElementById('sendBtn').addEventListener('click', function() {
             const nombre = document.getElementById('nombre').value.trim();
