@@ -102,35 +102,52 @@
             margin-top: 4px;
         }
 
-        /* ===== TOAST DE CONFIRMACIÓN ===== */
+        /* ===== TOAST DE CONFIRMACIÓN (modal centrado) ===== */
         .toast-confirm {
             position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #2a4a2a;
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1rem;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-            border: 1px solid #ffb703;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
             z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            transform: translateX(-50%) translateY(20px);
-            pointer-events: none;
-            white-space: nowrap;
+            transition: opacity 0.3s ease;
+            pointer-events: none; /* Evita clics mientras está oculto */
         }
 
         .toast-confirm.show {
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
+            pointer-events: auto; /* Permite clics en el modal (opcional) */
         }
 
-        .toast-confirm .emoji {
-            margin-left: 8px;
+        .toast-confirm .toast-content {
+            background: #2a4a2a;
+            border: 3px solid #ffb703;
+            border-radius: 30px;
+            padding: 40px 50px;
+            text-align: center;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #fff;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            max-width: 90%;
+            line-height: 1.4;
+        }
+
+        .toast-confirm.show .toast-content {
+            transform: scale(1);
+        }
+
+        .toast-confirm .toast-content .emoji {
+            display: block;
+            font-size: 4rem;
+            margin-top: 8px;
         }
 
         /* ===== MODAL DE RESUMEN DEL PEDIDO ===== */
@@ -564,15 +581,14 @@
             display: block;
         }
 
-        /* ===== NUEVO ESTILO PARA EL ENLACE DE DESARROLLO ===== */
-        .footnote .desarrollo-link {
+        .footnote .sc-link {
             margin-top: 8px;
             display: block;
             font-size: 0.75rem;
             color: #6a8a6a;
         }
 
-        .footnote .desarrollo-link a {
+        .footnote .sc-link a {
             color: #ffb703;
             text-decoration: underline;
         }
@@ -837,17 +853,20 @@
             .footnote {
                 font-size: 0.75rem;
             }
-            .footnote .desarrollo-link {
+            .footnote .sc-link {
                 font-size: 0.7rem;
             }
             .envio-leyenda {
                 font-size: 0.8rem;
                 padding: 6px 10px;
             }
-            .toast-confirm {
-                font-size: 0.9rem;
-                padding: 10px 18px;
-                bottom: 20px;
+            /* TOAST RESPONSIVE */
+            .toast-confirm .toast-content {
+                font-size: 2.2rem;
+                padding: 30px 24px;
+            }
+            .toast-confirm .toast-content .emoji {
+                font-size: 3.2rem;
             }
 
             .qty-grid button {
@@ -955,20 +974,21 @@
 
             <button class="btn-send" id="sendBtn">📲 ENVIAR PEDIDO</button>
 
-            <!-- ===== PIE DE PÁGINA MODIFICADO ===== -->
             <div class="footnote">
                 <span>Todas nuestras burgers vienen con papas</span>
                 <span>Tu hambre, nuestro ritmo</span>
-                <span class="desarrollo-link">
-                    Desarrollo: <a href="https://wa.me/5493518692251?text=Quiero%20algo%20similar%20al%20proyecto%20de%20Tech%20Classic%20Burguers" target="_blank">Contactar por WhatsApp</a>
+                <span class="sc-link">
+                    <a href="https://wa.me/5493518692251?text=Hola%2C%20Quiero%20algo%20similar%20al%20proyecto%20de%20Tech%20Classic%20Burguers" target="_blank">SC Photo</a>
                 </span>
             </div>
         </div>
 
     </div>
 
-    <!-- ===== TOAST DE CONFIRMACIÓN ===== -->
-    <div id="toastConfirm" class="toast-confirm"></div>
+    <!-- ===== TOAST DE CONFIRMACIÓN (modal centrado) ===== -->
+    <div id="toastConfirm" class="toast-confirm">
+        <div class="toast-content" id="toastContent"></div>
+    </div>
 
     <!-- ===== MODAL DE CANTIDAD (para productos) ===== -->
     <div id="qtyModal" class="qty-modal">
@@ -1074,18 +1094,20 @@
         setInterval(actualizarEstado, 60000);
 
         // ============================================================
-        //  TOAST DE CONFIRMACIÓN
+        //  TOAST DE CONFIRMACIÓN (cierre automático)
         // ============================================================
         var toastTimer = null;
 
         function mostrarToast(mensaje) {
             var toast = document.getElementById('toastConfirm');
-            toast.textContent = mensaje + ' 👍';
+            var content = document.getElementById('toastContent');
+            // Mostrar mensaje y emoji en una línea separada
+            content.innerHTML = mensaje + ' <span class="emoji">👍</span>';
             toast.classList.add('show');
             clearTimeout(toastTimer);
             toastTimer = setTimeout(function() {
                 toast.classList.remove('show');
-            }, 2000);
+            }, 2000); // Se cierra automáticamente a los 2 segundos
         }
 
         // ============================================================
