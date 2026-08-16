@@ -36,7 +36,7 @@
         }
 
         .brand .logo {
-            max-width: 270px; /* Aumentado 50% (180px → 270px) */
+            max-width: 306px;
             width: 100%;
             height: auto;
             display: block;
@@ -328,28 +328,31 @@
             letter-spacing: 0.5px;
         }
 
+        /* ===== BOTÓN ENVIAR (blanco con texto negro) ===== */
         .btn-send {
             width: 100%;
             padding: 16px;
-            background: #e63946;
+            background: #ffffff;
             border: none;
             border-radius: 60px;
             font-size: 1.2rem;
             font-weight: 700;
-            color: #fff;
+            color: #000000;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            box-shadow: 0 6px 18px rgba(230, 57, 70, 0.35);
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 4px 14px rgba(255, 255, 255, 0.25);
         }
 
         .btn-send:hover {
-            background: #c92f3b;
+            background: #f0f0f0;
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.35);
         }
 
         .btn-send:active {
             transform: scale(0.97);
+            background: #e0e0e0;
         }
 
         .footnote {
@@ -425,9 +428,8 @@
             .status {
                 font-size: 1rem;
             }
-            /* Ajuste del logo en móviles si es necesario */
             .brand .logo {
-                max-width: 220px; /* un poco más pequeño en móviles para no ocupar todo, pero sigue siendo 50% más grande que antes (180*1.5=270, en móvil lo dejamos en 220 para que no se vea enorme) */
+                max-width: 260px;
             }
         }
     </style>
@@ -482,7 +484,6 @@
                     <label for="direccion">Dirección de entrega</label>
                     <input type="text" id="direccion" placeholder="Calle, número, piso, etc." autocomplete="street-address" />
                 </div>
-                <!-- Texto eliminado: ya no aparece "(se suma si se selecciona 'Entrega a domicilio')" -->
             </div>
 
             <!-- TOTAL -->
@@ -807,6 +808,5 @@
             window.open(`https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(mensaje)}`, '_blank');
         });
     </script>
-
 </body>
 </html>
