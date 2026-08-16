@@ -56,22 +56,6 @@
             color: #ffb703;
         }
 
-        /* Estado ABIERTO/CERRADO */
-        .status {
-            text-align: center;
-            font-size: 0.9rem;
-            font-weight: 700;
-            margin-top: 4px;
-            padding: 4px 0;
-            letter-spacing: 1px;
-        }
-        .status.abierto {
-            color: #4caf50;
-        }
-        .status.cerrado {
-            color: #f44336;
-        }
-
         /* ===== PRODUCT CARDS ===== */
         .product-grid {
             display: flex;
@@ -425,9 +409,6 @@
             .form-section h2 {
                 font-size: 1.2rem;
             }
-            .status {
-                font-size: 1rem;
-            }
             .brand .logo {
                 max-width: 260px;
             }
@@ -441,8 +422,6 @@
         <div class="brand">
             <img src="images/logo_tech.png" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
-            <!-- Estado ABIERTO/CERRADO -->
-            <div class="status" id="statusIndicator">⏳ Cargando...</div>
         </div>
 
         <!-- PRODUCTOS -->
@@ -499,44 +478,6 @@
     </div>
 
     <script>
-        // ============================================================
-        //  INDICADOR ABIERTO/CERRADO
-        // ============================================================
-        function actualizarEstado() {
-            const now = new Date();
-            const dia = now.getDay(); // 0=domingo, 1=lunes, ..., 6=sábado
-            const hora = now.getHours();
-            const minutos = now.getMinutes();
-
-            let abierto = false;
-
-            // Lunes (1) cerrado
-            if (dia === 1) {
-                abierto = false;
-            } else {
-                // Martes a domingo
-                if (hora >= 20 && hora < 24) {
-                    abierto = true;
-                } else if (hora === 0 && minutos === 0) {
-                    abierto = (dia !== 1);
-                } else {
-                    abierto = false;
-                }
-            }
-
-            const statusDiv = document.getElementById('statusIndicator');
-            if (abierto) {
-                statusDiv.textContent = '🟢 ABIERTO · hasta las 00:00';
-                statusDiv.className = 'status abierto';
-            } else {
-                statusDiv.textContent = '🔴 CERRADO · Horario: mar-dom 20:00-00:00';
-                statusDiv.className = 'status cerrado';
-            }
-        }
-
-        actualizarEstado();
-        setInterval(actualizarEstado, 60000);
-
         // ============================================================
         //  DATOS DE PRODUCTOS (imágenes locales)
         // ============================================================
@@ -743,7 +684,7 @@
         updateTotal();
 
         // ============================================================
-        //  ENVÍO POR WHATSAPP
+        //  ENVÍO POR WHATSAPP con mensaje personalizado para Transferencia
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
 
@@ -795,6 +736,12 @@
             const metodoPago = document.getElementById('metodoPago').value;
             mensaje += `\n\n💳 *Pago:* ${metodoPago}`;
 
+            // Si es Transferencia, agregar alias y solicitud de comprobante
+            if (metodoPago === 'Transferencia') {
+                mensaje += `\n📌 *Alias:* Tech.burguer`;
+                mensaje += `\n📎 *Importante:* Por favor, enviá el comprobante de transferencia para confirmar el pedido.`;
+            }
+
             const envioLabel = isEntregaSelected() ? 'Entrega a domicilio' : 'Retiro en local';
             mensaje += `\n🚚 *Envío:* ${envioLabel}`;
             if (isEntregaSelected()) {
@@ -808,5 +755,6 @@
             window.open(`https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(mensaje)}`, '_blank');
         });
     </script>
+
 </body>
 </html>
