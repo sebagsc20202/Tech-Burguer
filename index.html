@@ -28,7 +28,6 @@
             width: 100%;
         }
 
-        /* ===== BRAND ===== */
         .brand {
             text-align: center;
             margin-bottom: 20px;
@@ -54,10 +53,7 @@
             margin-top: 4px;
             letter-spacing: 1px;
         }
-
-        .brand .tagline span {
-            color: #ffb703;
-        }
+        .brand .tagline span { color: #ffb703; }
 
         /* ===== PRODUCT CARDS ===== */
         .product-grid {
@@ -79,11 +75,8 @@
             align-items: flex-start;
         }
 
-        .product-card:hover {
-            border-color: #e63946;
-        }
+        .product-card:hover { border-color: #e63946; }
 
-        /* ===== IMAGEN ===== */
         .product-img {
             flex-shrink: 0;
             width: 80px;
@@ -104,10 +97,7 @@
             display: block;
         }
 
-        .product-info {
-            flex: 1;
-            min-width: 0;
-        }
+        .product-info { flex: 1; min-width: 0; }
 
         .product-header {
             display: flex;
@@ -185,20 +175,14 @@
             outline: none;
         }
 
-        .product-extras input[type="number"]:focus {
-            border-color: #e63946;
-        }
+        .product-extras input[type="number"]:focus { border-color: #e63946; }
 
         .product-extras .qty-wrap {
             display: flex;
             align-items: center;
             gap: 4px;
         }
-
-        .product-extras .qty-wrap label {
-            font-size: 0.8rem;
-            color: #b8d0b8;
-        }
+        .product-extras .qty-wrap label { color: #b8d0b8; }
 
         .toppings-group {
             display: flex;
@@ -245,9 +229,7 @@
             gap: 8px;
         }
 
-        .form-group {
-            margin-bottom: 14px;
-        }
+        .form-group { margin-bottom: 14px; }
 
         .form-group label {
             display: block;
@@ -273,9 +255,7 @@
         }
 
         .form-group input:focus,
-        .form-group select:focus {
-            border-color: #e63946;
-        }
+        .form-group select:focus { border-color: #e63946; }
 
         .form-group select {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8d0b8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
@@ -284,14 +264,8 @@
             padding-right: 36px;
         }
 
-        .form-group .address-field {
-            display: none;
-            margin-top: 8px;
-        }
-
-        .form-group .address-field.active {
-            display: block;
-        }
+        .form-group .address-field { display: none; margin-top: 8px; }
+        .form-group .address-field.active { display: block; }
 
         .checkbox-group {
             display: flex;
@@ -328,11 +302,7 @@
             border: 1px solid #3a5a3a;
         }
 
-        .total-box .label {
-            font-size: 0.95rem;
-            color: #b8d0b8;
-        }
-
+        .total-box .label { color: #b8d0b8; font-size: 0.95rem; }
         .total-box .amount {
             font-size: 1.6rem;
             font-weight: 900;
@@ -356,13 +326,8 @@
             box-shadow: 0 6px 18px rgba(230, 57, 70, 0.35);
         }
 
-        .btn-send:hover {
-            background: #c92f3b;
-        }
-
-        .btn-send:active {
-            transform: scale(0.97);
-        }
+        .btn-send:hover { background: #c92f3b; }
+        .btn-send:active { transform: scale(0.97); }
 
         .footnote {
             text-align: center;
@@ -373,24 +338,12 @@
             padding-top: 14px;
         }
 
-        .text-muted {
-            color: #8aaa8a;
-            font-size: 0.75rem;
-        }
-        .mt-1 {
-            margin-top: 6px;
-        }
+        .text-muted { color: #8aaa8a; font-size: 0.75rem; }
+        .mt-1 { margin-top: 6px; }
 
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1a2e1a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #e63946;
-            border-radius: 10px;
-        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #1a2e1a; }
+        ::-webkit-scrollbar-thumb { background: #e63946; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -419,23 +372,23 @@
                 <input type="tel" id="telefono" placeholder="Ej: 11 2345 6789" required />
             </div>
 
-            <!-- Pago múltiple -->
+            <!-- PAGO (checkboxes independientes) -->
             <div class="form-group">
                 <label>Método de pago (podés elegir varios)</label>
                 <div class="checkbox-group" id="pagoGroup">
-                    <label><input type="checkbox" value="Efectivo" checked /> Efectivo</label>
-                    <label><input type="checkbox" value="Débito/Crédito" /> Débito/Crédito</label>
-                    <label><input type="checkbox" value="Transferencia" /> Transferencia</label>
-                    <label><input type="checkbox" value="QR" /> QR</label>
+                    <label><input type="checkbox" name="pago[]" value="Efectivo" checked /> Efectivo</label>
+                    <label><input type="checkbox" name="pago[]" value="Débito/Crédito" /> Débito/Crédito</label>
+                    <label><input type="checkbox" name="pago[]" value="Transferencia" /> Transferencia</label>
+                    <label><input type="checkbox" name="pago[]" value="QR" /> QR</label>
                 </div>
             </div>
 
-            <!-- Envío múltiple -->
+            <!-- ENVÍO (checkboxes independientes) -->
             <div class="form-group">
                 <label>Forma de envío (podés elegir varias)</label>
                 <div class="checkbox-group" id="envioGroup">
-                    <label><input type="checkbox" value="retiro" checked /> Retiro en local</label>
-                    <label><input type="checkbox" value="entrega" /> Entrega a domicilio</label>
+                    <label><input type="checkbox" name="envio[]" value="retiro" checked /> Retiro en local</label>
+                    <label><input type="checkbox" name="envio[]" value="entrega" /> Entrega a domicilio</label>
                 </div>
                 <div class="address-field" id="addressField">
                     <label for="direccion">Dirección de entrega</label>
@@ -458,7 +411,7 @@
 
     <script>
         // ============================================================
-        //  DATOS DE PRODUCTOS con imágenes locales
+        //  DATOS DE PRODUCTOS (imágenes locales)
         // ============================================================
         const PRODUCTS = [{
             id: 'armatuburger',
@@ -511,7 +464,7 @@
         ];
 
         // ============================================================
-        //  RENDER
+        //  RENDER PRODUCTOS
         // ============================================================
         const grid = document.getElementById('productGrid');
 
@@ -522,7 +475,6 @@
                 card.className = 'product-card';
                 card.dataset.id = p.id;
 
-                // Imagen (siempre desde carpeta images)
                 const imgDiv = document.createElement('div');
                 imgDiv.className = 'product-img';
                 const img = document.createElement('img');
@@ -531,7 +483,6 @@
                 img.loading = 'lazy';
                 imgDiv.appendChild(img);
 
-                // Info
                 const info = document.createElement('div');
                 info.className = 'product-info';
 
@@ -608,7 +559,7 @@
         renderProducts();
 
         // ============================================================
-        //  TOTAL Y ENVÍO (con checkboxes)
+        //  TOTAL Y ENVÍO (sin interferencia entre checkboxes)
         // ============================================================
         const envioCheckboxes = document.querySelectorAll('#envioGroup input[type="checkbox"]');
         const addressField = document.getElementById('addressField');
@@ -631,6 +582,7 @@
             }
         }
 
+        // Solo afecta a los checkboxes de envío
         envioCheckboxes.forEach(cb => cb.addEventListener('change', toggleAddress));
         toggleAddress();
 
@@ -653,17 +605,24 @@
             totalDisplay.textContent = `$${calcularTotal().toLocaleString()}`;
         }
 
+        // Eventos de cambio: solo actualizan el total, no tocan el estado de otros checkboxes
         document.addEventListener('input', function(e) {
-            if (e.target.matches('.qty-input, .med-extra-input, .topping-check')) updateTotal();
+            if (e.target.matches('.qty-input, .med-extra-input, .topping-check')) {
+                updateTotal();
+            }
         });
+
+        // Envuelvo en una función para evitar propagación no deseada
         envioCheckboxes.forEach(cb => cb.addEventListener('change', updateTotal));
+        // Los checkboxes de pago también actualizan el total (aunque no afecta el monto)
         document.querySelectorAll('#pagoGroup input[type="checkbox"]').forEach(cb => cb.addEventListener('change', updateTotal));
+
         updateTotal();
 
         // ============================================================
         //  ENVÍO POR WHATSAPP
         // ============================================================
-        const BUSINESS_PHONE = '5491123456789'; // cambiá por el número real
+        const BUSINESS_PHONE = '5491123456789'; // Reemplazar con el número real
 
         document.getElementById('sendBtn').addEventListener('click', function() {
             const nombre = document.getElementById('nombre').value.trim();
@@ -710,9 +669,11 @@
                 return;
             }
 
+            // Métodos de pago seleccionados (independientes)
             const pagos = Array.from(document.querySelectorAll('#pagoGroup input[type="checkbox"]:checked')).map(cb => cb.value);
             mensaje += `\n\n💳 *Pago:* ${pagos.length ? pagos.join(', ') : 'No especificado'}`;
 
+            // Formas de envío seleccionadas
             const envios = Array.from(document.querySelectorAll('#envioGroup input[type="checkbox"]:checked')).map(cb =>
                 cb.value === 'retiro' ? 'Retiro en local' : 'Entrega a domicilio'
             );
