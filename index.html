@@ -378,6 +378,7 @@
             background: #e0e0e0;
         }
 
+        /* ===== PIE DE PÁGINA (dos líneas centradas) ===== */
         .footnote {
             text-align: center;
             font-size: 0.7rem;
@@ -385,6 +386,11 @@
             margin-top: 16px;
             border-top: 1px solid #2f4a2f;
             padding-top: 14px;
+            line-height: 1.6;
+        }
+
+        .footnote span {
+            display: block;
         }
 
         .text-muted {
@@ -458,6 +464,9 @@
             .status-card .horario {
                 font-size: 0.75rem;
             }
+            .footnote {
+                font-size: 0.75rem;
+            }
         }
     </style>
 </head>
@@ -523,7 +532,12 @@
             </div>
 
             <button class="btn-send" id="sendBtn">📲 ENVIAR PEDIDO</button>
-            <div class="footnote">Todas nuestras burgers vienen con papas · · · Tu hambre, nuestro ritmo</div>
+
+            <!-- PIE DE PÁGINA MODIFICADO: dos líneas centradas -->
+            <div class="footnote">
+                <span>Todas nuestras burgers vienen con papas</span>
+                <span>Tu hambre, nuestro ritmo</span>
+            </div>
         </div>
 
     </div>
@@ -537,16 +551,14 @@
             const dia = now.getDay(); // 0=domingo, 1=lunes, ..., 6=sábado
             const hora = now.getHours();
             const minutos = now.getMinutes();
-            const horaMin = hora + minutos / 60; // para comparar más fácil
+            const horaMin = hora + minutos / 60;
 
-            let estado = 'cerrado'; // 'abierto', 'casi', 'cerrado'
+            let estado = 'cerrado';
             let texto = '';
 
-            // Lunes (1) cerrado
             if (dia === 1) {
                 estado = 'cerrado';
             } else {
-                // Martes a domingo
                 if (horaMin >= 20 && horaMin < 23.5) {
                     estado = 'abierto';
                 } else if (horaMin >= 23.5 && horaMin < 24) {
@@ -559,7 +571,6 @@
             const card = document.getElementById('statusCard');
             const text = document.getElementById('statusText');
 
-            // Quitar clases previas
             card.classList.remove('abierto', 'cerrado', 'casi');
 
             if (estado === 'abierto') {
@@ -835,7 +846,6 @@
             const metodoPago = document.getElementById('metodoPago').value;
             mensaje += `\n\n💳 *Pago:* ${metodoPago}`;
 
-            // Si es Transferencia, agregar alias y solicitud de comprobante
             if (metodoPago === 'Transferencia') {
                 mensaje += `\n📌 *Alias:* Tech.burguer`;
                 mensaje += `\n📎 *Importante:* Por favor, enviá el comprobante de transferencia para confirmar el pedido.`;
