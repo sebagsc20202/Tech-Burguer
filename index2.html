@@ -435,7 +435,7 @@
             border-radius: 10px;
         }
 
-        /* ===== MODAL DE CANTIDAD (botón 0 = "Elijo otra Tech...") ===== */
+        /* ===== MODAL DE CANTIDAD ===== */
         .qty-modal {
             display: none;
             position: fixed;
@@ -469,6 +469,7 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             justify-items: center;
+            margin-bottom: 12px;
         }
 
         .qty-grid button {
@@ -499,25 +500,34 @@
             pointer-events: none;
         }
 
-        /* Estilo para el botón "Elijo otra Tech..." (antes 0) */
-        .qty-grid .btn-otro {
-            font-size: 0.75rem !important;
-            font-weight: 600;
-            padding: 0 4px;
-            background: #3a2a1a;
-            border: 2px solid #ffb703;
-            color: #ffb703;
-            aspect-ratio: auto;
-            border-radius: 30px;
+        /* Botón ancho completo */
+        .btn-otro-wrapper {
             width: 100%;
-            height: 100%;
-            min-height: 70px;
-            line-height: 1.2;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            margin-top: 4px;
         }
 
-        .qty-grid .btn-otro:active {
+        .btn-otro-wrapper button {
+            width: 100%;
+            max-width: 100%;
+            border: 2px solid #ffb703;
+            border-radius: 40px;
+            background: #3a2a1a;
+            color: #ffb703;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 14px 10px;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .btn-otro-wrapper button:active {
             background: #5a3a2a;
+            transform: scale(0.97);
         }
 
         /* ===== RESPONSIVE ===== */
@@ -583,10 +593,9 @@
             .qty-modal-content {
                 padding: 24px 16px 16px;
             }
-            .qty-grid .btn-otro {
-                font-size: 0.65rem !important;
-                min-height: 60px;
-                padding: 2px;
+            .btn-otro-wrapper button {
+                font-size: 0.9rem;
+                padding: 12px 8px;
             }
         }
     </style>
@@ -658,7 +667,7 @@
 
     </div>
 
-    <!-- ===== MODAL DE CANTIDAD (botón 8 normal, botón 0 = "Elijo otra Tech...") ===== -->
+    <!-- ===== MODAL DE CANTIDAD (botón "Elijo otra Tech..." ancho completo) ===== -->
     <div id="qtyModal" class="qty-modal">
         <div class="qty-modal-content">
             <div class="qty-grid">
@@ -672,8 +681,11 @@
                 <button data-value="8">8</button>
                 <button data-value="9">9</button>
                 <span class="qty-empty"></span>
-                <button data-value="0" class="btn-otro">Elijo otra Tech...</button>
                 <span class="qty-empty"></span>
+                <span class="qty-empty"></span>
+            </div>
+            <div class="btn-otro-wrapper">
+                <button data-value="0">Elijo otra Tech...</button>
             </div>
         </div>
     </div>
@@ -884,6 +896,7 @@
         let currentInput = null;
         const modal = document.getElementById('qtyModal');
         const modalButtons = modal.querySelectorAll('.qty-grid button');
+        const btnOtro = modal.querySelector('.btn-otro-wrapper button');
 
         function openModalForInput(input) {
             if (input) {
@@ -918,11 +931,12 @@
             }
         });
 
+        // Botones numéricos (1-9)
         modalButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const val = parseInt(this.dataset.value, 10);
-                if (!isNaN(val) && val >= 0 && val <= 9) {
+                if (!isNaN(val) && val >= 1 && val <= 9) {
                     if (currentInput) {
                         currentInput.value = val;
                         const evt = new Event('input', { bubbles: true });
@@ -931,6 +945,17 @@
                 }
                 closeModal();
             });
+        });
+
+        // Botón "Elijo otra Tech..." (asigna 0)
+        btnOtro.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (currentInput) {
+                currentInput.value = 0;
+                const evt = new Event('input', { bubbles: true });
+                currentInput.dispatchEvent(evt);
+            }
+            closeModal();
         });
 
         modal.addEventListener('click', function(e) {
@@ -997,7 +1022,7 @@
         updateTotal();
 
         // ============================================================
-        //  ENVÍO POR WHATSAPP con enlace a Google Maps para retiro
+        //  ENVÍO POR WHATSAPP
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
         const MAPS_URL = 'https://maps.app.goo.gl/7iPEqgpxnHL7By726';
@@ -1062,7 +1087,8 @@
                 mensaje += `\n📍 *Dirección:* ${direccionInput.value.trim()}`;
                 mensaje += `\n🚚 *Costo envío:* $${COSTO_ENVIO.toLocaleString()}`;
             } else {
-                mensaje += `\n📍 *Ubicación:* ${MAPS_URL}`;
+                // Cambio aquí: el texto del enlace ahora es "Retirala en este lugar!"
+                mensaje += `\n📍 *Retirala en este lugar!* ${MAPS_URL}`;
             }
 
             mensaje += `\n\n💰 *TOTAL:* $${calcularTotal().toLocaleString()}`;
