@@ -251,7 +251,7 @@
             gap: 4px;
         }
 
-        /* ===== ELIMINAMOS LA ETIQUETA "Cant." ===== */
+        /* ===== OCULTAMOS LA ETIQUETA "Cant." ===== */
         .product-extras .qty-wrap label {
             display: none;
         }
@@ -435,7 +435,7 @@
             border-radius: 10px;
         }
 
-        /* ===== MODAL DE CANTIDAD (patrón numérico con 0) ===== */
+        /* ===== MODAL DE CANTIDAD (sin título, con 0 centrado debajo del 8) ===== */
         .qty-modal {
             display: none;
             position: fixed;
@@ -462,15 +462,6 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
             max-width: 320px;
             width: 90%;
-        }
-
-        .qty-modal-title {
-            text-align: center;
-            color: #ffb703;
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
         }
 
         .qty-grid {
@@ -512,8 +503,9 @@
             background: #5a3a2a;
         }
 
-        .qty-grid span {
-            display: none; /* celdas vacías para la fila del 0 */
+        .qty-grid .qty-empty {
+            visibility: hidden;
+            pointer-events: none;
         }
 
         /* ===== RESPONSIVE ===== */
@@ -649,10 +641,9 @@
 
     </div>
 
-    <!-- ===== MODAL DE CANTIDAD (con botón 0) ===== -->
+    <!-- ===== MODAL DE CANTIDAD (sin título, 0 centrado) ===== -->
     <div id="qtyModal" class="qty-modal">
         <div class="qty-modal-content">
-            <div class="qty-modal-title">Cantidad</div>
             <div class="qty-grid">
                 <button data-value="1">1</button>
                 <button data-value="2">2</button>
@@ -663,9 +654,9 @@
                 <button data-value="7">7</button>
                 <button data-value="8">8</button>
                 <button data-value="9">9</button>
-                <span></span>
+                <span class="qty-empty"></span>
                 <button data-value="0" class="qty-zero">0</button>
-                <span></span>
+                <span class="qty-empty"></span>
             </div>
         </div>
     </div>
@@ -820,7 +811,7 @@
 
                 const qtyWrap = document.createElement('div');
                 qtyWrap.className = 'qty-wrap';
-                // Eliminamos la etiqueta "Cant." del HTML (solo input)
+                // Input sin etiqueta "Cant."
                 const qtyInput = document.createElement('input');
                 qtyInput.type = 'number';
                 qtyInput.min = 0;
