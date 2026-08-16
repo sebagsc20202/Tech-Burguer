@@ -21,6 +21,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            font-size: 16px;
         }
 
         .container {
@@ -53,6 +54,22 @@
 
         .brand .tagline span {
             color: #ffb703;
+        }
+
+        /* Estado ABIERTO/CERRADO */
+        .status {
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-top: 4px;
+            padding: 4px 0;
+            letter-spacing: 1px;
+        }
+        .status.abierto {
+            color: #4caf50;
+        }
+        .status.cerrado {
+            color: #f44336;
         }
 
         /* ===== PRODUCT CARDS ===== */
@@ -194,6 +211,7 @@
             color: #b8d0b8;
         }
 
+        /* ===== TOPPINGS (checkbox) ===== */
         .toppings-group {
             display: flex;
             flex-wrap: wrap;
@@ -287,32 +305,6 @@
             display: block;
         }
 
-        /* Grupos de checkboxes */
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px 18px;
-            padding-top: 4px;
-        }
-
-        .checkbox-group label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 400;
-            color: #d0e0d0;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            accent-color: #e63946;
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            pointer-events: auto;
-        }
-
         .total-box {
             background: #1a2e1a;
             border-radius: 60px;
@@ -388,6 +380,52 @@
             background: #e63946;
             border-radius: 10px;
         }
+
+        /* ===== AUMENTO DE LETRA EN CELULARES ===== */
+        @media (max-width: 480px) {
+            body {
+                font-size: 17px;
+            }
+            .product-name {
+                font-size: 1.2rem;
+            }
+            .product-price {
+                font-size: 1.2rem;
+            }
+            .product-desc {
+                font-size: 0.9rem;
+            }
+            .product-extras label {
+                font-size: 0.9rem;
+            }
+            .toppings-group label {
+                font-size: 0.85rem;
+            }
+            .form-group label {
+                font-size: 0.95rem;
+            }
+            .form-group input,
+            .form-group select {
+                font-size: 1rem;
+                padding: 14px 16px;
+            }
+            .total-box .amount {
+                font-size: 1.8rem;
+            }
+            .btn-send {
+                font-size: 1.3rem;
+                padding: 18px;
+            }
+            .brand .tagline {
+                font-size: 1rem;
+            }
+            .form-section h2 {
+                font-size: 1.2rem;
+            }
+            .status {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -397,6 +435,8 @@
         <div class="brand">
             <img src="images/logo_tech.png" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
+            <!-- Estado ABIERTO/CERRADO -->
+            <div class="status" id="statusIndicator">⏳ Cargando...</div>
         </div>
 
         <!-- PRODUCTOS -->
@@ -416,29 +456,31 @@
                 <input type="tel" id="telefono" placeholder="Ej: 351 8692251" required autocomplete="tel" />
             </div>
 
-            <!-- PAGO - clase 'pago-checkbox' -->
+            <!-- PAGO: menú desplegable -->
             <div class="form-group">
-                <label>Método de pago (podés elegir varios)</label>
-                <div class="checkbox-group" id="pagoGroup">
-                    <label><input type="checkbox" class="pago-checkbox" value="Efectivo" checked /> Efectivo</label>
-                    <label><input type="checkbox" class="pago-checkbox" value="Débito/Crédito" /> Débito/Crédito</label>
-                    <label><input type="checkbox" class="pago-checkbox" value="Transferencia" /> Transferencia</label>
-                    <label><input type="checkbox" class="pago-checkbox" value="QR" /> QR</label>
-                </div>
+                <label for="metodoPago">Método de pago</label>
+                <select id="metodoPago">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Débito/Crédito">Débito/Crédito</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="QR">QR</option>
+                </select>
             </div>
 
-            <!-- ENVÍO - clase 'envio-checkbox' -->
+            <!-- ENVÍO: menú desplegable -->
             <div class="form-group">
-                <label>Forma de envío (podés elegir varias)</label>
-                <div class="checkbox-group" id="envioGroup">
-                    <label><input type="checkbox" class="envio-checkbox" value="retiro" checked /> Retiro en local</label>
-                    <label><input type="checkbox" class="envio-checkbox" value="entrega" /> Entrega a domicilio</label>
-                </div>
+                <label for="formaEnvio">Forma de envío</label>
+                <select id="formaEnvio">
+                    <option value="retiro">Retiro en local</option>
+                    <option value="entrega">Entrega a domicilio</option>
+                </select>
                 <div class="address-field" id="addressField">
                     <label for="direccion">Dirección de entrega</label>
                     <input type="text" id="direccion" placeholder="Calle, número, piso, etc." autocomplete="street-address" />
                 </div>
-                <div class="text-muted mt-1">🚚 Costo de envío: <strong style="color:#ffb703;">$2.500</strong> (se suma si se selecciona "Entrega")</div>
+                <!-- Texto eliminado: ya no aparece "(se suma si se selecciona 'Entrega a domicilio')" -->
+                <!-- Solo mantenemos el ícono y el costo, pero sin el texto extra -->
+                <div class="text-muted mt-1" style="display: none;"></div>
             </div>
 
             <!-- TOTAL -->
@@ -454,6 +496,50 @@
     </div>
 
     <script>
+        // ============================================================
+        //  INDICADOR ABIERTO/CERRADO
+        // ============================================================
+        function actualizarEstado() {
+            const now = new Date();
+            const dia = now.getDay(); // 0=domingo, 1=lunes, ..., 6=sábado
+            const hora = now.getHours();
+            const minutos = now.getMinutes();
+
+            // Horario: martes (2) a domingo (0) de 20:00 a 23:59 (00:00 inclusive)
+            let abierto = false;
+
+            // Si es lunes (1) -> cerrado
+            if (dia === 1) {
+                abierto = false;
+            } else {
+                // Martes a domingo
+                // Abre a las 20:00
+                if (hora >= 20 && hora < 24) {
+                    abierto = true;
+                } else if (hora === 0 && minutos === 0) {
+                    // A las 00:00 sigue abierto (hasta las 00:00 inclusive)
+                    // Pero como es la hora exacta, consideramos abierto solo si no es lunes
+                    // ya que el lunes está excluido arriba
+                    abierto = (dia !== 1);
+                } else {
+                    abierto = false;
+                }
+            }
+
+            const statusDiv = document.getElementById('statusIndicator');
+            if (abierto) {
+                statusDiv.textContent = '🟢 ABIERTO · hasta las 00:00';
+                statusDiv.className = 'status abierto';
+            } else {
+                statusDiv.textContent = '🔴 CERRADO · Horario: mar-dom 20:00-00:00';
+                statusDiv.className = 'status cerrado';
+            }
+        }
+
+        // Ejecutar al cargar y cada minuto
+        actualizarEstado();
+        setInterval(actualizarEstado, 60000);
+
         // ============================================================
         //  DATOS DE PRODUCTOS (imágenes locales)
         // ============================================================
@@ -502,13 +588,14 @@
             imagen: 'images/cla.jpg'
         }];
 
+        // Toppings completos (incluye Mostaza)
         const TOPPINGS = [
             'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
             'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
         ];
 
         // ============================================================
-        //  RENDER PRODUCTOS (con cantidad inicial 1)
+        //  RENDER PRODUCTOS (cantidades iniciales en 0)
         // ============================================================
         const grid = document.getElementById('productGrid');
 
@@ -555,7 +642,7 @@
                 const qtyInput = document.createElement('input');
                 qtyInput.type = 'number';
                 qtyInput.min = 0;
-                qtyInput.value = 1; // <-- inicializado en 1 para autocompletar
+                qtyInput.value = 0;
                 qtyInput.dataset.productId = p.id;
                 qtyInput.className = 'qty-input';
                 qtyWrap.appendChild(qtyLabel);
@@ -603,19 +690,16 @@
         renderProducts();
 
         // ============================================================
-        //  TOTAL Y ENVÍO (completamente separados)
+        //  TOTAL Y ENVÍO (con select)
         // ============================================================
-        const envioCheckboxes = document.querySelectorAll('.envio-checkbox');
+        const formaEnvioSelect = document.getElementById('formaEnvio');
         const addressField = document.getElementById('addressField');
         const direccionInput = document.getElementById('direccion');
         const totalDisplay = document.getElementById('totalDisplay');
         const COSTO_ENVIO = 2500;
 
         function isEntregaSelected() {
-            for (let cb of envioCheckboxes) {
-                if (cb.value === 'entrega' && cb.checked) return true;
-            }
-            return false;
+            return formaEnvioSelect.value === 'entrega';
         }
 
         function toggleAddress() {
@@ -626,16 +710,14 @@
             }
         }
 
-        // Eventos solo para envío
-        envioCheckboxes.forEach(cb => {
-            cb.addEventListener('change', toggleAddress);
-            cb.addEventListener('change', updateTotal);
+        // Evento cambio en envío
+        formaEnvioSelect.addEventListener('change', function() {
+            toggleAddress();
+            updateTotal();
         });
 
-        // Eventos solo para pago (no afectan el total, pero actualizan por si acaso)
-        document.querySelectorAll('.pago-checkbox').forEach(cb => {
-            cb.addEventListener('change', updateTotal);
-        });
+        // También el método de pago solo actualiza total (no afecta monto)
+        document.getElementById('metodoPago').addEventListener('change', updateTotal);
 
         toggleAddress();
 
@@ -665,7 +747,7 @@
             }
         });
 
-        // Actualizar total al cargar
+        // Actualizar total al cargar (todas las cantidades en 0)
         updateTotal();
 
         // ============================================================
@@ -718,15 +800,13 @@
                 return;
             }
 
-            // Métodos de pago
-            const pagos = Array.from(document.querySelectorAll('.pago-checkbox:checked')).map(cb => cb.value);
-            mensaje += `\n\n💳 *Pago:* ${pagos.length ? pagos.join(', ') : 'No especificado'}`;
+            // Método de pago (selección única)
+            const metodoPago = document.getElementById('metodoPago').value;
+            mensaje += `\n\n💳 *Pago:* ${metodoPago}`;
 
-            // Formas de envío
-            const envios = Array.from(document.querySelectorAll('.envio-checkbox:checked')).map(cb =>
-                cb.value === 'retiro' ? 'Retiro en local' : 'Entrega a domicilio'
-            );
-            mensaje += `\n🚚 *Envío:* ${envios.length ? envios.join(', ') : 'No especificado'}`;
+            // Forma de envío (selección única)
+            const envioLabel = isEntregaSelected() ? 'Entrega a domicilio' : 'Retiro en local';
+            mensaje += `\n🚚 *Envío:* ${envioLabel}`;
             if (isEntregaSelected()) {
                 mensaje += `\n📍 *Dirección:* ${direccionInput.value.trim()}`;
                 mensaje += `\n🚚 *Costo envío:* $${COSTO_ENVIO.toLocaleString()}`;
