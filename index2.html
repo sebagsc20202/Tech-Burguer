@@ -102,7 +102,7 @@
             margin-top: 4px;
         }
 
-        /* ===== TOAST DE CONFIRMACIÓN (modal centrado) ===== */
+        /* ===== TOAST DE CONFIRMACIÓN ===== */
         .toast-confirm {
             position: fixed;
             top: 0;
@@ -540,6 +540,35 @@
             display: block;
         }
 
+        /* ===== OPCIONES DE PAGO CONDICIONALES ===== */
+        .pago-option {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 400;
+            color: #d0e0d0;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .pago-option input[type="radio"] {
+            accent-color: #e63946;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .pago-option.oculto {
+            display: none !important;
+        }
+
+        .pago-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 18px;
+            padding-top: 4px;
+        }
+
         .envio-leyenda {
             font-size: 0.85rem;
             color: #ffb703;
@@ -973,12 +1002,20 @@
 
             <div class="form-group">
                 <label for="metodoPago">Método de pago</label>
-                <select id="metodoPago">
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Débito/Crédito">Débito/Crédito</option>
-                    <option value="Transferencia">Transferencia</option>
-                    <option value="QR">QR</option>
-                </select>
+                <div class="pago-group" id="pagoGroup">
+                    <label class="pago-option">
+                        <input type="radio" name="metodoPago" value="Efectivo" checked /> Efectivo
+                    </label>
+                    <label class="pago-option">
+                        <input type="radio" name="metodoPago" value="Débito/Crédito" /> Débito/Crédito
+                    </label>
+                    <label class="pago-option">
+                        <input type="radio" name="metodoPago" value="Transferencia" /> Transferencia
+                    </label>
+                    <label class="pago-option">
+                        <input type="radio" name="metodoPago" value="QR" /> QR
+                    </label>
+                </div>
             </div>
 
             <div class="form-group">
@@ -1201,7 +1238,6 @@
                 card.className = 'product-card';
                 card.dataset.id = p.id;
 
-                // Botón de cancelar (X)
                 const cancelBtn = document.createElement('button');
                 cancelBtn.className = 'btn-cancelar-item';
                 cancelBtn.dataset.productId = p.id;
@@ -1336,7 +1372,7 @@
         }
 
         // ============================================================
-        //  MODALES Y EVENTOS DE CLIC (SOLO EN INPUTS)
+        //  MODALES Y EVENTOS DE CLIC
         // ============================================================
 
         let currentInput = null;
@@ -1376,7 +1412,6 @@
             currentMedInput = null;
         }
 
-        // Evento de clic en el grid (solo inputs)
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
 
@@ -1390,7 +1425,6 @@
                 return;
             }
 
-            // Botón de cancelar en la tarjeta
             if (target.classList.contains('btn-cancelar-item')) {
                 const productId = target.dataset.productId;
                 if (productId) {
@@ -1400,7 +1434,6 @@
             }
         });
 
-        // Botones del modal de cantidad (1-9)
         modalButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -1421,7 +1454,6 @@
             });
         });
 
-        // Cerrar modal
         btnCerrarModal.addEventListener('click', function() {
             closeModal();
         });
@@ -1432,7 +1464,6 @@
             }
         });
 
-        // Botones del modal de medallones (1, 2, 3)
         medButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -1460,9 +1491,49 @@
         });
 
         // ============================================================
-        //  TOTAL Y ENVÍO
+        //  CONTROL DE MÉTODOS DE PAGO SEGÚN ENVÍO
         // ============================================================
         const formaEnvioSelect = document.getElementById('formaEnvio');
+        const pagoRadios = document.querySelectorAll('input[name="metodoPago"]');
+        const pagoOptions = document.querySelectorAll('.pago-option');
+
+        function actualizarPagosSegunEnvio() {
+            const esEntrega = formaEnvioSelect.value === 'entrega';
+
+            pagoOptions.forEach((option, index) => {
+                const radio = pagoRadios[index];
+                const valor = radio.value;
+                if (esEntrega) {
+                    // Solo Efectivo y Transferencia
+                    if (valor === 'Efectivo' || valor === 'Transferencia') {
+                        option.classList.remove('oculto');
+                    } else {
+                        option.classList.add('oculto');
+                        if (radio.checked) {
+                            radio.checked = false;
+                            // Seleccionar Efectivo por defecto si estaba seleccionado
+                            const efectivoRadio = document.querySelector('input[name="metodoPago"][value="Efectivo"]');
+                            if (efectivoRadio) efectivoRadio.checked = true;
+                        }
+                    }
+                } else {
+                    option.classList.remove('oculto');
+                }
+            });
+        }
+
+        formaEnvioSelect.addEventListener('change', function() {
+            toggleAddress();
+            actualizarPagosSegunEnvio();
+            updateTotal();
+        });
+
+        // Ejecutar al cargar
+        setTimeout(actualizarPagosSegunEnvio, 100);
+
+        // ============================================================
+        //  TOTAL Y ENVÍO
+        // ============================================================
         const addressField = document.getElementById('addressField');
         const direccionInput = document.getElementById('direccion');
         const totalDisplay = document.getElementById('totalDisplay');
@@ -1479,13 +1550,6 @@
                 addressField.classList.remove('active');
             }
         }
-
-        formaEnvioSelect.addEventListener('change', function() {
-            toggleAddress();
-            updateTotal();
-        });
-
-        document.getElementById('metodoPago').addEventListener('change', updateTotal);
 
         toggleAddress();
 
@@ -1584,10 +1648,11 @@
                 html += `</div>`;
             }
 
-            const metodoPago = document.getElementById('metodoPago').value;
+            const metodoPago = document.querySelector('input[name="metodoPago"]:checked');
+            const pagoValue = metodoPago ? metodoPago.value : 'No especificado';
             html += `<div class="resumen-item" style="border-bottom:1px solid #2f4a2f;">`;
-            html += `💳 Pago: ${metodoPago}`;
-            if (metodoPago === 'Transferencia') {
+            html += `💳 Pago: ${pagoValue}`;
+            if (pagoValue === 'Transferencia') {
                 html += `<br><span style="font-size:0.8rem;color:#b8d0b8;padding-left:16px;">📌 Alias: Tech.burguer</span>`;
                 html += `<br><span style="font-size:0.8rem;color:#b8d0b8;padding-left:16px;">📎 Enviá el comprobante para confirmar</span>`;
             }
@@ -1673,10 +1738,11 @@
                 return;
             }
 
-            const metodoPago = document.getElementById('metodoPago').value;
-            mensaje += `\n\n💳 *Pago:* ${metodoPago}`;
+            const metodoPago = document.querySelector('input[name="metodoPago"]:checked');
+            const pagoValue = metodoPago ? metodoPago.value : 'No especificado';
+            mensaje += `\n\n💳 *Pago:* ${pagoValue}`;
 
-            if (metodoPago === 'Transferencia') {
+            if (pagoValue === 'Transferencia') {
                 mensaje += `\n📌 *Alias:* Tech.burguer`;
                 mensaje += `\n📎 *Importante:* Por favor, enviá el comprobante de transferencia para confirmar el pedido.`;
             }
