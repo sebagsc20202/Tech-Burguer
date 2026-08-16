@@ -447,7 +447,7 @@
             border-radius: 10px;
         }
 
-        /* ===== MODAL DE CANTIDAD ===== */
+        /* ===== MODAL DE CANTIDAD (para productos) ===== */
         .qty-modal {
             display: none;
             position: fixed;
@@ -512,7 +512,7 @@
             pointer-events: none;
         }
 
-        /* Botón ancho completo */
+        /* Botón ancho completo (Elijo otra Tech...) */
         .btn-otro-wrapper {
             width: 100%;
             display: flex;
@@ -539,6 +539,96 @@
 
         .btn-otro-wrapper button:active {
             background: #5a3a2a;
+            transform: scale(0.97);
+        }
+
+        /* ===== MODAL DE MEDALLONES EXTRA (1, 2, 3) ===== */
+        .med-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .med-modal.active {
+            display: flex;
+        }
+
+        .med-modal-content {
+            background: #1f331f;
+            border-radius: 24px;
+            padding: 28px 20px 20px;
+            border: 2px solid #3a5a3a;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            max-width: 280px;
+            width: 85%;
+            text-align: center;
+        }
+
+        .med-modal-title {
+            color: #ffb703;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .med-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            justify-items: center;
+            margin-bottom: 16px;
+        }
+
+        .med-grid button {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-width: 70px;
+            border: none;
+            border-radius: 50%;
+            background: #2a4a2a;
+            color: #fff;
+            font-size: 1.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .med-grid button:active {
+            transform: scale(0.92);
+            background: #3a6a3a;
+        }
+
+        .med-cancelar {
+            width: 100%;
+            border: 2px solid #f44336;
+            border-radius: 40px;
+            background: #3a1a1a;
+            color: #ff6b6b;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 12px 10px;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .med-cancelar:active {
+            background: #5a2a2a;
             transform: scale(0.97);
         }
 
@@ -601,7 +691,6 @@
                 font-size: 0.8rem;
                 padding: 6px 10px;
             }
-
             .qty-grid button {
                 font-size: 1.6rem;
                 max-width: 70px;
@@ -612,6 +701,18 @@
             .btn-otro-wrapper button {
                 font-size: 0.9rem;
                 padding: 12px 8px;
+            }
+            .med-grid button {
+                font-size: 1.6rem;
+                max-width: 60px;
+            }
+            .med-modal-content {
+                padding: 24px 16px 16px;
+                max-width: 250px;
+            }
+            .med-cancelar {
+                font-size: 0.9rem;
+                padding: 10px 8px;
             }
         }
     </style>
@@ -665,7 +766,6 @@
                 <div class="address-field" id="addressField">
                     <label for="direccion">Dirección de entrega</label>
                     <input type="text" id="direccion" placeholder="Calle, número, piso, etc." autocomplete="street-address" />
-                    <!-- LEYENDA DE COSTO DE ENVÍO -->
                     <div class="envio-leyenda">
                         🚚 La entrega tiene un costo adicional de <strong>$3.000</strong> que se suma al total de tu compra.
                     </div>
@@ -687,7 +787,7 @@
 
     </div>
 
-    <!-- ===== MODAL DE CANTIDAD ===== -->
+    <!-- ===== MODAL DE CANTIDAD (para productos) ===== -->
     <div id="qtyModal" class="qty-modal">
         <div class="qty-modal-content">
             <div class="qty-grid">
@@ -707,6 +807,19 @@
             <div class="btn-otro-wrapper">
                 <button data-value="0">Elijo otra Tech...</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE MEDALLONES EXTRA (1, 2, 3) ===== -->
+    <div id="medModal" class="med-modal">
+        <div class="med-modal-content">
+            <div class="med-modal-title">➕ Medallones extra</div>
+            <div class="med-grid">
+                <button data-value="1">1</button>
+                <button data-value="2">2</button>
+                <button data-value="3">3</button>
+            </div>
+            <button class="med-cancelar" id="medCancelar">Cancelar</button>
         </div>
     </div>
 
@@ -879,6 +992,7 @@
                     medInput.value = 0;
                     medInput.className = 'med-extra-input';
                     medInput.dataset.productId = p.id;
+                    medInput.readOnly = true; // Para que abra el modal en lugar de teclado
                     extraMed.appendChild(medInput);
                     extras.appendChild(extraMed);
 
@@ -911,13 +1025,22 @@
         renderProducts();
 
         // ============================================================
-        //  MODAL DE CANTIDAD Y EVENTOS DE CLIC EN TARJETAS
+        //  MODALES Y EVENTOS DE CLIC
         // ============================================================
+
+        // ----- Modal de cantidad (productos) -----
         let currentInput = null;
         const modal = document.getElementById('qtyModal');
         const modalButtons = modal.querySelectorAll('.qty-grid button');
         const btnOtro = modal.querySelector('.btn-otro-wrapper button');
 
+        // ----- Modal de medallones extra -----
+        let currentMedInput = null;
+        const medModal = document.getElementById('medModal');
+        const medButtons = medModal.querySelectorAll('.med-grid button');
+        const medCancelar = document.getElementById('medCancelar');
+
+        // ----- Funciones de apertura/cierre -----
         function openModalForInput(input) {
             if (input) {
                 currentInput = input;
@@ -930,18 +1053,40 @@
             currentInput = null;
         }
 
+        function openMedModalForInput(input) {
+            if (input) {
+                currentMedInput = input;
+                medModal.classList.add('active');
+            }
+        }
+
+        function closeMedModal() {
+            medModal.classList.remove('active');
+            currentMedInput = null;
+        }
+
+        // ----- Evento de clic en el grid de productos (delegación) -----
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
 
+            // Si se hace clic en un input de cantidad
             if (target.classList.contains('qty-input')) {
                 openModalForInput(target);
                 return;
             }
 
-            if (target.matches('input[type="checkbox"], .med-extra-input')) {
+            // Si se hace clic en un input de medallones extra
+            if (target.classList.contains('med-extra-input')) {
+                openMedModalForInput(target);
                 return;
             }
 
+            // Si se hace clic en checkbox o medallones extra (por si acaso) no hacer nada
+            if (target.matches('input[type="checkbox"]')) {
+                return;
+            }
+
+            // Clic en cualquier otra parte de la tarjeta (para abrir cantidad)
             const card = target.closest('.product-card');
             if (card) {
                 const qtyInput = card.querySelector('.qty-input');
@@ -951,7 +1096,7 @@
             }
         });
 
-        // Botones numéricos (1-9)
+        // ----- Botones del modal de cantidad (1-9) -----
         modalButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -978,9 +1123,39 @@
             closeModal();
         });
 
+        // Cerrar modal de cantidad al hacer clic en el fondo
         modal.addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
+            }
+        });
+
+        // ----- Botones del modal de medallones (1, 2, 3) -----
+        medButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const val = parseInt(this.dataset.value, 10);
+                if (!isNaN(val) && val >= 1 && val <= 3) {
+                    if (currentMedInput) {
+                        currentMedInput.value = val;
+                        const evt = new Event('input', { bubbles: true });
+                        currentMedInput.dispatchEvent(evt);
+                    }
+                }
+                closeMedModal();
+            });
+        });
+
+        // Botón Cancelar (cierra sin cambios)
+        medCancelar.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeMedModal();
+        });
+
+        // Cerrar modal de medallones al hacer clic en el fondo
+        medModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeMedModal();
             }
         });
 
@@ -1042,7 +1217,7 @@
         updateTotal();
 
         // ============================================================
-        //  ENVÍO POR WHATSAPP (con separación entre Pago y Envío)
+        //  ENVÍO POR WHATSAPP
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
         const MAPS_URL_LOCAL = 'https://bit.ly/4xOCf1o';
@@ -1100,7 +1275,6 @@
                 mensaje += `\n📎 *Importante:* Por favor, enviá el comprobante de transferencia para confirmar el pedido.`;
             }
 
-            // ==== SEPARACIÓN ENTRE PAGO Y ENVÍO (salto de línea) ====
             mensaje += `\n`;
 
             const envioLabel = isEntregaSelected() ? 'Entrega a domicilio' : 'Retiro en local';
