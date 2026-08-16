@@ -274,7 +274,6 @@
             display: flex;
             gap: 14px;
             align-items: flex-start;
-            /* cursor: pointer;  ELIMINADO */
         }
 
         .product-card:hover {
@@ -1328,11 +1327,31 @@
             });
         });
 
-        // Botón "Elijo otra Tech..." (asigna 0)
+        // Botón "Cancelar esta Tech" (asigna 0 y resetea extras)
         btnOtro.addEventListener('click', function(e) {
             e.stopPropagation();
             if (currentInput) {
                 currentInput.value = 0;
+                const productId = currentProductId;
+                if (productId) {
+                    const product = PRODUCTS.find(p => p.id === productId);
+                    if (product && product.hasExtras) {
+                        // Resetear medallones extra
+                        const medInput = document.querySelector(`.med-extra-input[data-product-id="${productId}"]`);
+                        if (medInput) {
+                            medInput.value = 0;
+                            const evtMed = new Event('input', { bubbles: true });
+                            medInput.dispatchEvent(evtMed);
+                        }
+                        // Desmarcar checkboxes de toppings
+                        const checks = document.querySelectorAll(`.topping-check[data-product-id="${productId}"]:checked`);
+                        checks.forEach(cb => {
+                            cb.checked = false;
+                            const evtChk = new Event('change', { bubbles: true });
+                            cb.dispatchEvent(evtChk);
+                        });
+                    }
+                }
                 const evt = new Event('input', { bubbles: true });
                 currentInput.dispatchEvent(evt);
             }
