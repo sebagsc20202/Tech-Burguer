@@ -36,7 +36,7 @@
         }
 
         .brand .logo {
-            max-width: 180px;
+            max-width: 270px; /* Aumentado 50% (180px → 270px) */
             width: 100%;
             height: auto;
             display: block;
@@ -425,6 +425,10 @@
             .status {
                 font-size: 1rem;
             }
+            /* Ajuste del logo en móviles si es necesario */
+            .brand .logo {
+                max-width: 220px; /* un poco más pequeño en móviles para no ocupar todo, pero sigue siendo 50% más grande que antes (180*1.5=270, en móvil lo dejamos en 220 para que no se vea enorme) */
+            }
         }
     </style>
 </head>
@@ -479,8 +483,6 @@
                     <input type="text" id="direccion" placeholder="Calle, número, piso, etc." autocomplete="street-address" />
                 </div>
                 <!-- Texto eliminado: ya no aparece "(se suma si se selecciona 'Entrega a domicilio')" -->
-                <!-- Solo mantenemos el ícono y el costo, pero sin el texto extra -->
-                <div class="text-muted mt-1" style="display: none;"></div>
             </div>
 
             <!-- TOTAL -->
@@ -505,21 +507,16 @@
             const hora = now.getHours();
             const minutos = now.getMinutes();
 
-            // Horario: martes (2) a domingo (0) de 20:00 a 23:59 (00:00 inclusive)
             let abierto = false;
 
-            // Si es lunes (1) -> cerrado
+            // Lunes (1) cerrado
             if (dia === 1) {
                 abierto = false;
             } else {
                 // Martes a domingo
-                // Abre a las 20:00
                 if (hora >= 20 && hora < 24) {
                     abierto = true;
                 } else if (hora === 0 && minutos === 0) {
-                    // A las 00:00 sigue abierto (hasta las 00:00 inclusive)
-                    // Pero como es la hora exacta, consideramos abierto solo si no es lunes
-                    // ya que el lunes está excluido arriba
                     abierto = (dia !== 1);
                 } else {
                     abierto = false;
@@ -536,7 +533,6 @@
             }
         }
 
-        // Ejecutar al cargar y cada minuto
         actualizarEstado();
         setInterval(actualizarEstado, 60000);
 
@@ -588,7 +584,6 @@
             imagen: 'images/cla.jpg'
         }];
 
-        // Toppings completos (incluye Mostaza)
         const TOPPINGS = [
             'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
             'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
@@ -710,13 +705,11 @@
             }
         }
 
-        // Evento cambio en envío
         formaEnvioSelect.addEventListener('change', function() {
             toggleAddress();
             updateTotal();
         });
 
-        // También el método de pago solo actualiza total (no afecta monto)
         document.getElementById('metodoPago').addEventListener('change', updateTotal);
 
         toggleAddress();
@@ -740,20 +733,18 @@
             totalDisplay.textContent = `$${calcularTotal().toLocaleString()}`;
         }
 
-        // Escuchar cambios en cantidades y toppings
         document.addEventListener('input', function(e) {
             if (e.target.matches('.qty-input, .med-extra-input, .topping-check')) {
                 updateTotal();
             }
         });
 
-        // Actualizar total al cargar (todas las cantidades en 0)
         updateTotal();
 
         // ============================================================
-        //  ENVÍO POR WHATSAPP (número actualizado)
+        //  ENVÍO POR WHATSAPP
         // ============================================================
-        const BUSINESS_PHONE = '5493518692251'; // 0351-8692251
+        const BUSINESS_PHONE = '5493518692251';
 
         document.getElementById('sendBtn').addEventListener('click', function() {
             const nombre = document.getElementById('nombre').value.trim();
@@ -800,11 +791,9 @@
                 return;
             }
 
-            // Método de pago (selección única)
             const metodoPago = document.getElementById('metodoPago').value;
             mensaje += `\n\n💳 *Pago:* ${metodoPago}`;
 
-            // Forma de envío (selección única)
             const envioLabel = isEntregaSelected() ? 'Entrega a domicilio' : 'Retiro en local';
             mensaje += `\n🚚 *Envío:* ${envioLabel}`;
             if (isEntregaSelected()) {
