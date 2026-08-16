@@ -540,7 +540,7 @@
             display: block;
         }
 
-        /* ===== OPCIONES DE PAGO CON DESTAQUE BLANCO ===== */
+        /* ===== OPCIONES DE PAGO (Efectivo, Transferencia, QR) ===== */
         .pago-group {
             display: flex;
             flex-wrap: wrap;
@@ -563,17 +563,39 @@
         }
 
         .pago-option input[type="radio"] {
-            accent-color: #e63946;
-            width: 18px;
-            height: 18px;
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #6a8a6a;
+            border-radius: 50%;
+            outline: none;
             cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            flex-shrink: 0;
         }
 
-        .pago-option:has(input:checked) {
-            background: #ffffff;
-            color: #1a1a1a;
+        .pago-option input[type="radio"]:checked {
             border-color: #ffffff;
-            box-shadow: 0 2px 12px rgba(255, 255, 255, 0.25);
+            background: #ffffff;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3), 0 0 12px rgba(255, 255, 255, 0.2);
+        }
+
+        .pago-option input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #1a2e1a;
+        }
+
+        .pago-option input[type="radio"]:focus {
+            outline: none;
         }
 
         .pago-option.oculto {
@@ -1019,10 +1041,9 @@
                 padding: 4px 10px;
             }
             .pago-option input[type="radio"] {
-                width: 16px;
-                height: 16px;
+                width: 18px;
+                height: 18px;
             }
-            /* Instagram botón flotante en móviles */
             .btn-instagram {
                 width: 50px;
                 height: 50px;
@@ -1071,9 +1092,6 @@
                 <div class="pago-group" id="pagoGroup">
                     <label class="pago-option">
                         <input type="radio" name="metodoPago" value="Efectivo" checked /> Efectivo
-                    </label>
-                    <label class="pago-option">
-                        <input type="radio" name="metodoPago" value="Débito/Crédito" /> Débito/Crédito
                     </label>
                     <label class="pago-option">
                         <input type="radio" name="metodoPago" value="Transferencia" /> Transferencia
@@ -1577,6 +1595,7 @@
                 const radio = pagoRadios[index];
                 const valor = radio.value;
                 if (esEntrega) {
+                    // Solo Efectivo y Transferencia
                     if (valor === 'Efectivo' || valor === 'Transferencia') {
                         option.classList.remove('oculto');
                     } else {
