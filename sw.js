@@ -1,16 +1,16 @@
 const CACHE_NAME = 'tech-burgers-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/images/logo_tech.png',
-  '/images/arm.jpg',
-  '/images/pro.jpg',
-  '/images/int.jpg',
-  '/images/mex.jpg',
-  '/images/yan.jpg',
-  '/images/cla.jpg',
-  '/images/icon-192.png',
-  '/images/icon-512.png'
+  './',
+  './index.html',
+  './images/logo_tech.png',
+  './images/arm.jpg',
+  './images/pro.jpg',
+  './images/int.jpg',
+  './images/mex.jpg',
+  './images/yan.jpg',
+  './images/cla.jpg',
+  './images/icon-192.png',
+  './images/icon-512.png'
 ];
 
 self.addEventListener('install', event => {
