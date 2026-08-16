@@ -120,7 +120,7 @@
             display: flex;
             gap: 14px;
             align-items: flex-start;
-            cursor: pointer; /* Indicador de que es clickeable */
+            cursor: pointer;
         }
 
         .product-card:hover {
@@ -138,7 +138,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            pointer-events: none; /* Evita que la imagen capture el clic */
+            pointer-events: none;
         }
 
         .product-img img {
@@ -151,7 +151,7 @@
         .product-info {
             flex: 1;
             min-width: 0;
-            pointer-events: none; /* Permite que el clic en el texto también active la tarjeta */
+            pointer-events: none;
         }
 
         .product-header {
@@ -208,7 +208,7 @@
             align-items: center;
             gap: 8px 12px;
             margin-top: 4px;
-            pointer-events: auto; /* Los elementos interactivos dentro de extras deben capturar clics */
+            pointer-events: auto;
         }
 
         .product-extras label {
@@ -251,8 +251,9 @@
             gap: 4px;
         }
 
+        /* ===== ELIMINAMOS LA ETIQUETA "Cant." ===== */
         .product-extras .qty-wrap label {
-            color: #b8d0b8;
+            display: none;
         }
 
         .toppings-group {
@@ -434,7 +435,7 @@
             border-radius: 10px;
         }
 
-        /* ===== MODAL DE CANTIDAD (patrón numérico) ===== */
+        /* ===== MODAL DE CANTIDAD (patrón numérico con 0) ===== */
         .qty-modal {
             display: none;
             position: fixed;
@@ -500,6 +501,19 @@
         .qty-grid button:active {
             transform: scale(0.92);
             background: #3a6a3a;
+        }
+
+        .qty-grid .qty-zero {
+            background: #3a2a1a;
+            color: #ffb703;
+        }
+
+        .qty-grid .qty-zero:active {
+            background: #5a3a2a;
+        }
+
+        .qty-grid span {
+            display: none; /* celdas vacías para la fila del 0 */
         }
 
         /* ===== RESPONSIVE ===== */
@@ -635,7 +649,7 @@
 
     </div>
 
-    <!-- ===== MODAL DE CANTIDAD (solo números 1-9, sin X) ===== -->
+    <!-- ===== MODAL DE CANTIDAD (con botón 0) ===== -->
     <div id="qtyModal" class="qty-modal">
         <div class="qty-modal-content">
             <div class="qty-modal-title">Cantidad</div>
@@ -649,6 +663,9 @@
                 <button data-value="7">7</button>
                 <button data-value="8">8</button>
                 <button data-value="9">9</button>
+                <span></span>
+                <button data-value="0" class="qty-zero">0</button>
+                <span></span>
             </div>
         </div>
     </div>
@@ -803,8 +820,7 @@
 
                 const qtyWrap = document.createElement('div');
                 qtyWrap.className = 'qty-wrap';
-                const qtyLabel = document.createElement('label');
-                qtyLabel.textContent = 'Cant.';
+                // Eliminamos la etiqueta "Cant." del HTML (solo input)
                 const qtyInput = document.createElement('input');
                 qtyInput.type = 'number';
                 qtyInput.min = 0;
@@ -812,7 +828,6 @@
                 qtyInput.dataset.productId = p.id;
                 qtyInput.className = 'qty-input';
                 qtyInput.readOnly = true;
-                qtyWrap.appendChild(qtyLabel);
                 qtyWrap.appendChild(qtyInput);
                 extras.appendChild(qtyWrap);
 
@@ -863,7 +878,6 @@
         const modal = document.getElementById('qtyModal');
         const modalButtons = modal.querySelectorAll('.qty-grid button');
 
-        // Función para abrir el modal con un input específico
         function openModalForInput(input) {
             if (input) {
                 currentInput = input;
@@ -876,34 +890,23 @@
             currentInput = null;
         }
 
-        // Delegación de eventos en el grid
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
 
-            // 1. Si el clic es directamente en el input de cantidad (o su label), abrir
+            // Si el clic es en el input de cantidad
             if (target.classList.contains('qty-input')) {
                 openModalForInput(target);
                 return;
             }
 
-            // 2. Si el clic es en un label que contiene el input de cantidad, abrir
-            if (target.tagName === 'LABEL' && target.closest('.qty-wrap')) {
-                const input = target.closest('.qty-wrap').querySelector('.qty-input');
-                if (input) {
-                    openModalForInput(input);
-                    return;
-                }
-            }
-
-            // 3. Si el clic es en un checkbox o input de medallones, no hacer nada (dejar que funcionen normalmente)
+            // Si el clic es en un checkbox o medallones, no hacer nada
             if (target.matches('input[type="checkbox"], .med-extra-input')) {
                 return;
             }
 
-            // 4. Si el clic es en cualquier otra parte de la tarjeta (incluyendo imagen, nombre, precio, etc.)
+            // Clic en cualquier otra parte de la tarjeta
             const card = target.closest('.product-card');
             if (card) {
-                // Buscar el input de cantidad dentro de esa tarjeta
                 const qtyInput = card.querySelector('.qty-input');
                 if (qtyInput) {
                     openModalForInput(qtyInput);
@@ -911,15 +914,14 @@
             }
         });
 
-        // Eventos de los botones del modal
+        // Eventos de los botones del modal (incluyendo el 0)
         modalButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const val = parseInt(this.dataset.value, 10);
-                if (!isNaN(val) && val >= 1 && val <= 9) {
+                if (!isNaN(val) && val >= 0 && val <= 9) {
                     if (currentInput) {
                         currentInput.value = val;
-                        // Disparar evento de input para actualizar total
                         const evt = new Event('input', { bubbles: true });
                         currentInput.dispatchEvent(evt);
                     }
