@@ -992,7 +992,7 @@
                     medInput.value = 0;
                     medInput.className = 'med-extra-input';
                     medInput.dataset.productId = p.id;
-                    medInput.readOnly = true; // Para que abra el modal en lugar de teclado
+                    medInput.readOnly = true;
                     extraMed.appendChild(medInput);
                     extras.appendChild(extraMed);
 
@@ -1217,7 +1217,7 @@
         updateTotal();
 
         // ============================================================
-        //  ENVÍO POR WHATSAPP
+        //  ENVÍO POR WHATSAPP (con dirección literal y enlace de ruta)
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
         const MAPS_URL_LOCAL = 'https://bit.ly/4xOCf1o';
@@ -1284,7 +1284,9 @@
                 const direccion = direccionInput.value.trim();
                 const direccionEncoded = encodeURIComponent(direccion);
                 const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${direccionEncoded}`;
-                mensaje += `\n📍 *Dirección de entrega:* ${mapsUrl}`;
+                // Mostramos la dirección literal y el enlace por separado
+                mensaje += `\n📍 *Dirección:* ${direccion}`;
+                mensaje += `\n🗺️ *Ver ruta:* ${mapsUrl}`;
                 mensaje += `\n🚚 *Costo envío:* $${COSTO_ENVIO.toLocaleString()}`;
             } else {
                 mensaje += `\n📍 *Retirala en este lugar!* ${MAPS_URL_LOCAL}`;
