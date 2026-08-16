@@ -352,6 +352,18 @@
             display: block;
         }
 
+        /* Leyenda de costo de envío */
+        .envio-leyenda {
+            font-size: 0.85rem;
+            color: #ffb703;
+            background: #1a2e1a;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #3a5a3a;
+            margin-top: 6px;
+            text-align: center;
+        }
+
         .total-box {
             background: #1a2e1a;
             border-radius: 60px;
@@ -585,6 +597,10 @@
             .footnote {
                 font-size: 0.75rem;
             }
+            .envio-leyenda {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
 
             .qty-grid button {
                 font-size: 1.6rem;
@@ -649,6 +665,10 @@
                 <div class="address-field" id="addressField">
                     <label for="direccion">Dirección de entrega</label>
                     <input type="text" id="direccion" placeholder="Calle, número, piso, etc." autocomplete="street-address" />
+                    <!-- LEYENDA DE COSTO DE ENVÍO -->
+                    <div class="envio-leyenda">
+                        🚚 La entrega tiene un costo adicional de <strong>$3.000</strong> que se suma al total de tu compra.
+                    </div>
                 </div>
             </div>
 
@@ -971,7 +991,7 @@
         const addressField = document.getElementById('addressField');
         const direccionInput = document.getElementById('direccion');
         const totalDisplay = document.getElementById('totalDisplay');
-        const COSTO_ENVIO = 2500;
+        const COSTO_ENVIO = 3000; // Cambiado de 2500 a 3000
 
         function isEntregaSelected() {
             return formaEnvioSelect.value === 'entrega';
@@ -1025,7 +1045,7 @@
         //  ENVÍO POR WHATSAPP
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
-        const MAPS_URL_LOCAL = 'https://bit.ly/4xOCf1o'; // para retiro en local
+        const MAPS_URL_LOCAL = 'https://bit.ly/4xOCf1o';
 
         document.getElementById('sendBtn').addEventListener('click', function() {
             const nombre = document.getElementById('nombre').value.trim();
@@ -1087,9 +1107,7 @@
                 const direccion = direccionInput.value.trim();
                 const direccionEncoded = encodeURIComponent(direccion);
                 const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${direccionEncoded}`;
-                // Mostrar dirección literal y enlace de ruta
-                mensaje += `\n📍 *Dirección:* ${direccion}`;
-                mensaje += `\n🗺️ *Ver ruta:* ${mapsUrl}`;
+                mensaje += `\n📍 *Dirección de entrega:* ${mapsUrl}`;
                 mensaje += `\n🚚 *Costo envío:* $${COSTO_ENVIO.toLocaleString()}`;
             } else {
                 mensaje += `\n📍 *Retirala en este lugar!* ${MAPS_URL_LOCAL}`;
