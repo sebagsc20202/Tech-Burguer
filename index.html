@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>Tech+Classic Burgers · Pedido</title>
+    <title>Tech Classic Burgers · Pedido</title>
     <style>
         /* ===== RESET & BASE ===== */
         * {
@@ -267,6 +267,7 @@
         .form-group .address-field { display: none; margin-top: 8px; }
         .form-group .address-field.active { display: block; }
 
+        /* Grupos de checkboxes con clases independientes */
         .checkbox-group {
             display: flex;
             flex-wrap: wrap;
@@ -289,6 +290,8 @@
             width: 18px;
             height: 18px;
             cursor: pointer;
+            /* Aseguramos que no haya estilos que afecten el estado */
+            pointer-events: auto;
         }
 
         .total-box {
@@ -372,23 +375,23 @@
                 <input type="tel" id="telefono" placeholder="Ej: 11 2345 6789" required />
             </div>
 
-            <!-- PAGO (checkboxes independientes) -->
+            <!-- PAGO - clase 'pago-checkbox' -->
             <div class="form-group">
                 <label>Método de pago (podés elegir varios)</label>
                 <div class="checkbox-group" id="pagoGroup">
-                    <label><input type="checkbox" name="pago[]" value="Efectivo" checked /> Efectivo</label>
-                    <label><input type="checkbox" name="pago[]" value="Débito/Crédito" /> Débito/Crédito</label>
-                    <label><input type="checkbox" name="pago[]" value="Transferencia" /> Transferencia</label>
-                    <label><input type="checkbox" name="pago[]" value="QR" /> QR</label>
+                    <label><input type="checkbox" class="pago-checkbox" value="Efectivo" checked /> Efectivo</label>
+                    <label><input type="checkbox" class="pago-checkbox" value="Débito/Crédito" /> Débito/Crédito</label>
+                    <label><input type="checkbox" class="pago-checkbox" value="Transferencia" /> Transferencia</label>
+                    <label><input type="checkbox" class="pago-checkbox" value="QR" /> QR</label>
                 </div>
             </div>
 
-            <!-- ENVÍO (checkboxes independientes) -->
+            <!-- ENVÍO - clase 'envio-checkbox' -->
             <div class="form-group">
                 <label>Forma de envío (podés elegir varias)</label>
                 <div class="checkbox-group" id="envioGroup">
-                    <label><input type="checkbox" name="envio[]" value="retiro" checked /> Retiro en local</label>
-                    <label><input type="checkbox" name="envio[]" value="entrega" /> Entrega a domicilio</label>
+                    <label><input type="checkbox" class="envio-checkbox" value="retiro" checked /> Retiro en local</label>
+                    <label><input type="checkbox" class="envio-checkbox" value="entrega" /> Entrega a domicilio</label>
                 </div>
                 <div class="address-field" id="addressField">
                     <label for="direccion">Dirección de entrega</label>
@@ -560,8 +563,9 @@
 
         // ============================================================
         //  TOTAL Y ENVÍO (sin interferencia entre checkboxes)
+        //  Usamos clases específicas: .envio-checkbox y .pago-checkbox
         // ============================================================
-        const envioCheckboxes = document.querySelectorAll('#envioGroup input[type="checkbox"]');
+        const envioCheckboxes = document.querySelectorAll('.envio-checkbox');
         const addressField = document.getElementById('addressField');
         const direccionInput = document.getElementById('direccion');
         const totalDisplay = document.getElementById('totalDisplay');
@@ -582,8 +586,15 @@
             }
         }
 
-        // Solo afecta a los checkboxes de envío
+        // Solo eventos para los checkboxes de envío
         envioCheckboxes.forEach(cb => cb.addEventListener('change', toggleAddress));
+        // También al cambiar, actualizamos el total
+        envioCheckboxes.forEach(cb => cb.addEventListener('change', updateTotal));
+
+        // Los checkboxes de pago no afectan el total, pero por si acaso los escuchamos para actualizar (no cambia el monto)
+        document.querySelectorAll('.pago-checkbox').forEach(cb => cb.addEventListener('change', updateTotal));
+
+        // Inicializar dirección
         toggleAddress();
 
         function calcularTotal() {
@@ -605,24 +616,20 @@
             totalDisplay.textContent = `$${calcularTotal().toLocaleString()}`;
         }
 
-        // Eventos de cambio: solo actualizan el total, no tocan el estado de otros checkboxes
+        // Escuchar cambios en cantidades y toppings
         document.addEventListener('input', function(e) {
             if (e.target.matches('.qty-input, .med-extra-input, .topping-check')) {
                 updateTotal();
             }
         });
 
-        // Envuelvo en una función para evitar propagación no deseada
-        envioCheckboxes.forEach(cb => cb.addEventListener('change', updateTotal));
-        // Los checkboxes de pago también actualizan el total (aunque no afecta el monto)
-        document.querySelectorAll('#pagoGroup input[type="checkbox"]').forEach(cb => cb.addEventListener('change', updateTotal));
-
         updateTotal();
 
         // ============================================================
-        //  ENVÍO POR WHATSAPP
+        //  ENVÍO POR WHATSAPP (número actualizado)
         // ============================================================
-        const BUSINESS_PHONE = '5491123456789'; // Reemplazar con el número real
+        // Número: 0351-8692251 → formato internacional: 5493518692251
+        const BUSINESS_PHONE = '5493518692251';
 
         document.getElementById('sendBtn').addEventListener('click', function() {
             const nombre = document.getElementById('nombre').value.trim();
@@ -669,12 +676,12 @@
                 return;
             }
 
-            // Métodos de pago seleccionados (independientes)
-            const pagos = Array.from(document.querySelectorAll('#pagoGroup input[type="checkbox"]:checked')).map(cb => cb.value);
+            // Recolectar métodos de pago (clase .pago-checkbox)
+            const pagos = Array.from(document.querySelectorAll('.pago-checkbox:checked')).map(cb => cb.value);
             mensaje += `\n\n💳 *Pago:* ${pagos.length ? pagos.join(', ') : 'No especificado'}`;
 
-            // Formas de envío seleccionadas
-            const envios = Array.from(document.querySelectorAll('#envioGroup input[type="checkbox"]:checked')).map(cb =>
+            // Recolectar formas de envío (clase .envio-checkbox)
+            const envios = Array.from(document.querySelectorAll('.envio-checkbox:checked')).map(cb =>
                 cb.value === 'retiro' ? 'Retiro en local' : 'Entrega a domicilio'
             );
             mensaje += `\n🚚 *Envío:* ${envios.length ? envios.join(', ') : 'No especificado'}`;
