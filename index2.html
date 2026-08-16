@@ -235,7 +235,6 @@
             transition: background 0.2s, transform 0.1s;
         }
 
-        /* Botón Cancelar (blanco) */
         .resumen-botones .btn-cancelar-resumen {
             background: #ffffff;
             color: #1a1a1a;
@@ -252,7 +251,6 @@
             transform: scale(0.97);
         }
 
-        /* Botón Confirmar (dorado) */
         .resumen-botones .btn-confirmar-resumen {
             background: #ffb703;
             color: #1a1a1a;
@@ -553,65 +551,61 @@
             display: block;
         }
 
-        /* ===== OPCIONES DE PAGO ===== */
-        .pago-group {
+        /* ===== BOTONES DE PAGO CON ICONOS ===== */
+        .pago-botones {
             display: flex;
+            gap: 12px;
             flex-wrap: wrap;
-            gap: 12px 18px;
-            padding-top: 4px;
         }
 
-        .pago-option {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 400;
-            color: #d0e0d0;
-            cursor: pointer;
+        .pago-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px 8px;
+            background: #1a2e1a;
+            border: 2px solid #3a5a3a;
+            border-radius: 16px;
+            color: #b8d0b8;
             font-size: 0.9rem;
-            padding: 6px 14px;
-            border-radius: 40px;
-            transition: background 0.2s, color 0.2s, border-color 0.2s;
-            border: 2px solid transparent;
-        }
-
-        .pago-option input[type="radio"] {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #6a8a6a;
-            border-radius: 50%;
-            outline: none;
+            font-weight: 600;
+            text-align: center;
             cursor: pointer;
             transition: all 0.2s ease;
-            position: relative;
-            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .pago-option input[type="radio"]:checked {
+        .pago-btn .icono {
+            font-size: 1.8rem;
+            line-height: 1;
+        }
+
+        .pago-btn .label {
+            font-size: 0.75rem;
+            line-height: 1.2;
+            color: #b8d0b8;
+        }
+
+        .pago-btn:hover {
+            border-color: #6a8a6a;
+            background: #1f331f;
+        }
+
+        .pago-btn.activo {
             border-color: #ffffff;
-            background: #ffffff;
-            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3), 0 0 12px rgba(255, 255, 255, 0.2);
+            background: #1f331f;
+            color: #ffffff;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2), 0 0 20px rgba(255, 255, 255, 0.1);
         }
 
-        .pago-option input[type="radio"]:checked::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #1a2e1a;
+        .pago-btn.activo .label {
+            color: #ffffff;
         }
 
-        .pago-option input[type="radio"]:focus {
-            outline: none;
-        }
-
-        .pago-option.oculto {
+        .pago-btn.oculto {
             display: none !important;
         }
 
@@ -1049,13 +1043,16 @@
                 top: 6px;
                 right: 6px;
             }
-            .pago-option {
+            .pago-btn {
+                min-width: 60px;
+                padding: 10px 6px;
                 font-size: 0.8rem;
-                padding: 4px 10px;
             }
-            .pago-option input[type="radio"] {
-                width: 18px;
-                height: 18px;
+            .pago-btn .icono {
+                font-size: 1.5rem;
+            }
+            .pago-btn .label {
+                font-size: 0.65rem;
             }
             .btn-instagram {
                 width: 50px;
@@ -1102,16 +1099,19 @@
 
             <div class="form-group">
                 <label for="metodoPago">Método de pago</label>
-                <div class="pago-group" id="pagoGroup">
-                    <label class="pago-option">
-                        <input type="radio" name="metodoPago" value="Efectivo" checked /> Efectivo
-                    </label>
-                    <label class="pago-option">
-                        <input type="radio" name="metodoPago" value="Transferencia" /> Transferencia
-                    </label>
-                    <label class="pago-option">
-                        <input type="radio" name="metodoPago" value="QR" /> QR
-                    </label>
+                <div class="pago-botones" id="pagoBotones">
+                    <div class="pago-btn" data-value="Efectivo">
+                        <span class="icono">💵</span>
+                        <span class="label">Efectivo</span>
+                    </div>
+                    <div class="pago-btn" data-value="Transferencia">
+                        <span class="icono">🏦</span>
+                        <span class="label">Transferencia</span>
+                    </div>
+                    <div class="pago-btn" data-value="QR">
+                        <span class="icono">📱</span>
+                        <span class="label">QR</span>
+                    </div>
                 </div>
             </div>
 
@@ -1595,33 +1595,58 @@
         });
 
         // ============================================================
-        //  CONTROL DE MÉTODOS DE PAGO SEGÚN ENVÍO
+        //  CONTROL DE BOTONES DE PAGO SEGÚN ENVÍO
         // ============================================================
         const formaEnvioSelect = document.getElementById('formaEnvio');
-        const pagoRadios = document.querySelectorAll('input[name="metodoPago"]');
-        const pagoOptions = document.querySelectorAll('.pago-option');
+        const pagoBotones = document.querySelectorAll('.pago-btn');
+        let pagoSeleccionado = null;
+
+        function seleccionarPago(valor) {
+            pagoBotones.forEach(btn => {
+                btn.classList.remove('activo');
+                if (btn.dataset.value === valor) {
+                    btn.classList.add('activo');
+                }
+            });
+            pagoSeleccionado = valor;
+        }
+
+        function obtenerPagoSeleccionado() {
+            return pagoSeleccionado || null;
+        }
+
+        pagoBotones.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const valor = this.dataset.value;
+                // Si ya está seleccionado, lo deseleccionamos (toggle off)
+                if (this.classList.contains('activo')) {
+                    this.classList.remove('activo');
+                    pagoSeleccionado = null;
+                } else {
+                    // Desmarcar todos
+                    pagoBotones.forEach(b => b.classList.remove('activo'));
+                    this.classList.add('activo');
+                    pagoSeleccionado = valor;
+                }
+            });
+        });
 
         function actualizarPagosSegunEnvio() {
             const esEntrega = formaEnvioSelect.value === 'entrega';
-
-            pagoOptions.forEach((option, index) => {
-                const radio = pagoRadios[index];
-                const valor = radio.value;
+            pagoBotones.forEach(btn => {
+                const valor = btn.dataset.value;
                 if (esEntrega) {
                     if (valor === 'Efectivo' || valor === 'Transferencia') {
-                        option.classList.remove('oculto');
+                        btn.classList.remove('oculto');
                     } else {
-                        option.classList.add('oculto');
-                        if (radio.checked) {
-                            radio.checked = false;
-                            const efectivoRadio = document.querySelector('input[name="metodoPago"][value="Efectivo"]');
-                            if (efectivoRadio) efectivoRadio.checked = true;
-                            const changeEvent = new Event('change', { bubbles: true });
-                            efectivoRadio.dispatchEvent(changeEvent);
+                        btn.classList.add('oculto');
+                        if (btn.classList.contains('activo')) {
+                            btn.classList.remove('activo');
+                            pagoSeleccionado = null;
                         }
                     }
                 } else {
-                    option.classList.remove('oculto');
+                    btn.classList.remove('oculto');
                 }
             });
         }
@@ -1751,8 +1776,7 @@
                 html += `</div>`;
             }
 
-            const metodoPago = document.querySelector('input[name="metodoPago"]:checked');
-            const pagoValue = metodoPago ? metodoPago.value : 'No especificado';
+            const pagoValue = obtenerPagoSeleccionado() || 'No especificado';
             html += `<div class="resumen-item" style="border-bottom:1px solid #2f4a2f;">`;
             html += `💳 Pago: ${pagoValue}`;
             if (pagoValue === 'Transferencia') {
@@ -1841,8 +1865,7 @@
                 return;
             }
 
-            const metodoPago = document.querySelector('input[name="metodoPago"]:checked');
-            const pagoValue = metodoPago ? metodoPago.value : 'No especificado';
+            const pagoValue = obtenerPagoSeleccionado() || 'No especificado';
             mensaje += `\n\n💳 *Pago:* ${pagoValue}`;
 
             if (pagoValue === 'Transferencia') {
