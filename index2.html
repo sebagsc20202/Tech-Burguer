@@ -120,6 +120,7 @@
             display: flex;
             gap: 14px;
             align-items: flex-start;
+            cursor: pointer; /* Indicador de que es clickeable */
         }
 
         .product-card:hover {
@@ -137,6 +138,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            pointer-events: none; /* Evita que la imagen capture el clic */
         }
 
         .product-img img {
@@ -149,6 +151,7 @@
         .product-info {
             flex: 1;
             min-width: 0;
+            pointer-events: none; /* Permite que el clic en el texto también active la tarjeta */
         }
 
         .product-header {
@@ -205,6 +208,7 @@
             align-items: center;
             gap: 8px 12px;
             margin-top: 4px;
+            pointer-events: auto; /* Los elementos interactivos dentro de extras deben capturar clics */
         }
 
         .product-extras label {
@@ -213,6 +217,7 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            pointer-events: auto;
         }
 
         .product-extras input[type="number"] {
@@ -227,6 +232,7 @@
             outline: none;
             cursor: pointer;
             -moz-appearance: textfield;
+            pointer-events: auto;
         }
 
         .product-extras input[type="number"]::-webkit-outer-spin-button,
@@ -257,6 +263,7 @@
             padding-top: 6px;
             border-top: 1px dashed #2f4a2f;
             width: 100%;
+            pointer-events: auto;
         }
 
         .toppings-group label {
@@ -265,6 +272,7 @@
             display: flex;
             align-items: center;
             gap: 3px;
+            pointer-events: auto;
         }
 
         .toppings-group input[type="checkbox"] {
@@ -272,6 +280,7 @@
             width: 15px;
             height: 15px;
             cursor: pointer;
+            pointer-events: auto;
         }
 
         /* ===== FORM ===== */
@@ -493,16 +502,6 @@
             background: #3a6a3a;
         }
 
-        .qty-grid button.qty-cancel {
-            background: #4a1a1a;
-            color: #ff6b6b;
-            font-size: 1.6rem;
-        }
-
-        .qty-grid button.qty-cancel:active {
-            background: #6a2a2a;
-        }
-
         /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             body {
@@ -636,7 +635,7 @@
 
     </div>
 
-    <!-- ===== MODAL DE CANTIDAD (patrón numérico) ===== -->
+    <!-- ===== MODAL DE CANTIDAD (solo números 1-9, sin X) ===== -->
     <div id="qtyModal" class="qty-modal">
         <div class="qty-modal-content">
             <div class="qty-modal-title">Cantidad</div>
@@ -650,7 +649,6 @@
                 <button data-value="7">7</button>
                 <button data-value="8">8</button>
                 <button data-value="9">9</button>
-                <button class="qty-cancel" data-value="cancel">X</button>
             </div>
         </div>
     </div>
@@ -854,46 +852,73 @@
                 card.appendChild(info);
                 grid.appendChild(card);
             });
-
-            // ===== ASIGNAR EVENTOS A LOS INPUTS DE CANTIDAD (delegación) =====
-            // Ya que los inputs se crean dinámicamente, usamos delegación en el grid
         }
 
         renderProducts();
 
         // ============================================================
-        //  MODAL DE CANTIDAD (patrón numérico)
+        //  MODAL DE CANTIDAD Y EVENTOS DE CLIC EN TARJETAS
         // ============================================================
         let currentInput = null;
         const modal = document.getElementById('qtyModal');
         const modalButtons = modal.querySelectorAll('.qty-grid button');
 
-        // Usamos delegación de eventos para los clicks en los inputs de cantidad
-        document.getElementById('productGrid').addEventListener('click', function(e) {
-            const target = e.target;
-            if (target.classList.contains('qty-input')) {
-                currentInput = target;
+        // Función para abrir el modal con un input específico
+        function openModalForInput(input) {
+            if (input) {
+                currentInput = input;
                 modal.classList.add('active');
             }
-        });
+        }
 
         function closeModal() {
             modal.classList.remove('active');
             currentInput = null;
         }
 
+        // Delegación de eventos en el grid
+        document.getElementById('productGrid').addEventListener('click', function(e) {
+            const target = e.target;
+
+            // 1. Si el clic es directamente en el input de cantidad (o su label), abrir
+            if (target.classList.contains('qty-input')) {
+                openModalForInput(target);
+                return;
+            }
+
+            // 2. Si el clic es en un label que contiene el input de cantidad, abrir
+            if (target.tagName === 'LABEL' && target.closest('.qty-wrap')) {
+                const input = target.closest('.qty-wrap').querySelector('.qty-input');
+                if (input) {
+                    openModalForInput(input);
+                    return;
+                }
+            }
+
+            // 3. Si el clic es en un checkbox o input de medallones, no hacer nada (dejar que funcionen normalmente)
+            if (target.matches('input[type="checkbox"], .med-extra-input')) {
+                return;
+            }
+
+            // 4. Si el clic es en cualquier otra parte de la tarjeta (incluyendo imagen, nombre, precio, etc.)
+            const card = target.closest('.product-card');
+            if (card) {
+                // Buscar el input de cantidad dentro de esa tarjeta
+                const qtyInput = card.querySelector('.qty-input');
+                if (qtyInput) {
+                    openModalForInput(qtyInput);
+                }
+            }
+        });
+
+        // Eventos de los botones del modal
         modalButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                const val = this.dataset.value;
-                if (val === 'cancel') {
-                    closeModal();
-                    return;
-                }
-                if (currentInput) {
-                    const num = parseInt(val, 10);
-                    if (!isNaN(num) && num >= 1 && num <= 9) {
-                        currentInput.value = num;
+                const val = parseInt(this.dataset.value, 10);
+                if (!isNaN(val) && val >= 1 && val <= 9) {
+                    if (currentInput) {
+                        currentInput.value = val;
                         // Disparar evento de input para actualizar total
                         const evt = new Event('input', { bubbles: true });
                         currentInput.dispatchEvent(evt);
