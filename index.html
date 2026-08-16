@@ -86,16 +86,15 @@
         /* ===== IMAGEN ===== */
         .product-img {
             flex-shrink: 0;
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             border-radius: 16px;
             background: #2a4a2a;
+            overflow: hidden;
+            border: 1px solid #3a5a3a;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.8rem;
-            overflow: hidden;
-            border: 1px solid #3a5a3a;
         }
 
         .product-img img {
@@ -378,11 +377,20 @@
             color: #8aaa8a;
             font-size: 0.75rem;
         }
-        .mt-1 { margin-top: 6px; }
+        .mt-1 {
+            margin-top: 6px;
+        }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #1a2e1a; }
-        ::-webkit-scrollbar-thumb { background: #e63946; border-radius: 10px; }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a2e1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e63946;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
@@ -450,7 +458,7 @@
 
     <script>
         // ============================================================
-        //  DATOS DE PRODUCTOS (agregá la URL de la imagen en cada uno)
+        //  DATOS DE PRODUCTOS con imágenes locales
         // ============================================================
         const PRODUCTS = [{
             id: 'armatuburger',
@@ -459,42 +467,42 @@
             desc: '1 medallón 120gr · doble cheddar · salsa Tech. Agregá medallones y toppings.',
             hasExtras: true,
             badge: 'BASE',
-            imagen: 'images/bas.jpg'  // <--- Reemplazá por una URL de imagen (ej: "/images/bas.jpg")
+            imagen: 'images/arm.jpg'
         }, {
             id: 'doblep',
             name: 'Doble Provoleta',
             price: 18000,
             desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.',
             hasExtras: false,
-            imagen: '🧀'
+            imagen: 'images/pro.jpg'
         }, {
             id: 'intense',
             name: 'Intense',
             price: 18000,
             desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.',
             hasExtras: false,
-            imagen: '🔥'
+            imagen: 'images/int.jpg'
         }, {
             id: 'techmex',
             name: 'Tech Mex',
             price: 18000,
             desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.',
             hasExtras: false,
-            imagen: '🥑'
+            imagen: 'images/mex.jpg'
         }, {
             id: 'yankee',
             name: 'Yankee',
             price: 16000,
             desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.',
             hasExtras: false,
-            imagen: '🥓'
+            imagen: 'images/yan.jpg'
         }, {
             id: 'clasica',
             name: 'Clásica',
             price: 16000,
             desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.',
             hasExtras: false,
-            imagen: '🥚'
+            imagen: 'images/cla.jpg'
         }];
 
         const TOPPINGS = [
@@ -514,19 +522,14 @@
                 card.className = 'product-card';
                 card.dataset.id = p.id;
 
-                // Imagen
+                // Imagen (siempre desde carpeta images)
                 const imgDiv = document.createElement('div');
                 imgDiv.className = 'product-img';
-                // Si la imagen es una URL (empieza con http) la mostramos como <img>
-                if (p.imagen && (p.imagen.startsWith('http://') || p.imagen.startsWith('https://'))) {
-                    const img = document.createElement('img');
-                    img.src = p.imagen;
-                    img.alt = p.name;
-                    imgDiv.appendChild(img);
-                } else {
-                    // Sino, mostramos el emoji o texto
-                    imgDiv.textContent = p.imagen || '🍔';
-                }
+                const img = document.createElement('img');
+                img.src = p.imagen || 'images/placeholder.jpg';
+                img.alt = p.name;
+                img.loading = 'lazy';
+                imgDiv.appendChild(img);
 
                 // Info
                 const info = document.createElement('div');
