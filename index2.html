@@ -564,6 +564,19 @@
             display: block;
         }
 
+        /* ===== NUEVO ESTILO PARA EL ENLACE DE DESARROLLO ===== */
+        .footnote .desarrollo-link {
+            margin-top: 8px;
+            display: block;
+            font-size: 0.75rem;
+            color: #6a8a6a;
+        }
+
+        .footnote .desarrollo-link a {
+            color: #ffb703;
+            text-decoration: underline;
+        }
+
         .text-muted {
             color: #8aaa8a;
             font-size: 0.75rem;
@@ -824,6 +837,9 @@
             .footnote {
                 font-size: 0.75rem;
             }
+            .footnote .desarrollo-link {
+                font-size: 0.7rem;
+            }
             .envio-leyenda {
                 font-size: 0.8rem;
                 padding: 6px 10px;
@@ -939,9 +955,13 @@
 
             <button class="btn-send" id="sendBtn">📲 ENVIAR PEDIDO</button>
 
+            <!-- ===== PIE DE PÁGINA MODIFICADO ===== -->
             <div class="footnote">
                 <span>Todas nuestras burgers vienen con papas</span>
                 <span>Tu hambre, nuestro ritmo</span>
+                <span class="desarrollo-link">
+                    Desarrollo: <a href="https://wa.me/5493518692251?text=Quiero%20algo%20similar%20al%20proyecto%20de%20Tech%20Classic%20Burguers" target="_blank">Contactar por WhatsApp</a>
+                </span>
             </div>
         </div>
 
