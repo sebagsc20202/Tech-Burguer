@@ -811,7 +811,6 @@
 
                 const qtyWrap = document.createElement('div');
                 qtyWrap.className = 'qty-wrap';
-                // Input sin etiqueta "Cant."
                 const qtyInput = document.createElement('input');
                 qtyInput.type = 'number';
                 qtyInput.min = 0;
@@ -884,18 +883,15 @@
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
 
-            // Si el clic es en el input de cantidad
             if (target.classList.contains('qty-input')) {
                 openModalForInput(target);
                 return;
             }
 
-            // Si el clic es en un checkbox o medallones, no hacer nada
             if (target.matches('input[type="checkbox"], .med-extra-input')) {
                 return;
             }
 
-            // Clic en cualquier otra parte de la tarjeta
             const card = target.closest('.product-card');
             if (card) {
                 const qtyInput = card.querySelector('.qty-input');
@@ -905,7 +901,6 @@
             }
         });
 
-        // Eventos de los botones del modal (incluyendo el 0)
         modalButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -921,7 +916,6 @@
             });
         });
 
-        // Cerrar modal al hacer clic en el fondo
         modal.addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
@@ -986,9 +980,10 @@
         updateTotal();
 
         // ============================================================
-        //  ENVÍO POR WHATSAPP
+        //  ENVÍO POR WHATSAPP con enlace a Google Maps para retiro
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
+        const MAPS_URL = 'https://maps.app.goo.gl/7iPEqgpxnHL7By726';
 
         document.getElementById('sendBtn').addEventListener('click', function() {
             const nombre = document.getElementById('nombre').value.trim();
@@ -1045,9 +1040,13 @@
 
             const envioLabel = isEntregaSelected() ? 'Entrega a domicilio' : 'Retiro en local';
             mensaje += `\n🚚 *Envío:* ${envioLabel}`;
+
             if (isEntregaSelected()) {
                 mensaje += `\n📍 *Dirección:* ${direccionInput.value.trim()}`;
                 mensaje += `\n🚚 *Costo envío:* $${COSTO_ENVIO.toLocaleString()}`;
+            } else {
+                // Si es retiro en local, agregar el enlace de Google Maps
+                mensaje += `\n📍 *Ubicación:* ${MAPS_URL}`;
             }
 
             mensaje += `\n\n💰 *TOTAL:* $${calcularTotal().toLocaleString()}`;
