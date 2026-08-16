@@ -56,6 +56,45 @@
             color: #ffb703;
         }
 
+        /* ===== TARJETA DE ESTADO ABIERTO/CERRADO ===== */
+        .status-card {
+            background: #1f331f;
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin: 10px 0 16px;
+            border: 2px solid #3a5a3a;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        .status-card.abierto {
+            border-color: #4caf50;
+            background: #1e3a1e;
+            color: #a5d6a7;
+        }
+
+        .status-card.cerrado {
+            border-color: #f44336;
+            background: #3a1e1e;
+            color: #ef9a9a;
+        }
+
+        .status-card.casi {
+            border-color: #ffb703;
+            background: #3a3a1e;
+            color: #ffd54f;
+        }
+
+        .status-card .horario {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #b8d0b8;
+            margin-top: 4px;
+        }
+
         /* ===== PRODUCT CARDS ===== */
         .product-grid {
             display: flex;
@@ -412,6 +451,13 @@
             .brand .logo {
                 max-width: 260px;
             }
+            .status-card {
+                font-size: 0.9rem;
+                padding: 10px 12px;
+            }
+            .status-card .horario {
+                font-size: 0.75rem;
+            }
         }
     </style>
 </head>
@@ -422,6 +468,11 @@
         <div class="brand">
             <img src="images/logo_tech.png" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
+            <!-- Tarjeta de estado ABIERTO/CERRADO -->
+            <div class="status-card" id="statusCard">
+                <div id="statusText">⏳ Cargando...</div>
+                <div class="horario">Mar–Dom · 20:00 a 00:00</div>
+            </div>
         </div>
 
         <!-- PRODUCTOS -->
@@ -478,6 +529,54 @@
     </div>
 
     <script>
+        // ============================================================
+        //  INDICADOR ABIERTO/CERRADO (con estado "casi cerrando")
+        // ============================================================
+        function actualizarEstado() {
+            const now = new Date();
+            const dia = now.getDay(); // 0=domingo, 1=lunes, ..., 6=sábado
+            const hora = now.getHours();
+            const minutos = now.getMinutes();
+            const horaMin = hora + minutos / 60; // para comparar más fácil
+
+            let estado = 'cerrado'; // 'abierto', 'casi', 'cerrado'
+            let texto = '';
+
+            // Lunes (1) cerrado
+            if (dia === 1) {
+                estado = 'cerrado';
+            } else {
+                // Martes a domingo
+                if (horaMin >= 20 && horaMin < 23.5) {
+                    estado = 'abierto';
+                } else if (horaMin >= 23.5 && horaMin < 24) {
+                    estado = 'casi';
+                } else {
+                    estado = 'cerrado';
+                }
+            }
+
+            const card = document.getElementById('statusCard');
+            const text = document.getElementById('statusText');
+
+            // Quitar clases previas
+            card.classList.remove('abierto', 'cerrado', 'casi');
+
+            if (estado === 'abierto') {
+                card.classList.add('abierto');
+                text.textContent = '🟢 ABIERTO · hasta las 00:00';
+            } else if (estado === 'casi') {
+                card.classList.add('casi');
+                text.textContent = '🟡 Estamos casi cerrando pero podemos hacer tu pedido !!!';
+            } else {
+                card.classList.add('cerrado');
+                text.textContent = '🔴 CERRADO';
+            }
+        }
+
+        actualizarEstado();
+        setInterval(actualizarEstado, 60000);
+
         // ============================================================
         //  DATOS DE PRODUCTOS (imágenes locales)
         // ============================================================
