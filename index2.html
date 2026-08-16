@@ -991,7 +991,7 @@
         const addressField = document.getElementById('addressField');
         const direccionInput = document.getElementById('direccion');
         const totalDisplay = document.getElementById('totalDisplay');
-        const COSTO_ENVIO = 3000; // Cambiado de 2500 a 3000
+        const COSTO_ENVIO = 3000;
 
         function isEntregaSelected() {
             return formaEnvioSelect.value === 'entrega';
@@ -1042,7 +1042,7 @@
         updateTotal();
 
         // ============================================================
-        //  ENVÍO POR WHATSAPP
+        //  ENVÍO POR WHATSAPP (con separación entre Pago y Envío)
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
         const MAPS_URL_LOCAL = 'https://bit.ly/4xOCf1o';
@@ -1099,6 +1099,9 @@
                 mensaje += `\n📌 *Alias:* Tech.burguer`;
                 mensaje += `\n📎 *Importante:* Por favor, enviá el comprobante de transferencia para confirmar el pedido.`;
             }
+
+            // ==== SEPARACIÓN ENTRE PAGO Y ENVÍO (salto de línea) ====
+            mensaje += `\n`;
 
             const envioLabel = isEntregaSelected() ? 'Entrega a domicilio' : 'Retiro en local';
             mensaje += `\n🚚 *Envío:* ${envioLabel}`;
