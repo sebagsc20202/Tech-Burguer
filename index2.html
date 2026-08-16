@@ -1022,10 +1022,10 @@
         updateTotal();
 
         // ============================================================
-        //  ENVÍO POR WHATSAPP con enlace clickeable
+        //  ENVÍO POR WHATSAPP con enlace de coordenadas que inicia ruta
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
-        const MAPS_URL = 'https://maps.app.goo.gl/7iPEqgpxnHL7By726';
+        const MAPS_URL = 'https://www.google.com/maps/dir/?api=1&destination=-31.322452,-64.267593';
 
         document.getElementById('sendBtn').addEventListener('click', function() {
             const nombre = document.getElementById('nombre').value.trim();
@@ -1087,7 +1087,7 @@
                 mensaje += `\n📍 *Dirección:* ${direccionInput.value.trim()}`;
                 mensaje += `\n🚚 *Costo envío:* $${COSTO_ENVIO.toLocaleString()}`;
             } else {
-                // El enlace es clickeable en WhatsApp porque la URL está presente
+                // Enlace con coordenadas que inicia la ruta
                 mensaje += `\n📍 *Retirala en este lugar!* ${MAPS_URL}`;
             }
 
