@@ -715,7 +715,7 @@
             border-radius: 10px;
         }
 
-        /* ===== MODAL DE CANTIDAD ===== */
+        /* ===== MODAL DE CANTIDAD (sin botón Cerrar) ===== */
         .qty-modal {
             display: none;
             position: fixed;
@@ -780,27 +780,7 @@
             pointer-events: none;
         }
 
-        .btn-cerrar-modal {
-            width: 100%;
-            border: 2px solid #555;
-            border-radius: 40px;
-            background: #2a2a2a;
-            color: #aaa;
-            font-size: 1rem;
-            font-weight: 600;
-            padding: 12px 10px;
-            cursor: pointer;
-            transition: background 0.15s, transform 0.1s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            line-height: 1.3;
-            margin-top: 8px;
-        }
-
-        .btn-cerrar-modal:active {
-            background: #3a3a3a;
-            transform: scale(0.97);
-        }
+        /* NOTA: El botón Cerrar ha sido eliminado */
 
         /* ===== MODAL DE MEDALLONES EXTRA ===== */
         .med-modal {
@@ -1043,10 +1023,6 @@
             .qty-modal-content {
                 padding: 24px 16px 16px;
             }
-            .btn-cerrar-modal {
-                font-size: 0.9rem;
-                padding: 10px;
-            }
             .med-grid button {
                 font-size: 1.6rem;
                 max-width: 60px;
@@ -1202,7 +1178,7 @@
         <div class="toast-content" id="toastContent"></div>
     </div>
 
-    <!-- ===== MODAL DE CANTIDAD ===== -->
+    <!-- ===== MODAL DE CANTIDAD (sin botón Cerrar) ===== -->
     <div id="qtyModal" class="qty-modal">
         <div class="qty-modal-content">
             <div class="qty-grid">
@@ -1219,7 +1195,7 @@
                 <span class="qty-empty"></span>
                 <span class="qty-empty"></span>
             </div>
-            <button class="btn-cerrar-modal" id="btnCerrarModal">Cerrar</button>
+            <!-- Botón Cerrar eliminado -->
         </div>
     </div>
 
@@ -1539,7 +1515,6 @@
         let currentProductId = null;
         const modal = document.getElementById('qtyModal');
         const modalButtons = modal.querySelectorAll('.qty-grid button');
-        const btnCerrarModal = document.getElementById('btnCerrarModal');
 
         let currentMedInput = null;
         const medModal = document.getElementById('medModal');
@@ -1614,10 +1589,7 @@
             });
         });
 
-        btnCerrarModal.addEventListener('click', function() {
-            closeModal();
-        });
-
+        // Cerrar modal al hacer clic en el fondo
         modal.addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
@@ -1965,12 +1937,10 @@
                     // Si el usuario cancela, no hacemos nada
                 });
             } else {
-                // Fallback: copiar al portapapeles
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(url).then(() => {
                         alert('✅ Enlace copiado al portapapeles. ¡Compartilo con tus amigos!');
                     }).catch(() => {
-                        // Si falla, mostrar el enlace en un prompt
                         prompt('Copiá este enlace para compartir:', url);
                     });
                 } else {
