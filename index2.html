@@ -762,8 +762,8 @@
         .qty-modal-title {
             color: #ffb703;
             font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 16px;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
             letter-spacing: 0.5px;
             text-align: center;
         }
@@ -1046,7 +1046,8 @@
                 padding: 24px 16px 16px;
             }
             .qty-modal-title {
-                font-size: 0.9rem;
+                font-size: 1.1rem;
+                margin-bottom: 16px;
             }
             .med-grid button {
                 font-size: 1.6rem;
@@ -1177,7 +1178,7 @@
                     <label for="direccion">Dirección de entrega</label>
                     <input type="text" id="direccion" placeholder="Calle, número, piso, etc." autocomplete="street-address" />
                     <div class="envio-leyenda">
-                        🚚 La entrega tiene un costo adicional de <strong>$3.000</strong> que se suma al total de tu compra.
+                        🚚 La entrega tiene un costo adicional de <strong>$2.000</strong> que se suma al total de tu compra.
                     </div>
                 </div>
             </div>
@@ -1719,7 +1720,7 @@
         const addressField = document.getElementById('addressField');
         const direccionInput = document.getElementById('direccion');
         const totalDisplay = document.getElementById('totalDisplay');
-        const COSTO_ENVIO = 3000;
+        const COSTO_ENVIO = 2000;   // ← cambiado a $2.000
 
         function isEntregaSelected() {
             return formaEnvioSelect.value === 'entrega';
