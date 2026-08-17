@@ -50,7 +50,7 @@
             border-radius: 50%;
             overflow: hidden;
             background: #1a2e1a;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05), 0 0 0 3px #ffffff;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05); /* ← sombra suave, sin borde */
             position: relative;
         }
 
@@ -60,6 +60,8 @@
             object-fit: cover;
             object-position: center;
             display: block;
+            transform: scale(1.1);          /* ← zoom del 10% */
+            transform-origin: center center;
         }
 
         .brand .tagline {
