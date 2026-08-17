@@ -3,13 +3,86 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>Tech Classic Burgers · Pedido</title>
+
+    <!-- ===== SEO Y META TAGS ===== -->
+    <title>Tech Classic Burgers · Las mejores hamburguesas artesanales en Córdoba</title>
+    <meta name="description" content="Pedí las mejores hamburguesas Tech de Córdoba. Doble medallón 120gr, papas gratis, envío a domicilio. Horario: Mar–Dom 20:00 a 00:00." />
+    <meta name="keywords" content="hamburguesas, burgers, tech classic, comida rápida, Córdoba, delivery, pedidos, hamburguesas artesanales" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://techclassicburgers.com/" />
+
+    <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
+    <meta property="og:title" content="Tech Classic Burgers · Pedí tu hamburguesa artesanal" />
+    <meta property="og:description" content="Doble medallón, papas gratis y el mejor sabor Tech. ¡Hacé tu pedido ahora!" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://techclassicburgers.com/" />
+    <meta property="og:image" content="https://techclassicburgers.com/images/icon-512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:locale" content="es_AR" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Tech Classic Burgers · Pedí tu hamburguesa artesanal" />
+    <meta name="twitter:description" content="Doble medallón, papas gratis y el mejor sabor Tech. ¡Hacé tu pedido ahora!" />
+    <meta name="twitter:image" content="https://techclassicburgers.com/images/icon-512.png" />
 
     <!-- ===== META TAGS PARA PWA ===== -->
-    <meta name="theme-color" content="#11522c" />
+    <meta name="theme-color" content="#1a2e1a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="manifest.json" />
+
+    <!-- ===== MARCADO ESTRUCTURADO JSON-LD (SEO para Google AI) ===== -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Restaurant",
+            "name": "Tech Classic Burgers",
+            "description": "Las mejores hamburguesas artesanales de Córdoba. Especialidad en doble medallón de 120gr, papas gratis y salsas exclusivas.",
+            "image": "https://techclassicburgers.com/images/icon-512.png",
+            "telephone": "+5493518692251",
+            "email": "contacto@techclassicburgers.com",
+            "url": "https://techclassicburgers.com/",
+            "priceRange": "$12000 - $18000",
+            "servesCuisine": "Hamburguesería artesanal",
+            "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Córdoba",
+                "addressCountry": "AR"
+            },
+            "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": "-31.4201",
+                "longitude": "-64.1888"
+            },
+            "openingHoursSpecification": [
+                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Monday", "opens": "00:00", "closes": "00:00" },
+                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Tuesday", "opens": "20:00", "closes": "00:00" },
+                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Wednesday", "opens": "20:00", "closes": "00:00" },
+                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Thursday", "opens": "20:00", "closes": "00:00" },
+                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Friday", "opens": "20:00", "closes": "00:00" },
+                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "20:00", "closes": "00:00" },
+                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "20:00", "closes": "00:00" }
+            ],
+            "menu": {
+                "@type": "Menu",
+                "name": "Menú Tech Classic",
+                "hasMenuItems": [
+                    { "@type": "MenuItem", "name": "Armá tu Burger", "description": "1 medallón 120gr · doble cheddar · salsa Tech. Agregá medallones y toppings.", "price": "12000", "priceCurrency": "ARS" },
+                    { "@type": "MenuItem", "name": "Doble Provoleta", "description": "Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.", "price": "18000", "priceCurrency": "ARS" },
+                    { "@type": "MenuItem", "name": "Intense", "description": "Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.", "price": "18000", "priceCurrency": "ARS" },
+                    { "@type": "MenuItem", "name": "Tech Mex", "description": "Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.", "price": "18000", "priceCurrency": "ARS" },
+                    { "@type": "MenuItem", "name": "Yankee", "description": "Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.", "price": "16000", "priceCurrency": "ARS" },
+                    { "@type": "MenuItem", "name": "Clásica", "description": "Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.", "price": "16000", "priceCurrency": "ARS" }
+                ]
+            },
+            "potentialAction": {
+                "@type": "OrderAction",
+                "target": "https://wa.me/5493518692251?text=Hola%2C%20Quiero%20hacer%20un%20pedido"
+            }
+        }
+    </script>
 
     <style>
         /* ===== RESET & BASE ===== */
@@ -20,7 +93,7 @@
         }
 
         body {
-            background-color: #11522c;
+            background-color: #1a2e1a;
             color: #e8f0e8;
             font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
             padding: 16px 12px 40px;
@@ -42,26 +115,14 @@
             margin-bottom: 20px;
         }
 
-        .logo-video-container {
+        .brand .logo {
             max-width: 306px;
             width: 100%;
-            aspect-ratio: 1 / 1;
+            height: auto;
+            display: block;
             margin: 0 auto 12px;
             border-radius: 50%;
-            overflow: hidden;
-            background: #11522c;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
-            position: relative;
-        }
-
-        .logo-video-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            display: block;
-            transform: scale(1.1);
-            transform-origin: center center;
         }
 
         .brand .tagline {
@@ -382,7 +443,6 @@
         .product-info {
             flex: 1;
             min-width: 0;
-            pointer-events: none;
         }
 
         .product-header {
@@ -417,7 +477,7 @@
             font-size: 1.1rem;
             font-weight: 800;
             color: #ffb703;
-            background: #11522c;
+            background: #1a2e1a;
             padding: 0 10px;
             border-radius: 30px;
             line-height: 1.8;
@@ -439,7 +499,6 @@
             align-items: center;
             gap: 8px 12px;
             margin-top: 4px;
-            pointer-events: auto;
         }
 
         .product-extras label {
@@ -448,12 +507,11 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            pointer-events: auto;
         }
 
         .product-extras input[type="number"] {
             width: 44px;
-            background: #11522c;
+            background: #1a2e1a;
             border: 1px solid #3a5a3a;
             border-radius: 30px;
             padding: 4px 4px 4px 8px;
@@ -463,7 +521,6 @@
             outline: none;
             cursor: pointer;
             -moz-appearance: textfield;
-            pointer-events: auto;
         }
 
         .product-extras input[type="number"]::-webkit-outer-spin-button,
@@ -483,7 +540,7 @@
         }
 
         .product-extras .qty-wrap label {
-            display: none;
+            color: #b8d0b8;
         }
 
         .toppings-group {
@@ -494,7 +551,6 @@
             padding-top: 6px;
             border-top: 1px dashed #2f4a2f;
             width: 100%;
-            pointer-events: auto;
         }
 
         .toppings-group label {
@@ -503,7 +559,6 @@
             display: flex;
             align-items: center;
             gap: 3px;
-            pointer-events: auto;
         }
 
         .toppings-group input[type="checkbox"] {
@@ -511,7 +566,6 @@
             width: 15px;
             height: 15px;
             cursor: pointer;
-            pointer-events: auto;
         }
 
         /* ===== BOTÓN DE CANCELAR EN LA TARJETA ===== */
@@ -586,7 +640,7 @@
         .form-group select {
             width: 100%;
             padding: 12px 14px;
-            background: #11522c;
+            background: #1a2e1a;
             border: 1px solid #3a5a3a;
             border-radius: 40px;
             color: #fff;
@@ -629,7 +683,7 @@
             flex: 1;
             min-width: 80px;
             padding: 12px 8px;
-            background: #11522c;
+            background: #1a2e1a;
             border: 2px solid #3a5a3a;
             border-radius: 16px;
             color: #b8d0b8;
@@ -679,7 +733,7 @@
         .envio-leyenda {
             font-size: 0.85rem;
             color: #ffb703;
-            background: #11522c;
+            background: #1a2e1a;
             padding: 8px 12px;
             border-radius: 10px;
             border: 1px solid #3a5a3a;
@@ -688,7 +742,7 @@
         }
 
         .total-box {
-            background: #11522c;
+            background: #1a2e1a;
             border-radius: 60px;
             padding: 14px 20px;
             display: flex;
@@ -775,7 +829,7 @@
             width: 4px;
         }
         ::-webkit-scrollbar-track {
-            background: #11522c;
+            background: #1a2e1a;
         }
         ::-webkit-scrollbar-thumb {
             background: #e63946;
@@ -812,169 +866,113 @@
             cursor: pointer;
         }
 
-        /* ===== MODAL DE CANTIDAD (con título) ===== */
-        .qty-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(4px);
-        }
-
-        .qty-modal.active {
-            display: flex;
-        }
-
-        .qty-modal-content {
-            background: #1f331f;
-            border-radius: 24px;
-            padding: 28px 20px 20px;
-            border: 2px solid #3a5a3a;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-            max-width: 320px;
-            width: 90%;
-            text-align: center;
-        }
-
-        .qty-modal-title {
-            color: #ffb703;
-            font-weight: 700;
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            letter-spacing: 0.5px;
-            text-align: center;
-        }
-
-        .qty-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            justify-items: center;
-            margin-bottom: 12px;
-        }
-
-        .qty-grid button {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            max-width: 80px;
-            border: none;
-            border-radius: 50%;
-            background: #2a4a2a;
-            color: #fff;
-            font-size: 1.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .qty-grid button:active {
-            transform: scale(0.92);
-            background: #3a6a3a;
-        }
-
-        .qty-grid .qty-empty {
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        /* ===== MODAL DE MEDALLONES EXTRA ===== */
-        .med-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 10000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(4px);
-        }
-
-        .med-modal.active {
-            display: flex;
-        }
-
-        .med-modal-content {
-            background: #1f331f;
-            border-radius: 24px;
-            padding: 28px 20px 20px;
-            border: 2px solid #3a5a3a;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-            max-width: 280px;
-            width: 85%;
-            text-align: center;
-        }
-
-        .med-modal-title {
-            color: #ffb703;
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
-        }
-
-        .med-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            justify-items: center;
-            margin-bottom: 16px;
-        }
-
-        .med-grid button {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            max-width: 70px;
-            border: none;
-            border-radius: 50%;
-            background: #2a4a2a;
-            color: #fff;
-            font-size: 1.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .med-grid button:active {
-            transform: scale(0.92);
-            background: #3a6a3a;
-        }
-
-        .med-cancelar {
-            width: 100%;
-            border: 2px solid #f44336;
-            border-radius: 40px;
-            background: #3a1a1a;
-            color: #ff6b6b;
-            font-size: 1rem;
-            font-weight: 600;
-            padding: 12px 10px;
-            cursor: pointer;
-            transition: background 0.15s, transform 0.1s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            line-height: 1.3;
-        }
-
-        .med-cancelar:active {
-            background: #5a2a2a;
-            transform: scale(0.97);
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            body {
+                font-size: 17px;
+            }
+            .product-name {
+                font-size: 1.2rem;
+            }
+            .product-price {
+                font-size: 1.2rem;
+            }
+            .product-desc {
+                font-size: 0.9rem;
+            }
+            .product-extras label {
+                font-size: 0.9rem;
+            }
+            .toppings-group label {
+                font-size: 0.85rem;
+            }
+            .form-group label {
+                font-size: 0.95rem;
+            }
+            .form-group input,
+            .form-group select {
+                font-size: 1rem;
+                padding: 14px 16px;
+            }
+            .total-box .amount {
+                font-size: 1.8rem;
+            }
+            .btn-send {
+                font-size: 1.3rem;
+                padding: 18px;
+            }
+            .brand .tagline {
+                font-size: 1rem;
+            }
+            .form-section h2 {
+                font-size: 1.2rem;
+            }
+            .brand .logo {
+                max-width: 260px;
+                margin-bottom: 10px;
+            }
+            .status-card {
+                font-size: 0.9rem;
+                padding: 10px 12px;
+            }
+            .status-card .horario {
+                font-size: 0.75rem;
+            }
+            .footnote {
+                font-size: 0.75rem;
+            }
+            .footnote .sc-link {
+                font-size: 0.7rem;
+            }
+            .envio-leyenda {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+            .toast-confirm .toast-content {
+                font-size: 2.2rem;
+                padding: 30px 24px;
+            }
+            .toast-confirm .toast-content .emoji {
+                font-size: 3.2rem;
+            }
+            .btn-cancelar-item {
+                width: 28px;
+                height: 28px;
+                font-size: 1rem;
+                top: 6px;
+                right: 6px;
+            }
+            .pago-btn {
+                min-width: 60px;
+                padding: 10px 6px;
+                font-size: 0.8rem;
+            }
+            .pago-btn .icono {
+                font-size: 1.5rem;
+            }
+            .pago-btn .label {
+                font-size: 0.65rem;
+            }
+            .btn-instagram {
+                width: 50px;
+                height: 50px;
+                bottom: 16px;
+                right: 16px;
+            }
+            .btn-instagram svg {
+                width: 26px;
+                height: 26px;
+            }
+            .btn-share {
+                width: 50px;
+                height: 50px;
+                bottom: 16px;
+                left: 16px;
+            }
+            .btn-share svg {
+                width: 26px;
+                height: 26px;
+            }
         }
 
         /* ===== BOTÓN FLOTANTE INSTAGRAM (derecha) ===== */
@@ -1051,248 +1049,6 @@
             fill: #e8f0e8;
             display: block;
         }
-
-        /* ===== BANNER DE COOKIES ===== */
-        .cookie-banner {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #1f331f;
-            border-top: 3px solid #ffb703;
-            padding: 16px 20px;
-            z-index: 99999;
-            box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.6);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            text-align: center;
-        }
-
-        .cookie-banner.active {
-            display: flex;
-        }
-
-        .cookie-banner p {
-            font-size: 0.9rem;
-            color: #d0e0d0;
-            max-width: 500px;
-            margin: 0;
-        }
-
-        .cookie-banner p a {
-            color: #ffb703;
-            text-decoration: underline;
-        }
-
-        .cookie-banner .cookie-botones {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .cookie-banner .cookie-botones button {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
-
-        .cookie-banner .cookie-botones .btn-aceptar {
-            background: #ffb703;
-            color: #1a1a1a;
-        }
-
-        .cookie-banner .cookie-botones .btn-aceptar:hover {
-            background: #e6a500;
-        }
-
-        .cookie-banner .cookie-botones .btn-aceptar:active {
-            transform: scale(0.97);
-        }
-
-        .cookie-banner .cookie-botones .btn-mas-info {
-            background: transparent;
-            color: #b8d0b8;
-            border: 2px solid #3a5a3a;
-        }
-
-        .cookie-banner .cookie-botones .btn-mas-info:hover {
-            background: #2a4a2a;
-            border-color: #6a8a6a;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 480px) {
-            body {
-                font-size: 17px;
-            }
-            .product-name {
-                font-size: 1.2rem;
-            }
-            .product-price {
-                font-size: 1.2rem;
-            }
-            .product-desc {
-                font-size: 0.9rem;
-            }
-            .product-extras label {
-                font-size: 0.9rem;
-            }
-            .toppings-group label {
-                font-size: 0.85rem;
-            }
-            .form-group label {
-                font-size: 0.95rem;
-            }
-            .form-group input,
-            .form-group select {
-                font-size: 1rem;
-                padding: 14px 16px;
-            }
-            .total-box .amount {
-                font-size: 1.8rem;
-            }
-            .btn-send {
-                font-size: 1.3rem;
-                padding: 18px;
-            }
-            .brand .tagline {
-                font-size: 1rem;
-            }
-            .form-section h2 {
-                font-size: 1.2rem;
-            }
-            .logo-video-container {
-                max-width: 260px;
-                margin-bottom: 10px;
-            }
-            .status-card {
-                font-size: 0.9rem;
-                padding: 10px 12px;
-            }
-            .status-card .horario {
-                font-size: 0.75rem;
-            }
-            .footnote {
-                font-size: 0.75rem;
-            }
-            .footnote .sc-link {
-                font-size: 0.7rem;
-            }
-            .envio-leyenda {
-                font-size: 0.8rem;
-                padding: 6px 10px;
-            }
-            .toast-confirm .toast-content {
-                font-size: 2.2rem;
-                padding: 30px 24px;
-            }
-            .toast-confirm .toast-content .emoji {
-                font-size: 3.2rem;
-            }
-            .qty-grid button {
-                font-size: 1.6rem;
-                max-width: 70px;
-            }
-            .qty-modal-content {
-                padding: 24px 16px 16px;
-            }
-            .qty-modal-title {
-                font-size: 1.1rem;
-                margin-bottom: 16px;
-            }
-            .med-grid button {
-                font-size: 1.6rem;
-                max-width: 60px;
-            }
-            .med-modal-content {
-                padding: 24px 16px 16px;
-                max-width: 250px;
-            }
-            .med-cancelar {
-                font-size: 0.9rem;
-                padding: 10px 8px;
-            }
-            .resumen-modal-content {
-                padding: 18px 14px;
-            }
-            .resumen-modal-content h3 {
-                font-size: 1.3rem;
-            }
-            .resumen-item {
-                font-size: 0.8rem;
-            }
-            .resumen-total {
-                font-size: 1rem;
-            }
-            .resumen-botones button {
-                font-size: 0.9rem;
-                padding: 12px;
-            }
-            .cancel-modal-content {
-                padding: 30px 20px 20px;
-            }
-            .cancel-modal-content .emoji {
-                font-size: 3.2rem;
-            }
-            .cancel-modal-content .mensaje {
-                font-size: 1.2rem;
-            }
-            .btn-cancelar-item {
-                width: 28px;
-                height: 28px;
-                font-size: 1rem;
-                top: 6px;
-                right: 6px;
-            }
-            .pago-btn {
-                min-width: 60px;
-                padding: 10px 6px;
-                font-size: 0.8rem;
-            }
-            .pago-btn .icono {
-                font-size: 1.5rem;
-            }
-            .pago-btn .label {
-                font-size: 0.65rem;
-            }
-            .btn-instagram {
-                width: 50px;
-                height: 50px;
-                bottom: 16px;
-                right: 16px;
-            }
-            .btn-instagram svg {
-                width: 26px;
-                height: 26px;
-            }
-            .btn-share {
-                width: 50px;
-                height: 50px;
-                bottom: 16px;
-                left: 16px;
-            }
-            .btn-share svg {
-                width: 26px;
-                height: 26px;
-            }
-            .cookie-banner {
-                padding: 14px 16px;
-            }
-            .cookie-banner p {
-                font-size: 0.8rem;
-            }
-            .cookie-banner .cookie-botones button {
-                padding: 8px 18px;
-                font-size: 0.8rem;
-            }
-        }
     </style>
 </head>
 <body>
@@ -1300,9 +1056,7 @@
 
         <!-- BRAND -->
         <div class="brand">
-            <div class="logo-video-container">
-                <img src="images/icon-512.png" alt="Tech Classic Burgers" />
-            </div>
+            <img src="images/logo_tech.png" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
             <div class="status-card" id="statusCard">
                 <div id="statusText">⏳ Cargando...</div>
@@ -1355,7 +1109,7 @@
                     <label for="direccion">Dirección de entrega</label>
                     <input type="text" id="direccion" placeholder="Calle, número, piso, etc." autocomplete="street-address" />
                     <div class="envio-leyenda">
-                        🚚 La entrega tiene un costo adicional de <strong>$2.000</strong> que se suma al total de tu compra.
+                        🚚 La entrega tiene un costo adicional de <strong>$2.500</strong> que se suma al total de tu compra.
                     </div>
                 </div>
             </div>
@@ -1384,44 +1138,44 @@
     </div>
 
     <!-- ===== MODAL DE CANTIDAD (con título) ===== -->
-    <div id="qtyModal" class="qty-modal">
-        <div class="qty-modal-content">
-            <div class="qty-modal-title">➕ Cuantas querés..?</div>
-            <div class="qty-grid">
-                <button data-value="1">1</button>
-                <button data-value="2">2</button>
-                <button data-value="3">3</button>
-                <button data-value="4">4</button>
-                <button data-value="5">5</button>
-                <button data-value="6">6</button>
-                <button data-value="7">7</button>
-                <button data-value="8">8</button>
-                <button data-value="9">9</button>
-                <span class="qty-empty"></span>
-                <span class="qty-empty"></span>
-                <span class="qty-empty"></span>
+    <div id="qtyModal" class="qty-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center; backdrop-filter:blur(4px);">
+        <div style="background:#1f331f; border-radius:24px; padding:28px 20px 20px; border:2px solid #3a5a3a; max-width:320px; width:90%; text-align:center;">
+            <div style="color:#ffb703; font-weight:700; font-size:1.4rem; margin-bottom:20px;">➕ Cuantas querés..?</div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; justify-items:center; margin-bottom:12px;">
+                <button data-value="1" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">1</button>
+                <button data-value="2" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">2</button>
+                <button data-value="3" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">3</button>
+                <button data-value="4" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">4</button>
+                <button data-value="5" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">5</button>
+                <button data-value="6" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">6</button>
+                <button data-value="7" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">7</button>
+                <button data-value="8" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">8</button>
+                <button data-value="9" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">9</button>
+                <span style="visibility:hidden;"></span>
+                <span style="visibility:hidden;"></span>
+                <span style="visibility:hidden;"></span>
             </div>
         </div>
     </div>
 
     <!-- ===== MODAL DE MEDALLONES EXTRA ===== -->
-    <div id="medModal" class="med-modal">
-        <div class="med-modal-content">
-            <div class="med-modal-title">➕ Medallones extra</div>
-            <div class="med-grid">
-                <button data-value="1">1</button>
-                <button data-value="2">2</button>
-                <button data-value="3">3</button>
+    <div id="medModal" class="med-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; justify-content:center; align-items:center; backdrop-filter:blur(4px);">
+        <div style="background:#1f331f; border-radius:24px; padding:28px 20px 20px; border:2px solid #3a5a3a; max-width:280px; width:85%; text-align:center;">
+            <div style="color:#ffb703; font-weight:700; font-size:1rem; margin-bottom:16px;">➕ Medallones extra</div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; justify-items:center; margin-bottom:16px;">
+                <button data-value="1" style="width:100%; aspect-ratio:1/1; max-width:70px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">1</button>
+                <button data-value="2" style="width:100%; aspect-ratio:1/1; max-width:70px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">2</button>
+                <button data-value="3" style="width:100%; aspect-ratio:1/1; max-width:70px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">3</button>
             </div>
-            <button class="med-cancelar" id="medCancelar">Cancelar</button>
+            <button id="medCancelar" style="width:100%; border:2px solid #f44336; border-radius:40px; background:#3a1a1a; color:#ff6b6b; font-size:1rem; font-weight:600; padding:12px 10px; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">Cancelar</button>
         </div>
     </div>
 
     <!-- ===== MODAL DE CONFIRMACIÓN PARA CANCELAR (sin botones) ===== -->
-    <div id="cancelModal" class="cancel-modal">
-        <div class="cancel-modal-content">
-            <span class="emoji">👍</span>
-            <div class="mensaje">Elegí tranquilo</div>
+    <div id="cancelModal" class="cancel-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:99998; justify-content:center; align-items:center; backdrop-filter:blur(4px); padding:16px;">
+        <div style="background:#1f331f; border-radius:24px; padding:40px 30px 30px; border:2px solid #3a5a3a; max-width:340px; width:100%; text-align:center;">
+            <span style="font-size:4rem; display:block; margin-bottom:12px;">👍</span>
+            <div style="font-size:1.4rem; font-weight:700; color:#e8f0e8; line-height:1.4;">Elegí tranquilo</div>
         </div>
     </div>
 
@@ -1435,19 +1189,6 @@
                 <button class="btn-cancelar-resumen" id="btnCancelarResumen">✖ Cancelar</button>
                 <button class="btn-confirmar-resumen" id="btnConfirmarResumen">✅ Confirmar y enviar</button>
             </div>
-        </div>
-    </div>
-
-    <!-- ===== BANNER DE COOKIES ===== -->
-    <div id="cookieBanner" class="cookie-banner">
-        <p>
-            🍪 Usamos cookies propias y de terceros para mejorar tu experiencia.
-            Al continuar navegando, aceptas su uso.
-            <a href="#" target="_blank">Más información</a>
-        </p>
-        <div class="cookie-botones">
-            <button class="btn-aceptar" id="aceptarCookies">Aceptar</button>
-            <button class="btn-mas-info" id="masInfoCookies">Más info</button>
         </div>
     </div>
 
@@ -1471,34 +1212,6 @@
     </button>
 
     <script>
-        // ============================================================
-        //  COOKIES BANNER
-        // ============================================================
-        const cookieBanner = document.getElementById('cookieBanner');
-        const aceptarBtn = document.getElementById('aceptarCookies');
-        const masInfoBtn = document.getElementById('masInfoCookies');
-
-        function checkCookies() {
-            const cookiesAceptadas = localStorage.getItem('cookies_aceptadas');
-            if (cookiesAceptadas === 'true') {
-                cookieBanner.classList.remove('active');
-            } else {
-                cookieBanner.classList.add('active');
-            }
-        }
-
-        function aceptarCookies() {
-            localStorage.setItem('cookies_aceptadas', 'true');
-            cookieBanner.classList.remove('active');
-        }
-
-        aceptarBtn.addEventListener('click', aceptarCookies);
-        masInfoBtn.addEventListener('click', function() {
-            alert('📄 Política de cookies: Usamos cookies para mejorar tu experiencia. Podés gestionarlas desde la configuración de tu navegador.');
-        });
-
-        checkCookies();
-
         // ============================================================
         //  REGISTRO DE SERVICE WORKER (PWA)
         // ============================================================
@@ -1668,18 +1381,18 @@
                 priceSpan.textContent = `$${p.price.toLocaleString()}`;
                 header.appendChild(nameSpan);
                 header.appendChild(priceSpan);
-                info.appendChild(header);
 
                 const desc = document.createElement('div');
                 desc.className = 'product-desc';
                 desc.textContent = p.desc;
-                info.appendChild(desc);
 
                 const extras = document.createElement('div');
                 extras.className = 'product-extras';
 
                 const qtyWrap = document.createElement('div');
                 qtyWrap.className = 'qty-wrap';
+                const qtyLabel = document.createElement('label');
+                qtyLabel.textContent = 'Cant.';
                 const qtyInput = document.createElement('input');
                 qtyInput.type = 'number';
                 qtyInput.min = 0;
@@ -1687,6 +1400,7 @@
                 qtyInput.dataset.productId = p.id;
                 qtyInput.className = 'qty-input';
                 qtyInput.readOnly = true;
+                qtyWrap.appendChild(qtyLabel);
                 qtyWrap.appendChild(qtyInput);
                 extras.appendChild(qtyWrap);
 
@@ -1719,6 +1433,8 @@
                     extras.appendChild(toppingsDiv);
                 }
 
+                info.appendChild(header);
+                info.appendChild(desc);
                 info.appendChild(extras);
 
                 card.appendChild(info);
@@ -1776,20 +1492,20 @@
         //  MODALES Y EVENTOS DE CLIC
         // ============================================================
 
-        // --- Modal de cancelación (sin botones, se cierra automáticamente) ---
+        // --- Modal de cancelación ---
         const cancelModal = document.getElementById('cancelModal');
 
         function mostrarCancelModal() {
-            cancelModal.classList.add('active');
+            cancelModal.style.display = 'flex';
             clearTimeout(cancelModal._timer);
             cancelModal._timer = setTimeout(function() {
-                cancelModal.classList.remove('active');
+                cancelModal.style.display = 'none';
             }, 900);
         }
 
         cancelModal.addEventListener('click', function(e) {
             if (e.target === this) {
-                cancelModal.classList.remove('active');
+                cancelModal.style.display = 'none';
                 clearTimeout(cancelModal._timer);
             }
         });
@@ -1797,37 +1513,37 @@
         // --- Modales de cantidad y medallones ---
         let currentInput = null;
         let currentProductId = null;
-        const modal = document.getElementById('qtyModal');
-        const modalButtons = modal.querySelectorAll('.qty-grid button');
+        const qtyModal = document.getElementById('qtyModal');
+        const qtyModalButtons = qtyModal.querySelectorAll('button');
 
         let currentMedInput = null;
         const medModal = document.getElementById('medModal');
-        const medButtons = medModal.querySelectorAll('.med-grid button');
+        const medModalButtons = medModal.querySelectorAll('button');
         const medCancelar = document.getElementById('medCancelar');
 
-        function openModalForInput(input) {
+        function openQtyModal(input) {
             if (input) {
                 currentInput = input;
                 currentProductId = input.dataset.productId;
-                modal.classList.add('active');
+                qtyModal.style.display = 'flex';
             }
         }
 
-        function closeModal() {
-            modal.classList.remove('active');
+        function closeQtyModal() {
+            qtyModal.style.display = 'none';
             currentInput = null;
             currentProductId = null;
         }
 
-        function openMedModalForInput(input) {
+        function openMedModal(input) {
             if (input) {
                 currentMedInput = input;
-                medModal.classList.add('active');
+                medModal.style.display = 'flex';
             }
         }
 
         function closeMedModal() {
-            medModal.classList.remove('active');
+            medModal.style.display = 'none';
             currentMedInput = null;
         }
 
@@ -1835,12 +1551,12 @@
             const target = e.target;
 
             if (target.classList.contains('qty-input')) {
-                openModalForInput(target);
+                openQtyModal(target);
                 return;
             }
 
             if (target.classList.contains('med-extra-input')) {
-                openMedModalForInput(target);
+                openMedModal(target);
                 return;
             }
 
@@ -1854,7 +1570,7 @@
             }
         });
 
-        modalButtons.forEach(btn => {
+        qtyModalButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const val = parseInt(this.dataset.value, 10);
@@ -1868,19 +1584,20 @@
                         const evt = new Event('input', { bubbles: true });
                         currentInput.dispatchEvent(evt);
                         actualizarVisibilidadCancelar();
+                        updateTotal();
                     }
                 }
-                closeModal();
+                closeQtyModal();
             });
         });
 
-        modal.addEventListener('click', function(e) {
+        qtyModal.addEventListener('click', function(e) {
             if (e.target === this) {
-                closeModal();
+                closeQtyModal();
             }
         });
 
-        medButtons.forEach(btn => {
+        medModalButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const val = parseInt(this.dataset.value, 10);
@@ -1889,6 +1606,7 @@
                         currentMedInput.value = val;
                         const evt = new Event('input', { bubbles: true });
                         currentMedInput.dispatchEvent(evt);
+                        updateTotal();
                     }
                 }
                 closeMedModal();
@@ -1912,20 +1630,6 @@
         const formaEnvioSelect = document.getElementById('formaEnvio');
         const pagoBotones = document.querySelectorAll('.pago-btn');
         let pagoSeleccionado = null;
-
-        function seleccionarPago(valor) {
-            pagoBotones.forEach(btn => {
-                btn.classList.remove('activo');
-                if (btn.dataset.value === valor) {
-                    btn.classList.add('activo');
-                }
-            });
-            pagoSeleccionado = valor;
-        }
-
-        function obtenerPagoSeleccionado() {
-            return pagoSeleccionado || null;
-        }
 
         pagoBotones.forEach(btn => {
             btn.addEventListener('click', function() {
@@ -1975,7 +1679,7 @@
         const addressField = document.getElementById('addressField');
         const direccionInput = document.getElementById('direccion');
         const totalDisplay = document.getElementById('totalDisplay');
-        const COSTO_ENVIO = 2000;
+        const COSTO_ENVIO = 2500;
 
         function isEntregaSelected() {
             return formaEnvioSelect.value === 'entrega';
@@ -2086,7 +1790,7 @@
                 html += `</div>`;
             }
 
-            const pagoValue = obtenerPagoSeleccionado() || 'No especificado';
+            const pagoValue = pagoSeleccionado || 'No especificado';
             html += `<div class="resumen-item" style="border-bottom:1px solid #2f4a2f;">`;
             html += `💳 Pago: ${pagoValue}`;
             if (pagoValue === 'Transferencia') {
@@ -2156,7 +1860,6 @@
         //  ENVÍO POR WHATSAPP
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
-        const MAPS_URL_LOCAL = 'https://bit.ly/4xOCf1o';
 
         function enviarPedido() {
             const nombre = document.getElementById('nombre').value.trim();
@@ -2199,7 +1902,7 @@
 
             mensaje += `\n🍟 *Papas Individuales:* ${totalHamburguesas} GRATIS !!`;
 
-            const pagoValue = obtenerPagoSeleccionado() || 'No especificado';
+            const pagoValue = pagoSeleccionado || 'No especificado';
             mensaje += `\n\n💳 *Pago:* ${pagoValue}`;
 
             if (pagoValue === 'Transferencia') {
@@ -2214,13 +1917,12 @@
 
             if (isEntregaSelected()) {
                 const direccion = direccionInput.value.trim();
-                const direccionEncoded = encodeURIComponent(direccion);
-                const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${direccionEncoded}`;
+                const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(direccion)}`;
                 mensaje += `\n📍 *Dirección:* ${direccion}`;
                 mensaje += `\n🗺️ *Ver ruta:* ${mapsUrl}`;
                 mensaje += `\n🚚 *Costo envío:* $${COSTO_ENVIO.toLocaleString()}`;
             } else {
-                mensaje += `\n📍 *Retirala en este lugar!* ${MAPS_URL_LOCAL}`;
+                mensaje += `\n📍 *Retirala en este lugar!* https://bit.ly/4xOCf1o`;
             }
 
             mensaje += `\n\n💰 *TOTAL:* $${calcularTotal().toLocaleString()}`;
@@ -2262,7 +1964,7 @@
         setTimeout(actualizarVisibilidadCancelar, 100);
 
         // ============================================================
-        //  POPUP DE IMAGEN AL HACER CLIC EN LA MINIATURA (corregido)
+        //  POPUP DE IMAGEN AL HACER CLIC EN LA MINIATURA
         // ============================================================
         const imagePopup = document.getElementById('imagePopup');
         const popupImage = document.getElementById('popupImage');
@@ -2273,13 +1975,11 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // Cerrar al hacer clic en el fondo o en la imagen
         imagePopup.addEventListener('click', function(e) {
             imagePopup.classList.remove('active');
             document.body.style.overflow = '';
         });
 
-        // Detectar clic en el contenedor .product-img (o sus hijos)
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
             const imgDiv = target.closest('.product-img');
@@ -2295,7 +1995,6 @@
             }
         });
 
-        // Cerrar con tecla ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && imagePopup.classList.contains('active')) {
                 imagePopup.classList.remove('active');
