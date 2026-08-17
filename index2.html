@@ -12,10 +12,7 @@
     <link rel="manifest" href="manifest.json" />
 
     <style>
-        :root {
-            --bg-color: #1a2e1a;
-        }
-
+        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -23,7 +20,7 @@
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: #1a2e1a;
             color: #e8f0e8;
             font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
             padding: 16px 12px 40px;
@@ -39,6 +36,7 @@
             width: 100%;
         }
 
+        /* ===== BRAND ===== */
         .brand {
             text-align: center;
             margin-bottom: 20px;
@@ -51,18 +49,16 @@
             margin: 0 auto 12px;
             border-radius: 50%;
             overflow: hidden;
-            background: var(--bg-color);
+            background: #1a2e1a;
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.05), 0 0 0 3px #ffffff;
             position: relative;
         }
 
-        .logo-video-container video {
+        .logo-video-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: 20% 50%;   /* 30% a la izquierda */
-            transform: scale(1.5);       /* más zoom */
-            transform-origin: center center;
+            object-position: center;
             display: block;
         }
 
@@ -79,6 +75,7 @@
             color: #ffb703;
         }
 
+        /* ===== TARJETA DE ESTADO ABIERTO/CERRADO ===== */
         .status-card {
             background: #1f331f;
             border-radius: 16px;
@@ -117,6 +114,7 @@
             margin-top: 4px;
         }
 
+        /* ===== TOAST DE CONFIRMACIÓN ===== */
         .toast-confirm {
             position: fixed;
             top: 0;
@@ -164,6 +162,7 @@
             margin-top: 8px;
         }
 
+        /* ===== MODAL DE RESUMEN DEL PEDIDO ===== */
         .resumen-modal {
             display: none;
             position: fixed;
@@ -280,6 +279,7 @@
             transform: scale(0.97);
         }
 
+        /* ===== PRODUCT CARDS ===== */
         .product-grid {
             display: flex;
             flex-direction: column;
@@ -363,7 +363,7 @@
             font-size: 1.1rem;
             font-weight: 800;
             color: #ffb703;
-            background: var(--bg-color);
+            background: #1a2e1a;
             padding: 0 10px;
             border-radius: 30px;
             line-height: 1.8;
@@ -399,7 +399,7 @@
 
         .product-extras input[type="number"] {
             width: 44px;
-            background: var(--bg-color);
+            background: #1a2e1a;
             border: 1px solid #3a5a3a;
             border-radius: 30px;
             padding: 4px 4px 4px 8px;
@@ -460,6 +460,7 @@
             pointer-events: auto;
         }
 
+        /* ===== BOTÓN DE CANCELAR EN LA TARJETA ===== */
         .btn-cancelar-item {
             position: absolute;
             top: 8px;
@@ -494,6 +495,7 @@
             display: flex;
         }
 
+        /* ===== FORM ===== */
         .form-section {
             background: #1f331f;
             border-radius: 18px;
@@ -529,7 +531,7 @@
         .form-group select {
             width: 100%;
             padding: 12px 14px;
-            background: var(--bg-color);
+            background: #1a2e1a;
             border: 1px solid #3a5a3a;
             border-radius: 40px;
             color: #fff;
@@ -561,6 +563,7 @@
             display: block;
         }
 
+        /* ===== BOTONES DE PAGO CON ICONOS ===== */
         .pago-botones {
             display: flex;
             gap: 12px;
@@ -571,7 +574,7 @@
             flex: 1;
             min-width: 80px;
             padding: 12px 8px;
-            background: var(--bg-color);
+            background: #1a2e1a;
             border: 2px solid #3a5a3a;
             border-radius: 16px;
             color: #b8d0b8;
@@ -621,7 +624,7 @@
         .envio-leyenda {
             font-size: 0.85rem;
             color: #ffb703;
-            background: var(--bg-color);
+            background: #1a2e1a;
             padding: 8px 12px;
             border-radius: 10px;
             border: 1px solid #3a5a3a;
@@ -630,7 +633,7 @@
         }
 
         .total-box {
-            background: var(--bg-color);
+            background: #1a2e1a;
             border-radius: 60px;
             padding: 14px 20px;
             display: flex;
@@ -717,13 +720,14 @@
             width: 4px;
         }
         ::-webkit-scrollbar-track {
-            background: var(--bg-color);
+            background: #1a2e1a;
         }
         ::-webkit-scrollbar-thumb {
             background: #e63946;
             border-radius: 10px;
         }
 
+        /* ===== MODAL DE CANTIDAD (sin botón Cerrar) ===== */
         .qty-modal {
             display: none;
             position: fixed;
@@ -750,16 +754,6 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
             max-width: 320px;
             width: 90%;
-            text-align: center;
-        }
-
-        .qty-modal-title {
-            color: #ffb703;
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
-            text-align: center;
         }
 
         .qty-grid {
@@ -798,6 +792,9 @@
             pointer-events: none;
         }
 
+        /* NOTA: El botón Cerrar ha sido eliminado */
+
+        /* ===== MODAL DE MEDALLONES EXTRA ===== */
         .med-modal {
             display: none;
             position: fixed;
@@ -887,6 +884,7 @@
             transform: scale(0.97);
         }
 
+        /* ===== BOTÓN FLOTANTE INSTAGRAM (derecha) ===== */
         .btn-instagram {
             position: fixed;
             bottom: 24px;
@@ -922,6 +920,7 @@
             display: block;
         }
 
+        /* ===== BOTÓN FLOTANTE COMPARTIR (izquierda) ===== */
         .btn-share {
             position: fixed;
             bottom: 24px;
@@ -960,59 +959,158 @@
             display: block;
         }
 
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
-            body { font-size: 17px; }
-            .product-name { font-size: 1.2rem; }
-            .product-price { font-size: 1.2rem; }
-            .product-desc { font-size: 0.9rem; }
-            .product-extras label { font-size: 0.9rem; }
-            .toppings-group label { font-size: 0.85rem; }
-            .form-group label { font-size: 0.95rem; }
+            body {
+                font-size: 17px;
+            }
+            .product-name {
+                font-size: 1.2rem;
+            }
+            .product-price {
+                font-size: 1.2rem;
+            }
+            .product-desc {
+                font-size: 0.9rem;
+            }
+            .product-extras label {
+                font-size: 0.9rem;
+            }
+            .toppings-group label {
+                font-size: 0.85rem;
+            }
+            .form-group label {
+                font-size: 0.95rem;
+            }
             .form-group input,
-            .form-group select { font-size: 1rem; padding: 14px 16px; }
-            .total-box .amount { font-size: 1.8rem; }
-            .btn-send { font-size: 1.3rem; padding: 18px; }
-            .brand .tagline { font-size: 1rem; }
-            .form-section h2 { font-size: 1.2rem; }
-            .logo-video-container { max-width: 260px; margin-bottom: 10px; }
-            .status-card { font-size: 0.9rem; padding: 10px 12px; }
-            .status-card .horario { font-size: 0.75rem; }
-            .footnote { font-size: 0.75rem; }
-            .footnote .sc-link { font-size: 0.7rem; }
-            .envio-leyenda { font-size: 0.8rem; padding: 6px 10px; }
-            .toast-confirm .toast-content { font-size: 2.2rem; padding: 30px 24px; }
-            .toast-confirm .toast-content .emoji { font-size: 3.2rem; }
-            .qty-grid button { font-size: 1.6rem; max-width: 70px; }
-            .qty-modal-content { padding: 24px 16px 16px; }
-            .qty-modal-title { font-size: 1rem; margin-bottom: 12px; }
-            .med-grid button { font-size: 1.6rem; max-width: 60px; }
-            .med-modal-content { padding: 24px 16px 16px; max-width: 250px; }
-            .med-cancelar { font-size: 0.9rem; padding: 10px 8px; }
-            .resumen-modal-content { padding: 18px 14px; }
-            .resumen-modal-content h3 { font-size: 1rem; }
-            .resumen-item { font-size: 0.8rem; }
-            .resumen-total { font-size: 1rem; }
-            .resumen-botones button { font-size: 0.9rem; padding: 12px; }
-            .btn-cancelar-item { width: 28px; height: 28px; font-size: 1rem; top: 6px; right: 6px; }
-            .pago-btn { min-width: 60px; padding: 10px 6px; font-size: 0.8rem; }
-            .pago-btn .icono { font-size: 1.5rem; }
-            .pago-btn .label { font-size: 0.65rem; }
-            .btn-instagram { width: 50px; height: 50px; bottom: 16px; right: 16px; }
-            .btn-instagram svg { width: 26px; height: 26px; }
-            .btn-share { width: 50px; height: 50px; bottom: 16px; left: 16px; }
-            .btn-share svg { width: 26px; height: 26px; }
+            .form-group select {
+                font-size: 1rem;
+                padding: 14px 16px;
+            }
+            .total-box .amount {
+                font-size: 1.8rem;
+            }
+            .btn-send {
+                font-size: 1.3rem;
+                padding: 18px;
+            }
+            .brand .tagline {
+                font-size: 1rem;
+            }
+            .form-section h2 {
+                font-size: 1.2rem;
+            }
+            .logo-video-container {
+                max-width: 260px;
+                margin-bottom: 10px;
+            }
+            .status-card {
+                font-size: 0.9rem;
+                padding: 10px 12px;
+            }
+            .status-card .horario {
+                font-size: 0.75rem;
+            }
+            .footnote {
+                font-size: 0.75rem;
+            }
+            .footnote .sc-link {
+                font-size: 0.7rem;
+            }
+            .envio-leyenda {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+            .toast-confirm .toast-content {
+                font-size: 2.2rem;
+                padding: 30px 24px;
+            }
+            .toast-confirm .toast-content .emoji {
+                font-size: 3.2rem;
+            }
+            .qty-grid button {
+                font-size: 1.6rem;
+                max-width: 70px;
+            }
+            .qty-modal-content {
+                padding: 24px 16px 16px;
+            }
+            .med-grid button {
+                font-size: 1.6rem;
+                max-width: 60px;
+            }
+            .med-modal-content {
+                padding: 24px 16px 16px;
+                max-width: 250px;
+            }
+            .med-cancelar {
+                font-size: 0.9rem;
+                padding: 10px 8px;
+            }
+            .resumen-modal-content {
+                padding: 18px 14px;
+            }
+            .resumen-modal-content h3 {
+                font-size: 1rem;
+            }
+            .resumen-item {
+                font-size: 0.8rem;
+            }
+            .resumen-total {
+                font-size: 1rem;
+            }
+            .resumen-botones button {
+                font-size: 0.9rem;
+                padding: 12px;
+            }
+            .btn-cancelar-item {
+                width: 28px;
+                height: 28px;
+                font-size: 1rem;
+                top: 6px;
+                right: 6px;
+            }
+            .pago-btn {
+                min-width: 60px;
+                padding: 10px 6px;
+                font-size: 0.8rem;
+            }
+            .pago-btn .icono {
+                font-size: 1.5rem;
+            }
+            .pago-btn .label {
+                font-size: 0.65rem;
+            }
+            .btn-instagram {
+                width: 50px;
+                height: 50px;
+                bottom: 16px;
+                right: 16px;
+            }
+            .btn-instagram svg {
+                width: 26px;
+                height: 26px;
+            }
+            .btn-share {
+                width: 50px;
+                height: 50px;
+                bottom: 16px;
+                left: 16px;
+            }
+            .btn-share svg {
+                width: 26px;
+                height: 26px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
 
+        <!-- BRAND -->
         <div class="brand">
             <div class="logo-video-container">
-                <video autoplay loop muted playsinline>
-                    <source src="images/logo_video.mp4" type="video/mp4">
-                    Tu navegador no soporta videos.
-                </video>
+                <img src="images/icon-512.png" alt="Tech Classic Burgers" />
             </div>
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
             <div class="status-card" id="statusCard">
@@ -1021,8 +1119,10 @@
             </div>
         </div>
 
+        <!-- PRODUCTOS -->
         <div class="product-grid" id="productGrid"></div>
 
+        <!-- FORMULARIO -->
         <div class="form-section" id="formSection">
             <h2>📋 DATOS DEL PEDIDO</h2>
 
@@ -1087,13 +1187,14 @@
 
     </div>
 
+    <!-- ===== TOAST DE CONFIRMACIÓN ===== -->
     <div id="toastConfirm" class="toast-confirm">
         <div class="toast-content" id="toastContent"></div>
     </div>
 
+    <!-- ===== MODAL DE CANTIDAD (sin botón Cerrar) ===== -->
     <div id="qtyModal" class="qty-modal">
         <div class="qty-modal-content">
-            <div class="qty-modal-title">Cuantas vas a querer...?</div>
             <div class="qty-grid">
                 <button data-value="1">1</button>
                 <button data-value="2">2</button>
@@ -1108,9 +1209,11 @@
                 <span class="qty-empty"></span>
                 <span class="qty-empty"></span>
             </div>
+            <!-- Botón Cerrar eliminado -->
         </div>
     </div>
 
+    <!-- ===== MODAL DE MEDALLONES EXTRA ===== -->
     <div id="medModal" class="med-modal">
         <div class="med-modal-content">
             <div class="med-modal-title">➕ Medallones extra</div>
@@ -1123,6 +1226,7 @@
         </div>
     </div>
 
+    <!-- ===== MODAL DE RESUMEN DEL PEDIDO ===== -->
     <div id="resumenModal" class="resumen-modal">
         <div class="resumen-modal-content">
             <h3>📋 Revisá tu pedido</h3>
@@ -1135,12 +1239,14 @@
         </div>
     </div>
 
+    <!-- ===== BOTÓN FLOTANTE INSTAGRAM (derecha) ===== -->
     <a href="https://www.instagram.com/techburger__" target="_blank" rel="noopener noreferrer" class="btn-instagram" aria-label="Síguenos en Instagram">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
         </svg>
     </a>
 
+    <!-- ===== BOTÓN FLOTANTE COMPARTIR (izquierda) ===== -->
     <button class="btn-share" id="shareBtn" aria-label="Compartir esta app">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
@@ -1148,31 +1254,44 @@
     </button>
 
     <script>
-        // Service Worker
+        // ============================================================
+        //  REGISTRO DE SERVICE WORKER (PWA)
+        // ============================================================
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
                 .then(reg => console.log('✅ SW registrado correctamente', reg))
                 .catch(err => console.log('❌ Error al registrar SW', err));
         }
 
-        // Estado abierto/cerrado
+        // ============================================================
+        //  INDICADOR ABIERTO/CERRADO
+        // ============================================================
         function actualizarEstado() {
             const now = new Date();
             const dia = now.getDay();
             const hora = now.getHours();
             const minutos = now.getMinutes();
             const horaMin = hora + minutos / 60;
+
             let estado = 'cerrado';
+
             if (dia === 1) {
                 estado = 'cerrado';
             } else {
-                if (horaMin >= 20 && horaMin < 23.5) estado = 'abierto';
-                else if (horaMin >= 23.5 && horaMin < 24) estado = 'casi';
-                else estado = 'cerrado';
+                if (horaMin >= 20 && horaMin < 23.5) {
+                    estado = 'abierto';
+                } else if (horaMin >= 23.5 && horaMin < 24) {
+                    estado = 'casi';
+                } else {
+                    estado = 'cerrado';
+                }
             }
+
             const card = document.getElementById('statusCard');
             const text = document.getElementById('statusText');
+
             card.classList.remove('abierto', 'cerrado', 'casi');
+
             if (estado === 'abierto') {
                 card.classList.add('abierto');
                 text.textContent = '🟢 ABIERTO · hasta las 00:00';
@@ -1184,11 +1303,15 @@
                 text.textContent = '🔴 CERRADO';
             }
         }
+
         actualizarEstado();
         setInterval(actualizarEstado, 60000);
 
-        // Toast
+        // ============================================================
+        //  TOAST DE CONFIRMACIÓN
+        // ============================================================
         var toastTimer = null;
+
         function mostrarToast(mensaje) {
             var toast = document.getElementById('toastConfirm');
             var content = document.getElementById('toastContent');
@@ -1200,7 +1323,9 @@
             }, 750);
         }
 
-        // Productos
+        // ============================================================
+        //  DATOS DE PRODUCTOS
+        // ============================================================
         const PRODUCTS = [{
             id: 'armatuburger',
             name: 'Armá tu Burger',
@@ -1246,8 +1371,14 @@
             imagen: 'images/cla.jpg'
         }];
 
-        const TOPPINGS = ['Lechuga', 'Tomate', 'Bacon', 'Cebolla morada', 'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'];
+        const TOPPINGS = [
+            'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
+            'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
+        ];
 
+        // ============================================================
+        //  RENDER PRODUCTOS
+        // ============================================================
         const grid = document.getElementById('productGrid');
 
         function renderProducts() {
@@ -1338,43 +1469,62 @@
                 }
 
                 info.appendChild(extras);
+
                 card.appendChild(info);
                 grid.appendChild(card);
             });
         }
+
         renderProducts();
 
+        // ============================================================
+        //  MANEJAR VISIBILIDAD DEL BOTÓN DE CANCELAR
+        // ============================================================
         function actualizarVisibilidadCancelar() {
             document.querySelectorAll('.product-card').forEach(card => {
                 const qtyInput = card.querySelector('.qty-input');
                 const cancelBtn = card.querySelector('.btn-cancelar-item');
                 if (qtyInput && cancelBtn) {
                     const val = parseInt(qtyInput.value) || 0;
-                    cancelBtn.classList.toggle('visible', val > 0);
+                    if (val > 0) {
+                        cancelBtn.classList.add('visible');
+                    } else {
+                        cancelBtn.classList.remove('visible');
+                    }
                 }
             });
         }
 
+        // ============================================================
+        //  FUNCIÓN PARA RESETEAR UN PRODUCTO COMPLETO
+        // ============================================================
         function resetearProducto(productId) {
             const qtyInput = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
             if (qtyInput) {
                 qtyInput.value = 0;
-                qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
+                const evt = new Event('input', { bubbles: true });
+                qtyInput.dispatchEvent(evt);
             }
             const medInput = document.querySelector(`.med-extra-input[data-product-id="${productId}"]`);
             if (medInput) {
                 medInput.value = 0;
-                medInput.dispatchEvent(new Event('input', { bubbles: true }));
+                const evt = new Event('input', { bubbles: true });
+                medInput.dispatchEvent(evt);
             }
-            document.querySelectorAll(`.topping-check[data-product-id="${productId}"]:checked`).forEach(cb => {
+            const checks = document.querySelectorAll(`.topping-check[data-product-id="${productId}"]:checked`);
+            checks.forEach(cb => {
                 cb.checked = false;
-                cb.dispatchEvent(new Event('change', { bubbles: true }));
+                const evt = new Event('change', { bubbles: true });
+                cb.dispatchEvent(evt);
             });
             actualizarVisibilidadCancelar();
             updateTotal();
         }
 
-        // Modales
+        // ============================================================
+        //  MODALES Y EVENTOS DE CLIC
+        // ============================================================
+
         let currentInput = null;
         let currentProductId = null;
         const modal = document.getElementById('qtyModal');
@@ -1392,17 +1542,20 @@
                 modal.classList.add('active');
             }
         }
+
         function closeModal() {
             modal.classList.remove('active');
             currentInput = null;
             currentProductId = null;
         }
+
         function openMedModalForInput(input) {
             if (input) {
                 currentMedInput = input;
                 medModal.classList.add('active');
             }
         }
+
         function closeMedModal() {
             medModal.classList.remove('active');
             currentMedInput = null;
@@ -1410,17 +1563,22 @@
 
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
+
             if (target.classList.contains('qty-input')) {
                 openModalForInput(target);
                 return;
             }
+
             if (target.classList.contains('med-extra-input')) {
                 openMedModalForInput(target);
                 return;
             }
+
             if (target.classList.contains('btn-cancelar-item')) {
                 const productId = target.dataset.productId;
-                if (productId) resetearProducto(productId);
+                if (productId) {
+                    resetearProducto(productId);
+                }
                 return;
             }
         });
@@ -1433,16 +1591,23 @@
                     if (currentInput) {
                         currentInput.value = val;
                         const product = PRODUCTS.find(p => p.id === currentProductId);
-                        if (product) mostrarToast(val + ' ' + product.name);
-                        currentInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        if (product) {
+                            mostrarToast(val + ' ' + product.name);
+                        }
+                        const evt = new Event('input', { bubbles: true });
+                        currentInput.dispatchEvent(evt);
                         actualizarVisibilidadCancelar();
                     }
                 }
                 closeModal();
             });
         });
+
+        // Cerrar modal al hacer clic en el fondo
         modal.addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
+            if (e.target === this) {
+                closeModal();
+            }
         });
 
         medButtons.forEach(btn => {
@@ -1452,24 +1617,41 @@
                 if (!isNaN(val) && val >= 1 && val <= 3) {
                     if (currentMedInput) {
                         currentMedInput.value = val;
-                        currentMedInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        const evt = new Event('input', { bubbles: true });
+                        currentMedInput.dispatchEvent(evt);
                     }
                 }
                 closeMedModal();
             });
         });
+
         medCancelar.addEventListener('click', function(e) {
             e.stopPropagation();
             closeMedModal();
         });
+
         medModal.addEventListener('click', function(e) {
-            if (e.target === this) closeMedModal();
+            if (e.target === this) {
+                closeMedModal();
+            }
         });
 
-        // Pago y envío
+        // ============================================================
+        //  CONTROL DE BOTONES DE PAGO SEGÚN ENVÍO
+        // ============================================================
         const formaEnvioSelect = document.getElementById('formaEnvio');
         const pagoBotones = document.querySelectorAll('.pago-btn');
         let pagoSeleccionado = null;
+
+        function seleccionarPago(valor) {
+            pagoBotones.forEach(btn => {
+                btn.classList.remove('activo');
+                if (btn.dataset.value === valor) {
+                    btn.classList.add('activo');
+                }
+            });
+            pagoSeleccionado = valor;
+        }
 
         function obtenerPagoSeleccionado() {
             return pagoSeleccionado || null;
@@ -1508,14 +1690,18 @@
                 }
             });
         }
+
         formaEnvioSelect.addEventListener('change', function() {
             toggleAddress();
             actualizarPagosSegunEnvio();
             updateTotal();
         });
+
         setTimeout(actualizarPagosSegunEnvio, 100);
 
-        // Total
+        // ============================================================
+        //  TOTAL Y ENVÍO
+        // ============================================================
         const addressField = document.getElementById('addressField');
         const direccionInput = document.getElementById('direccion');
         const totalDisplay = document.getElementById('totalDisplay');
@@ -1524,9 +1710,15 @@
         function isEntregaSelected() {
             return formaEnvioSelect.value === 'entrega';
         }
+
         function toggleAddress() {
-            addressField.classList.toggle('active', isEntregaSelected());
+            if (isEntregaSelected()) {
+                addressField.classList.add('active');
+            } else {
+                addressField.classList.remove('active');
+            }
         }
+
         toggleAddress();
 
         function calcularTotal() {
@@ -1554,9 +1746,12 @@
                 updateTotal();
             }
         });
+
         updateTotal();
 
-        // Resumen
+        // ============================================================
+        //  MODAL DE RESUMEN DEL PEDIDO
+        // ============================================================
         const resumenModal = document.getElementById('resumenModal');
         const resumenDetalle = document.getElementById('resumenDetalle');
         const resumenTotal = document.getElementById('resumenTotal');
@@ -1595,6 +1790,7 @@
                             const tops = Array.from(checks).map(cb => cb.value).join(', ');
                             html += `<br><span style="font-size:0.8rem;color:#b8d0b8;padding-left:16px;">🧂 Toppings: ${tops}</span>`;
                         }
+
                         html += `</div>`;
                     }
                 }
@@ -1615,7 +1811,9 @@
                 }
                 html += `</div>`;
             } else {
-                html += `<div class="resumen-item" style="border-bottom:1px solid #2f4a2f;">📍 Retiro en local</div>`;
+                html += `<div class="resumen-item" style="border-bottom:1px solid #2f4a2f;">`;
+                html += `📍 Retiro en local`;
+                html += `</div>`;
             }
 
             const pagoValue = obtenerPagoSeleccionado() || 'No especificado';
@@ -1639,10 +1837,12 @@
                 alert('Completá nombre y teléfono.');
                 return;
             }
+
             if (isEntregaSelected() && !direccionInput.value.trim()) {
                 alert('Ingresá la dirección de entrega.');
                 return;
             }
+
             if (generarResumen()) {
                 resumenModal.classList.add('active');
             }
@@ -1658,10 +1858,14 @@
         });
 
         resumenModal.addEventListener('click', function(e) {
-            if (e.target === this) resumenModal.classList.remove('active');
+            if (e.target === this) {
+                resumenModal.classList.remove('active');
+            }
         });
 
-        // Envío WhatsApp
+        // ============================================================
+        //  ENVÍO POR WHATSAPP
+        // ============================================================
         const BUSINESS_PHONE = '5493518692251';
         const MAPS_URL_LOCAL = 'https://bit.ly/4xOCf1o';
 
@@ -1703,14 +1907,17 @@
 
             const pagoValue = obtenerPagoSeleccionado() || 'No especificado';
             mensaje += `\n\n💳 *Pago:* ${pagoValue}`;
+
             if (pagoValue === 'Transferencia') {
                 mensaje += `\n📌 *Alias:* Tech.burguer`;
-                mensaje += `\n📎 *Importante:* Enviá el comprobante de transferencia para confirmar el pedido.`;
+                mensaje += `\n📎 *Importante:* Por favor, enviá el comprobante de transferencia para confirmar el pedido.`;
             }
 
             mensaje += `\n`;
+
             const envioLabel = isEntregaSelected() ? 'Entrega a domicilio' : 'Retiro en local';
             mensaje += `\n🚚 *Envío:* ${envioLabel}`;
+
             if (isEntregaSelected()) {
                 const direccion = direccionInput.value.trim();
                 const direccionEncoded = encodeURIComponent(direccion);
@@ -1728,22 +1935,37 @@
             window.open(`https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
-        // Compartir
+        // ============================================================
+        //  BOTÓN DE COMPARTIR (Web Share API / copia al portapapeles)
+        // ============================================================
         document.getElementById('shareBtn').addEventListener('click', function() {
             const url = window.location.href;
             const title = document.title || 'Tech Classic Burgers';
+
             if (navigator.share) {
-                navigator.share({ title, text: '🍔 Pedí tus burgers favoritas en Tech Classic Burgers', url })
-                    .catch(() => {});
-            } else if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(url)
-                    .then(() => alert('✅ Enlace copiado al portapapeles. ¡Compartilo con tus amigos!'))
-                    .catch(() => prompt('Copiá este enlace para compartir:', url));
+                navigator.share({
+                    title: title,
+                    text: '🍔 Pedí tus burgers favoritas en Tech Classic Burgers',
+                    url: url
+                }).catch(err => {
+                    // Si el usuario cancela, no hacemos nada
+                });
             } else {
-                prompt('Copiá este enlace para compartir:', url);
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        alert('✅ Enlace copiado al portapapeles. ¡Compartilo con tus amigos!');
+                    }).catch(() => {
+                        prompt('Copiá este enlace para compartir:', url);
+                    });
+                } else {
+                    prompt('Copiá este enlace para compartir:', url);
+                }
             }
         });
 
+        // ============================================================
+        //  INICIALIZAR VISIBILIDAD DEL BOTÓN DE CANCELAR
+        // ============================================================
         setTimeout(actualizarVisibilidadCancelar, 100);
     </script>
 </body>
