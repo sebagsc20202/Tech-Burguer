@@ -6,7 +6,7 @@
     <title>Tech Classic Burgers · Pedido</title>
 
     <!-- ===== META TAGS PARA PWA ===== -->
-    <meta name="theme-color" content="#1a2e1a" />
+    <meta name="theme-color" content="#11522c" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="manifest.json" />
@@ -20,7 +20,7 @@
         }
 
         body {
-            background-color: #1a2e1a;
+            background-color: #11522c;
             color: #e8f0e8;
             font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
             padding: 16px 12px 40px;
@@ -42,12 +42,26 @@
             margin-bottom: 20px;
         }
 
-        .brand .logo {
+        .logo-video-container {
             max-width: 306px;
             width: 100%;
-            height: auto;
-            display: block;
+            aspect-ratio: 1 / 1;
             margin: 0 auto 12px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #11522c;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        .logo-video-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            transform: scale(1.1);
+            transform-origin: center center;
         }
 
         .brand .tagline {
@@ -351,7 +365,7 @@
             font-size: 1.1rem;
             font-weight: 800;
             color: #ffb703;
-            background: #1a2e1a;
+            background: #11522c;
             padding: 0 10px;
             border-radius: 30px;
             line-height: 1.8;
@@ -387,7 +401,7 @@
 
         .product-extras input[type="number"] {
             width: 44px;
-            background: #1a2e1a;
+            background: #11522c;
             border: 1px solid #3a5a3a;
             border-radius: 30px;
             padding: 4px 4px 4px 8px;
@@ -519,7 +533,7 @@
         .form-group select {
             width: 100%;
             padding: 12px 14px;
-            background: #1a2e1a;
+            background: #11522c;
             border: 1px solid #3a5a3a;
             border-radius: 40px;
             color: #fff;
@@ -562,7 +576,7 @@
             flex: 1;
             min-width: 80px;
             padding: 12px 8px;
-            background: #1a2e1a;
+            background: #11522c;
             border: 2px solid #3a5a3a;
             border-radius: 16px;
             color: #b8d0b8;
@@ -612,7 +626,7 @@
         .envio-leyenda {
             font-size: 0.85rem;
             color: #ffb703;
-            background: #1a2e1a;
+            background: #11522c;
             padding: 8px 12px;
             border-radius: 10px;
             border: 1px solid #3a5a3a;
@@ -621,7 +635,7 @@
         }
 
         .total-box {
-            background: #1a2e1a;
+            background: #11522c;
             border-radius: 60px;
             padding: 14px 20px;
             display: flex;
@@ -708,14 +722,14 @@
             width: 4px;
         }
         ::-webkit-scrollbar-track {
-            background: #1a2e1a;
+            background: #11522c;
         }
         ::-webkit-scrollbar-thumb {
             background: #e63946;
             border-radius: 10px;
         }
 
-        /* ===== MODAL DE CANTIDAD (sin botón Cerrar) ===== */
+        /* ===== MODAL DE CANTIDAD (con título) ===== */
         .qty-modal {
             display: none;
             position: fixed;
@@ -742,6 +756,16 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
             max-width: 320px;
             width: 90%;
+            text-align: center;
+        }
+
+        .qty-modal-title {
+            color: #ffb703;
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+            text-align: center;
         }
 
         .qty-grid {
@@ -779,8 +803,6 @@
             visibility: hidden;
             pointer-events: none;
         }
-
-        /* NOTA: El botón Cerrar ha sido eliminado */
 
         /* ===== MODAL DE MEDALLONES EXTRA ===== */
         .med-modal {
@@ -988,7 +1010,7 @@
             .form-section h2 {
                 font-size: 1.2rem;
             }
-            .brand .logo {
+            .logo-video-container {
                 max-width: 260px;
                 margin-bottom: 10px;
             }
@@ -1022,6 +1044,10 @@
             }
             .qty-modal-content {
                 padding: 24px 16px 16px;
+            }
+            .qty-modal-title {
+                font-size: 1.1rem;
+                margin-bottom: 16px;
             }
             .med-grid button {
                 font-size: 1.6rem;
@@ -1097,7 +1123,9 @@
 
         <!-- BRAND -->
         <div class="brand">
-            <img src="images/logo_tech.png" alt="Tech Classic Burgers" class="logo" />
+            <div class="logo-video-container">
+                <img src="images/icon-512.png" alt="Tech Classic Burgers" />
+            </div>
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
             <div class="status-card" id="statusCard">
                 <div id="statusText">⏳ Cargando...</div>
@@ -1150,7 +1178,7 @@
                     <label for="direccion">Dirección de entrega</label>
                     <input type="text" id="direccion" placeholder="Calle, número, piso, etc." autocomplete="street-address" />
                     <div class="envio-leyenda">
-                        🚚 La entrega tiene un costo adicional de <strong>$3.000</strong> que se suma al total de tu compra.
+                        🚚 La entrega tiene un costo adicional de <strong>$2.000</strong> que se suma al total de tu compra.
                     </div>
                 </div>
             </div>
@@ -1178,9 +1206,10 @@
         <div class="toast-content" id="toastContent"></div>
     </div>
 
-    <!-- ===== MODAL DE CANTIDAD (sin botón Cerrar) ===== -->
+    <!-- ===== MODAL DE CANTIDAD (con título) ===== -->
     <div id="qtyModal" class="qty-modal">
         <div class="qty-modal-content">
+            <div class="qty-modal-title">➕ Cuantas querés..?</div>
             <div class="qty-grid">
                 <button data-value="1">1</button>
                 <button data-value="2">2</button>
@@ -1691,7 +1720,7 @@
         const addressField = document.getElementById('addressField');
         const direccionInput = document.getElementById('direccion');
         const totalDisplay = document.getElementById('totalDisplay');
-        const COSTO_ENVIO = 3000;
+        const COSTO_ENVIO = 2000;   // ← cambiado a $2.000
 
         function isEntregaSelected() {
             return formaEnvioSelect.value === 'entrega';
