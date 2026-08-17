@@ -1125,7 +1125,7 @@
 
         <!-- BRAND -->
         <div class="brand">
-            <img src="images/logo_tech.webp" alt="Tech Classic Burgers" class="logo" />
+            <img src="images/icon-512.png" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
             <div class="status-card" id="statusCard">
                 <div id="statusText">⏳ Cargando...</div>
@@ -2067,9 +2067,7 @@
         function actualizarFlechas() {
             const scrollLeft = popupSlider.scrollLeft;
             const maxScroll = popupSlider.scrollWidth - popupSlider.clientWidth;
-            // Mostrar flecha izquierda solo si hay scroll a la izquierda (no estamos en la primera imagen)
             arrowLeft.classList.toggle('visible', scrollLeft > 10);
-            // Mostrar flecha derecha solo si hay scroll a la derecha (no estamos en la última)
             arrowRight.classList.toggle('visible', maxScroll - scrollLeft > 10);
         }
 
@@ -2096,22 +2094,19 @@
             }
         }
 
-        // Solo cerrar al hacer clic en el fondo (no en las imágenes)
+        // Cerrar al hacer clic en el fondo
         imagePopup.addEventListener('click', function(e) {
             if (e.target === imagePopup) {
                 cerrarPopup();
             }
         });
 
-        // Al hacer clic en una imagen, centrar (no cerrar)
+        // **CAMBIADO: Al hacer clic en una imagen, se cierra el popup**
         popupTrack.addEventListener('click', function(e) {
             const img = e.target.closest('img');
             if (!img) return;
-            const imagenes = popupTrack.querySelectorAll('img');
-            const index = Array.from(imagenes).indexOf(img);
-            if (index !== -1) {
-                centrarImagen(index);
-            }
+            // Cerrar el popup al hacer clic en la imagen
+            cerrarPopup();
         });
 
         popupSlider.addEventListener('scroll', actualizarFlechas);
