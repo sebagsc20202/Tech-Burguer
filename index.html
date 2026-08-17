@@ -888,13 +888,12 @@
             padding: 0 10px;
             box-sizing: border-box;
             transition: border 0.2s ease;
-            border: 3px solid transparent; /* base transparente */
+            border: 3px solid transparent;
             border-radius: 8px;
         }
 
-        /* Estilo para la imagen seleccionada */
         .popup-track img.selected {
-            border-color: #ff0000; /* rojo fino */
+            border-color: #ff0000;
         }
 
         /* Ocultar scrollbar */
@@ -904,6 +903,38 @@
         .popup-slider {
             -ms-overflow-style: none;
             scrollbar-width: none;
+        }
+
+        /* ===== FLECHAS INDICADORAS (sin interacción) ===== */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3.5rem;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.25);
+            pointer-events: none;
+            user-select: none;
+            z-index: 10;
+            animation: pulse 1.8s ease-in-out infinite;
+            text-shadow: 0 0 15px rgba(0,0,0,0.5);
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+        .nav-arrow-left {
+            left: 12px;
+        }
+        .nav-arrow-right {
+            right: 12px;
+        }
+        .nav-arrow.visible {
+            opacity: 0.7;
+        }
+
+        @keyframes pulse {
+            0% { transform: translateY(-50%) scale(0.9); opacity: 0.4; }
+            50% { transform: translateY(-50%) scale(1.1); opacity: 0.9; }
+            100% { transform: translateY(-50%) scale(0.9); opacity: 0.4; }
         }
 
         /* ===== RESPONSIVE ===== */
@@ -1013,6 +1044,11 @@
                 width: 26px;
                 height: 26px;
             }
+            .nav-arrow {
+                font-size: 2.8rem;
+            }
+            .nav-arrow-left { left: 6px; }
+            .nav-arrow-right { right: 6px; }
         }
 
         /* ===== BOTÓN FLOTANTE INSTAGRAM (derecha) ===== */
@@ -1237,6 +1273,9 @@
         <div class="popup-slider" id="popupSlider">
             <div class="popup-track" id="popupTrack"></div>
         </div>
+        <!-- Flechas indicadoras (solo visuales) -->
+        <div class="nav-arrow nav-arrow-left" id="arrowLeft">‹</div>
+        <div class="nav-arrow nav-arrow-right" id="arrowRight">›</div>
     </div>
 
     <!-- ===== BOTÓN FLOTANTE INSTAGRAM (derecha) ===== -->
@@ -2006,11 +2045,13 @@
         setTimeout(actualizarVisibilidadCancelar, 100);
 
         // ============================================================
-        //  POPUP DE IMAGEN (CARRUSEL TÁCTIL CON SELECCIÓN)
+        //  POPUP DE IMAGEN (CARRUSEL TÁCTIL CON SELECCIÓN Y FLECHAS)
         // ============================================================
         const imagePopup = document.getElementById('imagePopup');
         const popupSlider = document.getElementById('popupSlider');
         const popupTrack = document.getElementById('popupTrack');
+        const arrowLeft = document.getElementById('arrowLeft');
+        const arrowRight = document.getElementById('arrowRight');
 
         // Generar todas las imágenes del carrusel a partir de los productos
         function generarTrack() {
@@ -2040,6 +2081,26 @@
                     if (w > 0) popupSlider.scrollLeft = index * w;
                 });
             }
+            // Actualizar flechas después de centrar
+            actualizarFlechas();
+        }
+
+        // Función para mostrar/ocultar flechas según la posición del scroll
+        function actualizarFlechas() {
+            const scrollLeft = popupSlider.scrollLeft;
+            const maxScroll = popupSlider.scrollWidth - popupSlider.clientWidth;
+            // Mostrar flecha izquierda si hay scroll a la izquierda
+            if (scrollLeft > 10) {
+                arrowLeft.classList.add('visible');
+            } else {
+                arrowLeft.classList.remove('visible');
+            }
+            // Mostrar flecha derecha si hay scroll a la derecha
+            if (maxScroll - scrollLeft > 10) {
+                arrowRight.classList.add('visible');
+            } else {
+                arrowRight.classList.remove('visible');
+            }
         }
 
         // Abrir popup en el índice del producto clickeado
@@ -2051,6 +2112,8 @@
             seleccionarImagen(index);
             imagePopup.classList.add('active');
             document.body.style.overflow = 'hidden';
+            // Actualizar flechas después de un momento (cuando el scroll esté listo)
+            setTimeout(actualizarFlechas, 100);
         }
 
         // Cerrar popup
@@ -2077,6 +2140,33 @@
             }
         });
 
+        // Escuchar scroll para actualizar las flechas
+        popupSlider.addEventListener('scroll', function() {
+            actualizarFlechas();
+            // También actualizar la selección según la imagen más visible
+            const sliderWidth = popupSlider.clientWidth;
+            if (sliderWidth > 0) {
+                const scrollCenter = popupSlider.scrollLeft + sliderWidth / 2;
+                const imagenes = popupTrack.querySelectorAll('img');
+                let closestIndex = 0;
+                let closestDist = Infinity;
+                imagenes.forEach((img, i) => {
+                    const imgCenter = i * sliderWidth + sliderWidth / 2;
+                    const dist = Math.abs(scrollCenter - imgCenter);
+                    if (dist < closestDist) {
+                        closestDist = dist;
+                        closestIndex = i;
+                    }
+                });
+                // Solo cambiar si la distancia es menor que medio slide
+                if (closestDist < sliderWidth * 0.6) {
+                    imagenes.forEach((img, i) => {
+                        img.classList.toggle('selected', i === closestIndex);
+                    });
+                }
+            }
+        });
+
         // También cerrar con tecla ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && imagePopup.classList.contains('active')) {
@@ -2100,7 +2190,7 @@
             }
         });
 
-        // Ajustar el scroll al cambiar el tamaño de la ventana (por si se abre en móvil y luego se rota)
+        // Ajustar al cambiar el tamaño de la ventana
         let resizeTimeout;
         window.addEventListener('resize', function() {
             if (imagePopup.classList.contains('active')) {
@@ -2110,12 +2200,12 @@
                     const sliderWidth = popupSlider.clientWidth;
                     if (sliderWidth > 0) {
                         const index = Math.round(currentScroll / sliderWidth);
-                        // Re-seleccionar para mantener el borde y el centro
                         const imagenes = popupTrack.querySelectorAll('img');
                         if (index >= 0 && index < imagenes.length) {
                             seleccionarImagen(index);
                         }
                     }
+                    actualizarFlechas();
                 }, 200);
             }
         });
@@ -2123,8 +2213,8 @@
         // Generar track al inicio
         generarTrack();
 
-        // Si no hay ninguna imagen seleccionada al abrir, seleccionar la primera (por defecto)
-        // Pero lo manejamos desde abrirPopupImagen
+        // Inicializar flechas (ocultas por defecto)
+        actualizarFlechas();
     </script>
 </body>
 </html>
