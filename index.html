@@ -123,6 +123,7 @@
             margin: 0 auto 12px;
             border-radius: 50%;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+            /* No necesita cursor pointer ni hover porque no es interactivo */
         }
 
         .brand .tagline {
@@ -1056,7 +1057,8 @@
 
         <!-- BRAND -->
         <div class="brand">
-            <img src="images/logo_tech.png" alt="Tech Classic Burgers" class="logo" />
+            <!-- Cambio: logo_tech.png reemplazado por icon-512.png -->
+            <img src="images/icon-512.png" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
             <div class="status-card" id="statusCard">
                 <div id="statusText">⏳ Cargando...</div>
@@ -1980,6 +1982,7 @@
             document.body.style.overflow = '';
         });
 
+        // Popup desde las miniaturas de productos
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
             const imgDiv = target.closest('.product-img');
