@@ -56,9 +56,11 @@
             border-radius: 50%;
             overflow: hidden;
             background: var(--bg-color);
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+            /* ⬇️ BORDE EXTERNO DE 3px (se suma por fuera, no afecta el tamaño) */
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05), 0 0 0 3px #ffffff;
             position: relative;
-            border: 3px solid #ffffff;   /* ← BORDE BLANCO AGREGADO */
+            /* ⬇️ ELIMINAMOS el border interno para que no coma espacio */
+            /* border: 3px solid #ffffff;  ← ya no está */
         }
 
         .logo-video-container video {
