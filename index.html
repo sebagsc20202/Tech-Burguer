@@ -887,13 +887,8 @@
             cursor: pointer;
             padding: 0 10px;
             box-sizing: border-box;
-            transition: border 0.2s ease;
-            border: 3px solid transparent;
             border-radius: 8px;
-        }
-
-        .popup-track img.selected {
-            border-color: #ff0000;
+            /* Sin borde rojo */
         }
 
         /* Ocultar scrollbar */
@@ -2045,7 +2040,7 @@
         setTimeout(actualizarVisibilidadCancelar, 100);
 
         // ============================================================
-        //  POPUP DE IMAGEN (CARRUSEL TÁCTIL CON SELECCIÓN Y FLECHAS)
+        //  POPUP DE IMAGEN (CARRUSEL TÁCTIL SIN SELECCIÓN)
         // ============================================================
         const imagePopup = document.getElementById('imagePopup');
         const popupSlider = document.getElementById('popupSlider');
@@ -2065,13 +2060,8 @@
             });
         }
 
-        // Función para seleccionar una imagen (aplica borde rojo y centra)
-        function seleccionarImagen(index) {
-            const imagenes = popupTrack.querySelectorAll('img');
-            imagenes.forEach((img, i) => {
-                img.classList.toggle('selected', i === index);
-            });
-            // Centrar la imagen en el viewport
+        // Función para centrar una imagen (sin borde)
+        function centrarImagen(index) {
             const sliderWidth = popupSlider.clientWidth;
             if (sliderWidth > 0) {
                 popupSlider.scrollLeft = index * sliderWidth;
@@ -2082,25 +2072,15 @@
                 });
             }
             // Actualizar flechas después de centrar
-            actualizarFlechas();
+            setTimeout(actualizarFlechas, 50);
         }
 
         // Función para mostrar/ocultar flechas según la posición del scroll
         function actualizarFlechas() {
             const scrollLeft = popupSlider.scrollLeft;
             const maxScroll = popupSlider.scrollWidth - popupSlider.clientWidth;
-            // Mostrar flecha izquierda si hay scroll a la izquierda
-            if (scrollLeft > 10) {
-                arrowLeft.classList.add('visible');
-            } else {
-                arrowLeft.classList.remove('visible');
-            }
-            // Mostrar flecha derecha si hay scroll a la derecha
-            if (maxScroll - scrollLeft > 10) {
-                arrowRight.classList.add('visible');
-            } else {
-                arrowRight.classList.remove('visible');
-            }
+            arrowLeft.classList.toggle('visible', scrollLeft > 10);
+            arrowRight.classList.toggle('visible', maxScroll - scrollLeft > 10);
         }
 
         // Abrir popup en el índice del producto clickeado
@@ -2108,11 +2088,11 @@
             if (popupTrack.children.length === 0) {
                 generarTrack();
             }
-            // Seleccionar la imagen al abrir
-            seleccionarImagen(index);
+            // Centrar la imagen sin selección
+            centrarImagen(index);
             imagePopup.classList.add('active');
             document.body.style.overflow = 'hidden';
-            // Actualizar flechas después de un momento (cuando el scroll esté listo)
+            // Actualizar flechas después de un momento
             setTimeout(actualizarFlechas, 100);
         }
 
@@ -2129,52 +2109,28 @@
             }
         });
 
-        // Evento de clic en las imágenes (selecciona y centra)
+        // Al hacer clic en una imagen, solo centramos sin borde
         popupTrack.addEventListener('click', function(e) {
             const img = e.target.closest('img');
             if (!img) return;
             const imagenes = popupTrack.querySelectorAll('img');
             const index = Array.from(imagenes).indexOf(img);
             if (index !== -1) {
-                seleccionarImagen(index);
+                centrarImagen(index);
             }
         });
 
         // Escuchar scroll para actualizar las flechas
-        popupSlider.addEventListener('scroll', function() {
-            actualizarFlechas();
-            // También actualizar la selección según la imagen más visible
-            const sliderWidth = popupSlider.clientWidth;
-            if (sliderWidth > 0) {
-                const scrollCenter = popupSlider.scrollLeft + sliderWidth / 2;
-                const imagenes = popupTrack.querySelectorAll('img');
-                let closestIndex = 0;
-                let closestDist = Infinity;
-                imagenes.forEach((img, i) => {
-                    const imgCenter = i * sliderWidth + sliderWidth / 2;
-                    const dist = Math.abs(scrollCenter - imgCenter);
-                    if (dist < closestDist) {
-                        closestDist = dist;
-                        closestIndex = i;
-                    }
-                });
-                // Solo cambiar si la distancia es menor que medio slide
-                if (closestDist < sliderWidth * 0.6) {
-                    imagenes.forEach((img, i) => {
-                        img.classList.toggle('selected', i === closestIndex);
-                    });
-                }
-            }
-        });
+        popupSlider.addEventListener('scroll', actualizarFlechas);
 
-        // También cerrar con tecla ESC
+        // Cerrar con ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && imagePopup.classList.contains('active')) {
                 cerrarPopup();
             }
         });
 
-        // Detectar clic en las miniaturas de productos para abrir el carrusel
+        // Detectar clic en miniaturas para abrir
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
             const imgDiv = target.closest('.product-img');
@@ -2200,10 +2156,8 @@
                     const sliderWidth = popupSlider.clientWidth;
                     if (sliderWidth > 0) {
                         const index = Math.round(currentScroll / sliderWidth);
-                        const imagenes = popupTrack.querySelectorAll('img');
-                        if (index >= 0 && index < imagenes.length) {
-                            seleccionarImagen(index);
-                        }
+                        // Solo centramos sin selección
+                        centrarImagen(index);
                     }
                     actualizarFlechas();
                 }, 200);
