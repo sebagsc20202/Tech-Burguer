@@ -199,7 +199,7 @@
 
         .resumen-modal-content h3 {
             color: #ffb703;
-            font-size: 1.2rem;
+            font-size: 1.6rem;   /* ← más grande */
             text-align: center;
             margin-bottom: 16px;
             letter-spacing: 0.5px;
@@ -1160,7 +1160,7 @@
                 padding: 18px 14px;
             }
             .resumen-modal-content h3 {
-                font-size: 1rem;
+                font-size: 1.3rem;   /* ← más grande en móvil también */
             }
             .resumen-item {
                 font-size: 0.8rem;
@@ -1744,7 +1744,6 @@
             if (target.classList.contains('btn-cancelar-item')) {
                 const productId = target.dataset.productId;
                 if (productId) {
-                    // Mostrar modal de confirmación en lugar de resetear directamente
                     mostrarCancelModal(productId);
                 }
                 return;
