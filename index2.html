@@ -376,7 +376,7 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            pointer-events: none;
+            pointer-events: none; /* Para que el clic pase al contenedor */
         }
 
         .product-info {
@@ -2262,7 +2262,7 @@
         setTimeout(actualizarVisibilidadCancelar, 100);
 
         // ============================================================
-        //  POPUP DE IMAGEN AL HACER CLIC EN LA MINIATURA
+        //  POPUP DE IMAGEN AL HACER CLIC EN LA MINIATURA (corregido)
         // ============================================================
         const imagePopup = document.getElementById('imagePopup');
         const popupImage = document.getElementById('popupImage');
@@ -2273,15 +2273,18 @@
             document.body.style.overflow = 'hidden';
         }
 
+        // Cerrar al hacer clic en el fondo o en la imagen
         imagePopup.addEventListener('click', function(e) {
             imagePopup.classList.remove('active');
             document.body.style.overflow = '';
         });
 
+        // Detectar clic en el contenedor .product-img (o sus hijos)
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
-            if (target.tagName === 'IMG' && target.closest('.product-img')) {
-                const card = target.closest('.product-card');
+            const imgDiv = target.closest('.product-img');
+            if (imgDiv) {
+                const card = imgDiv.closest('.product-card');
                 if (card) {
                     const productId = card.dataset.id;
                     const product = PRODUCTS.find(p => p.id === productId);
@@ -2292,6 +2295,7 @@
             }
         });
 
+        // Cerrar con tecla ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && imagePopup.classList.contains('active')) {
                 imagePopup.classList.remove('active');
