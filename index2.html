@@ -89,7 +89,7 @@
             font-size: 1rem;
             letter-spacing: 0.5px;
             transition: border-color 0.3s, background 0.3s;
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7); /* ← misma sombra que productos */
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
         }
 
         .status-card.abierto {
@@ -278,6 +278,99 @@
         }
 
         .resumen-botones .btn-confirmar-resumen:active {
+            background: #d49a00;
+            transform: scale(0.97);
+        }
+
+        /* ===== MODAL DE CONFIRMACIÓN PARA CANCELAR ===== */
+        .cancel-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 99998;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            padding: 16px;
+        }
+
+        .cancel-modal.active {
+            display: flex;
+        }
+
+        .cancel-modal-content {
+            background: #1f331f;
+            border-radius: 24px;
+            padding: 30px 24px 24px;
+            border: 2px solid #3a5a3a;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            max-width: 340px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .cancel-modal-content .emoji {
+            font-size: 3.5rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .cancel-modal-content .mensaje {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #e8f0e8;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .cancel-modal-botones {
+            display: flex;
+            gap: 12px;
+        }
+
+        .cancel-modal-botones button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .cancel-modal-botones .btn-cancelar-cancel {
+            background: #ffffff;
+            color: #1a1a1a;
+            border: 2px solid #cccccc;
+        }
+
+        .cancel-modal-botones .btn-cancelar-cancel:hover {
+            background: #f0f0f0;
+            border-color: #aaaaaa;
+        }
+
+        .cancel-modal-botones .btn-cancelar-cancel:active {
+            background: #e0e0e0;
+            transform: scale(0.97);
+        }
+
+        .cancel-modal-botones .btn-confirmar-cancel {
+            background: #ffb703;
+            color: #1a1a1a;
+            border: 2px solid #ffb703;
+        }
+
+        .cancel-modal-botones .btn-confirmar-cancel:hover {
+            background: #e6a500;
+            border-color: #e6a500;
+        }
+
+        .cancel-modal-botones .btn-confirmar-cancel:active {
             background: #d49a00;
             transform: scale(0.97);
         }
@@ -505,7 +598,7 @@
             padding: 20px 18px;
             border: 1px solid #3a5a3a;
             margin-top: 10px;
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7); /* ← misma sombra que productos */
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
         }
 
         .form-section h2 {
@@ -1079,6 +1172,12 @@
                 font-size: 0.9rem;
                 padding: 12px;
             }
+            .cancel-modal-content .mensaje {
+                font-size: 1rem;
+            }
+            .cancel-modal-content .emoji {
+                font-size: 2.8rem;
+            }
             .btn-cancelar-item {
                 width: 28px;
                 height: 28px;
@@ -1240,6 +1339,18 @@
                 <button data-value="3">3</button>
             </div>
             <button class="med-cancelar" id="medCancelar">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE CONFIRMACIÓN PARA CANCELAR ===== -->
+    <div id="cancelModal" class="cancel-modal">
+        <div class="cancel-modal-content">
+            <span class="emoji">👍</span>
+            <div class="mensaje">Elegí tranquilo</div>
+            <div class="cancel-modal-botones">
+                <button class="btn-cancelar-cancel" id="btnCancelarCancel">Seguir pidiendo</button>
+                <button class="btn-confirmar-cancel" id="btnConfirmarCancel">Sí, cancelar</button>
+            </div>
         </div>
     </div>
 
@@ -1542,6 +1653,45 @@
         //  MODALES Y EVENTOS DE CLIC
         // ============================================================
 
+        // --- Variable para manejar la cancelación ---
+        let pendingCancelProductId = null;
+
+        // --- Modal de cancelación ---
+        const cancelModal = document.getElementById('cancelModal');
+        const btnCancelarCancel = document.getElementById('btnCancelarCancel');
+        const btnConfirmarCancel = document.getElementById('btnConfirmarCancel');
+
+        function mostrarCancelModal(productId) {
+            pendingCancelProductId = productId;
+            cancelModal.classList.add('active');
+        }
+
+        function cerrarCancelModal() {
+            cancelModal.classList.remove('active');
+            pendingCancelProductId = null;
+        }
+
+        btnCancelarCancel.addEventListener('click', function(e) {
+            e.stopPropagation();
+            cerrarCancelModal();
+        });
+
+        btnConfirmarCancel.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (pendingCancelProductId) {
+                resetearProducto(pendingCancelProductId);
+                mostrarToast('✅ Tech cancelada');
+            }
+            cerrarCancelModal();
+        });
+
+        cancelModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarCancelModal();
+            }
+        });
+
+        // --- Modales de cantidad y medallones ---
         let currentInput = null;
         let currentProductId = null;
         const modal = document.getElementById('qtyModal');
@@ -1594,7 +1744,8 @@
             if (target.classList.contains('btn-cancelar-item')) {
                 const productId = target.dataset.productId;
                 if (productId) {
-                    resetearProducto(productId);
+                    // Mostrar modal de confirmación en lugar de resetear directamente
+                    mostrarCancelModal(productId);
                 }
                 return;
             }
