@@ -2092,6 +2092,31 @@
         });
 
         // ============================================================
+        //  LIMPIAR PEDIDO DESPUÉS DE ENVIAR
+        // ============================================================
+        function limpiarPedido() {
+            // Resetear cantidades de productos
+            document.querySelectorAll('.qty-input').forEach(input => input.value = 0);
+            document.querySelectorAll('.med-extra-input').forEach(input => input.value = 0);
+            document.querySelectorAll('.topping-check').forEach(cb => cb.checked = false);
+
+            // Limpiar campos del formulario
+            document.getElementById('nombre').value = '';
+            document.getElementById('telefono').value = '';
+            document.getElementById('direccion').value = '';
+
+            // Resetear método de pago
+            pagoBotones.forEach(btn => btn.classList.remove('activo'));
+            pagoSeleccionado = null;
+
+            // Actualizar total y visibilidad de botones cancelar
+            updateTotal();
+
+            // Mostrar toast de confirmación
+            mostrarToast('✅ Pedido enviado. ¡Todo listo para otro!');
+        }
+
+        // ============================================================
         //  ENVÍO POR WHATSAPP
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
@@ -2136,7 +2161,7 @@
                 return;
             }
 
-            // Agregar línea de papas individuales
+            // Papas individuales
             mensaje += `\n🍟 *Papas Individuales:* ${totalHamburguesas} GRATIS !!`;
 
             const pagoValue = obtenerPagoSeleccionado() || 'No especificado';
@@ -2166,7 +2191,11 @@
             mensaje += `\n\n💰 *TOTAL:* $${calcularTotal().toLocaleString()}`;
             mensaje += '\n\n📲 ¡Gracias por tu pedido!';
 
+            // Abrir WhatsApp
             window.open(`https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(mensaje)}`, '_blank');
+
+            // Limpiar todo después de enviar
+            limpiarPedido();
         }
 
         // ============================================================
