@@ -1331,7 +1331,7 @@
             <button class="btn-send" id="sendBtn">📲 ENVIAR PEDIDO</button>
 
             <div class="footnote">
-                <span>Todas nuestras burgers vienen con papas</span>
+                <span><strong>Todas nuestras burgers vienen con papas</strong></span>
                 <span>Tu hambre, nuestro ritmo</span>
                 <span class="sc-link">
                     <a href="https://wa.me/5493518692251?text=Hola%2C%20Quiero%20algo%20similar%20al%20proyecto%20de%20Tech%20Classic%20Burguers" target="_blank">SC Photo</a>
@@ -2106,8 +2106,11 @@
             mensaje += `📱 *Teléfono:* ${telefono}\n`;
 
             let tieneProductos = false;
+            let totalHamburguesas = 0;
+
             document.querySelectorAll('.qty-input').forEach(input => {
                 const cant = parseInt(input.value) || 0;
+                totalHamburguesas += cant;
                 if (cant > 0) {
                     const product = PRODUCTS.find(p => p.id === input.dataset.productId);
                     if (product) {
@@ -2132,6 +2135,9 @@
                 alert('Agregá al menos un producto con cantidad > 0.');
                 return;
             }
+
+            // Agregar línea de papas individuales
+            mensaje += `\n🍟 *Papas Individuales:* ${totalHamburguesas} GRATIS !!`;
 
             const pagoValue = obtenerPagoSeleccionado() || 'No especificado';
             mensaje += `\n\n💳 *Pago:* ${pagoValue}`;
