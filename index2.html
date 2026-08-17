@@ -42,7 +42,7 @@
             margin-bottom: 20px;
         }
 
-        /* Contenedor circular para el video */
+        /* Contenedor circular para el video de TikTok */
         .logo-video-container {
             max-width: 306px;
             width: 100%;
@@ -50,14 +50,16 @@
             margin: 0 auto 12px;
             border-radius: 50%;
             overflow: hidden;
-            background: #1a2e1a; /* color de fondo por si el video tarda en cargar */
+            background: #1a2e1a;
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+            position: relative;
         }
 
-        .logo-video-container video {
+        .logo-video-container iframe {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border: none;
             display: block;
         }
 
@@ -1119,14 +1121,17 @@
 <body>
     <div class="container">
 
-        <!-- BRAND -->
+        <!-- ===== BRAND CON VIDEO DE TIKTOK ===== -->
         <div class="brand">
-            <!-- Logo en video circular -->
+            <!-- Contenedor circular con video de TikTok (sin audio) -->
             <div class="logo-video-container">
-                <video autoplay loop muted playsinline>
-                    <source src="images/logo_video.mp4" type="video/mp4">
-                    Tu navegador no soporta videos.
-                </video>
+                <iframe 
+                    src="https://www.tiktok.com/player/v1/7674810295486811399?muted=1&autoplay=1&loop=1&controls=0" 
+                    frameborder="0" 
+                    allow="autoplay; encrypted-media" 
+                    allowfullscreen
+                    loading="lazy"
+                ></iframe>
             </div>
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
             <div class="status-card" id="statusCard">
@@ -1135,10 +1140,10 @@
             </div>
         </div>
 
-        <!-- PRODUCTOS -->
+        <!-- ===== PRODUCTOS ===== -->
         <div class="product-grid" id="productGrid"></div>
 
-        <!-- FORMULARIO -->
+        <!-- ===== FORMULARIO ===== -->
         <div class="form-section" id="formSection">
             <h2>📋 DATOS DEL PEDIDO</h2>
 
@@ -1226,7 +1231,7 @@
                 <span class="qty-empty"></span>
                 <span class="qty-empty"></span>
             </div>
-            <!-- Botón Cerrar eliminado -->
+            <!-- Sin botón Cerrar (se cierra al seleccionar o tocar fuera) -->
         </div>
     </div>
 
