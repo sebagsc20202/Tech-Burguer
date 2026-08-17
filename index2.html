@@ -715,7 +715,7 @@
             border-radius: 10px;
         }
 
-        /* ===== MODAL DE CANTIDAD (sin botón Cerrar) ===== */
+        /* ===== MODAL DE CANTIDAD (con título) ===== */
         .qty-modal {
             display: none;
             position: fixed;
@@ -742,6 +742,16 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
             max-width: 320px;
             width: 90%;
+            text-align: center;
+        }
+
+        .qty-modal-title {
+            color: #ffb703;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+            text-align: center;
         }
 
         .qty-grid {
@@ -779,8 +789,6 @@
             visibility: hidden;
             pointer-events: none;
         }
-
-        /* NOTA: El botón Cerrar ha sido eliminado */
 
         /* ===== MODAL DE MEDALLONES EXTRA ===== */
         .med-modal {
@@ -1023,6 +1031,10 @@
             .qty-modal-content {
                 padding: 24px 16px 16px;
             }
+            .qty-modal-title {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
             .med-grid button {
                 font-size: 1.6rem;
                 max-width: 60px;
@@ -1178,9 +1190,10 @@
         <div class="toast-content" id="toastContent"></div>
     </div>
 
-    <!-- ===== MODAL DE CANTIDAD (sin botón Cerrar) ===== -->
+    <!-- ===== MODAL DE CANTIDAD (con título) ===== -->
     <div id="qtyModal" class="qty-modal">
         <div class="qty-modal-content">
+            <div class="qty-modal-title">Cuantas vas a querer...?</div>
             <div class="qty-grid">
                 <button data-value="1">1</button>
                 <button data-value="2">2</button>
