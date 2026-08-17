@@ -6,12 +6,18 @@
     <title>Tech Classic Burgers · Pedido</title>
 
     <!-- ===== META TAGS PARA PWA ===== -->
+    <!-- ⚠️ CAMBIÁ ESTE COLOR por el mismo que uses en --bg-color abajo -->
     <meta name="theme-color" content="#1a2e1a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="manifest.json" />
 
     <style>
+        /* ===== VARIABLE DE COLOR PRINCIPAL ===== */
+        :root {
+            --bg-color: #1a2e1a;   /* ← CAMBIÁ ESTE HEX por el color exacto del fondo de tu video */
+        }
+
         /* ===== RESET & BASE ===== */
         * {
             margin: 0;
@@ -20,7 +26,7 @@
         }
 
         body {
-            background-color: #1a2e1a;
+            background-color: var(--bg-color);
             color: #e8f0e8;
             font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
             padding: 16px 12px 40px;
@@ -49,9 +55,10 @@
             margin: 0 auto 12px;
             border-radius: 50%;
             overflow: hidden;
-            background: #1a2e1a;
+            background: var(--bg-color);
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
             position: relative;
+            border: 3px solid #ffffff;   /* ← BORDE BLANCO AGREGADO */
         }
 
         .logo-video-container video {
@@ -365,7 +372,7 @@
             font-size: 1.1rem;
             font-weight: 800;
             color: #ffb703;
-            background: #1a2e1a;
+            background: var(--bg-color);
             padding: 0 10px;
             border-radius: 30px;
             line-height: 1.8;
@@ -401,7 +408,7 @@
 
         .product-extras input[type="number"] {
             width: 44px;
-            background: #1a2e1a;
+            background: var(--bg-color);
             border: 1px solid #3a5a3a;
             border-radius: 30px;
             padding: 4px 4px 4px 8px;
@@ -533,7 +540,7 @@
         .form-group select {
             width: 100%;
             padding: 12px 14px;
-            background: #1a2e1a;
+            background: var(--bg-color);
             border: 1px solid #3a5a3a;
             border-radius: 40px;
             color: #fff;
@@ -576,7 +583,7 @@
             flex: 1;
             min-width: 80px;
             padding: 12px 8px;
-            background: #1a2e1a;
+            background: var(--bg-color);
             border: 2px solid #3a5a3a;
             border-radius: 16px;
             color: #b8d0b8;
@@ -626,7 +633,7 @@
         .envio-leyenda {
             font-size: 0.85rem;
             color: #ffb703;
-            background: #1a2e1a;
+            background: var(--bg-color);
             padding: 8px 12px;
             border-radius: 10px;
             border: 1px solid #3a5a3a;
@@ -635,7 +642,7 @@
         }
 
         .total-box {
-            background: #1a2e1a;
+            background: var(--bg-color);
             border-radius: 60px;
             padding: 14px 20px;
             display: flex;
@@ -722,7 +729,7 @@
             width: 4px;
         }
         ::-webkit-scrollbar-track {
-            background: #1a2e1a;
+            background: var(--bg-color);
         }
         ::-webkit-scrollbar-thumb {
             background: #e63946;
