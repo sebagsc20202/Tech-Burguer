@@ -6,7 +6,7 @@
     <title>Tech Classic Burgers · Pedido</title>
 
     <!-- ===== META TAGS PARA PWA ===== -->
-    <meta name="theme-color" content="#11522c" />
+    <meta name="theme-color" content="#1a2e1a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="manifest.json" />
@@ -20,7 +20,7 @@
         }
 
         body {
-            background-color: #11522c;
+            background-color: #1a2e1a;
             color: #e8f0e8;
             font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
             padding: 16px 12px 40px;
@@ -42,26 +42,12 @@
             margin-bottom: 20px;
         }
 
-        .logo-video-container {
+        .brand .logo {
             max-width: 306px;
             width: 100%;
-            aspect-ratio: 1 / 1;
-            margin: 0 auto 12px;
-            border-radius: 50%;
-            overflow: hidden;
-            background: #11522c;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
-            position: relative;
-        }
-
-        .logo-video-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
+            height: auto;
             display: block;
-            transform: scale(1.1);
-            transform-origin: center center;
+            margin: 0 auto 12px;
         }
 
         .brand .tagline {
@@ -89,7 +75,6 @@
             font-size: 1rem;
             letter-spacing: 0.5px;
             transition: border-color 0.3s, background 0.3s;
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
         }
 
         .status-card.abierto {
@@ -117,215 +102,6 @@
             margin-top: 4px;
         }
 
-        /* ===== TOAST DE CONFIRMACIÓN ===== */
-        .toast-confirm {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            z-index: 99999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .toast-confirm.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .toast-confirm .toast-content {
-            background: #2a4a2a;
-            border: 3px solid #ffb703;
-            border-radius: 30px;
-            padding: 40px 50px;
-            text-align: center;
-            font-size: 2.8rem;
-            font-weight: 700;
-            color: #fff;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-            transform: scale(0.8);
-            transition: transform 0.3s ease;
-            max-width: 90%;
-            line-height: 1.4;
-        }
-
-        .toast-confirm.show .toast-content {
-            transform: scale(1);
-        }
-
-        .toast-confirm .toast-content .emoji {
-            display: block;
-            font-size: 4rem;
-            margin-top: 8px;
-        }
-
-        /* ===== MODAL DE RESUMEN DEL PEDIDO ===== */
-        .resumen-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 99999;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(6px);
-            padding: 16px;
-        }
-
-        .resumen-modal.active {
-            display: flex;
-        }
-
-        .resumen-modal-content {
-            background: #1f331f;
-            border-radius: 24px;
-            padding: 24px 20px 20px;
-            border: 2px solid #3a5a3a;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-            max-width: 420px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .resumen-modal-content h3 {
-            color: #ffb703;
-            font-size: 1.6rem;
-            text-align: center;
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
-        }
-
-        .resumen-item {
-            border-bottom: 1px solid #2f4a2f;
-            padding: 8px 0;
-            font-size: 0.9rem;
-            color: #d0e0d0;
-        }
-
-        .resumen-item .cantidad {
-            color: #ffb703;
-            font-weight: 700;
-        }
-
-        .resumen-item .precio {
-            float: right;
-            color: #ffb703;
-            font-weight: 700;
-        }
-
-        .resumen-total {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #ffb703;
-            text-align: right;
-            padding-top: 12px;
-            border-top: 2px solid #ffb703;
-            margin-top: 8px;
-        }
-
-        .resumen-botones {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .resumen-botones button {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            border-radius: 40px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
-
-        .resumen-botones .btn-cancelar-resumen {
-            background: #ffffff;
-            color: #1a1a1a;
-            border: 2px solid #cccccc;
-        }
-
-        .resumen-botones .btn-cancelar-resumen:hover {
-            background: #f0f0f0;
-            border-color: #aaaaaa;
-        }
-
-        .resumen-botones .btn-cancelar-resumen:active {
-            background: #e0e0e0;
-            transform: scale(0.97);
-        }
-
-        .resumen-botones .btn-confirmar-resumen {
-            background: #ffb703;
-            color: #1a1a1a;
-            border: 2px solid #ffb703;
-        }
-
-        .resumen-botones .btn-confirmar-resumen:hover {
-            background: #e6a500;
-            border-color: #e6a500;
-        }
-
-        .resumen-botones .btn-confirmar-resumen:active {
-            background: #d49a00;
-            transform: scale(0.97);
-        }
-
-        /* ===== MODAL DE CONFIRMACIÓN PARA CANCELAR (sin botones) ===== */
-        .cancel-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 99998;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(4px);
-            padding: 16px;
-        }
-
-        .cancel-modal.active {
-            display: flex;
-        }
-
-        .cancel-modal-content {
-            background: #1f331f;
-            border-radius: 24px;
-            padding: 40px 30px 30px;
-            border: 2px solid #3a5a3a;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-            max-width: 340px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .cancel-modal-content .emoji {
-            font-size: 4rem;
-            display: block;
-            margin-bottom: 12px;
-        }
-
-        .cancel-modal-content .mensaje {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #e8f0e8;
-            line-height: 1.4;
-        }
-
         /* ===== PRODUCT CARDS ===== */
         .product-grid {
             display: flex;
@@ -344,7 +120,7 @@
             display: flex;
             gap: 14px;
             align-items: flex-start;
-            position: relative;
+            cursor: pointer; /* ← para indicar que es clickeable */
         }
 
         .product-card:hover {
@@ -362,7 +138,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            pointer-events: none;
+            pointer-events: none; /* ← para que el clic lo maneje la card */
         }
 
         .product-img img {
@@ -370,12 +146,13 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            pointer-events: none;
         }
 
         .product-info {
             flex: 1;
             min-width: 0;
-            pointer-events: none;
+            pointer-events: none; /* ← para que el clic lo maneje la card */
         }
 
         .product-header {
@@ -391,6 +168,7 @@
             font-weight: 700;
             color: #fff;
             letter-spacing: -0.3px;
+            pointer-events: none; /* ← el clic lo maneja la card */
         }
 
         .product-name .badge {
@@ -410,13 +188,14 @@
             font-size: 1.1rem;
             font-weight: 800;
             color: #ffb703;
-            background: #11522c;
+            background: #1a2e1a;
             padding: 0 10px;
             border-radius: 30px;
             line-height: 1.8;
             white-space: nowrap;
             border: 1px solid #3a5a3a;
             margin-top: 2px;
+            pointer-events: none;
         }
 
         .product-desc {
@@ -424,6 +203,7 @@
             color: #b8d0b8;
             margin: 2px 0 8px;
             line-height: 1.3;
+            pointer-events: none;
         }
 
         .product-extras {
@@ -432,7 +212,7 @@
             align-items: center;
             gap: 8px 12px;
             margin-top: 4px;
-            pointer-events: auto;
+            pointer-events: auto; /* ← permitimos interacción en los inputs */
         }
 
         .product-extras label {
@@ -446,7 +226,7 @@
 
         .product-extras input[type="number"] {
             width: 44px;
-            background: #11522c;
+            background: #1a2e1a;
             border: 1px solid #3a5a3a;
             border-radius: 30px;
             padding: 4px 4px 4px 8px;
@@ -454,15 +234,7 @@
             font-weight: 600;
             font-size: 0.9rem;
             outline: none;
-            cursor: pointer;
-            -moz-appearance: textfield;
             pointer-events: auto;
-        }
-
-        .product-extras input[type="number"]::-webkit-outer-spin-button,
-        .product-extras input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
         }
 
         .product-extras input[type="number"]:focus {
@@ -476,7 +248,8 @@
         }
 
         .product-extras .qty-wrap label {
-            display: none;
+            color: #b8d0b8;
+            pointer-events: none;
         }
 
         .toppings-group {
@@ -487,7 +260,6 @@
             padding-top: 6px;
             border-top: 1px dashed #2f4a2f;
             width: 100%;
-            pointer-events: auto;
         }
 
         .toppings-group label {
@@ -507,39 +279,59 @@
             pointer-events: auto;
         }
 
-        /* ===== BOTÓN DE CANCELAR EN LA TARJETA ===== */
-        .btn-cancelar-item {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: #3a1a1a;
-            border: 2px solid #f44336;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            color: #ff6b6b;
-            font-size: 1.2rem;
-            font-weight: 700;
-            cursor: pointer;
+        /* ===== IMAGE MODAL (POPUP) ===== */
+        .image-modal {
             display: none;
-            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 99999;
             justify-content: center;
-            line-height: 1;
-            transition: background 0.15s, transform 0.1s;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-            z-index: 2;
+            align-items: center;
+            backdrop-filter: blur(6px);
+            padding: 20px;
+            cursor: pointer;
         }
 
-        .btn-cancelar-item:hover {
-            background: #5a2a2a;
-        }
-
-        .btn-cancelar-item:active {
-            transform: scale(0.9);
-        }
-
-        .btn-cancelar-item.visible {
+        .image-modal.active {
             display: flex;
+        }
+
+        .image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            width: auto;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+            object-fit: contain;
+            cursor: default;
+            transform: scale(0.9);
+            transition: transform 0.25s ease;
+        }
+
+        .image-modal.active img {
+            transform: scale(1);
+        }
+
+        .image-modal .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2.8rem;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 300;
+            line-height: 1;
+            transition: transform 0.2s;
+            z-index: 10;
+        }
+
+        .image-modal .close-btn:hover {
+            transform: scale(1.2);
         }
 
         /* ===== FORM ===== */
@@ -549,7 +341,6 @@
             padding: 20px 18px;
             border: 1px solid #3a5a3a;
             margin-top: 10px;
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
         }
 
         .form-section h2 {
@@ -579,7 +370,7 @@
         .form-group select {
             width: 100%;
             padding: 12px 14px;
-            background: #11522c;
+            background: #1a2e1a;
             border: 1px solid #3a5a3a;
             border-radius: 40px;
             color: #fff;
@@ -611,77 +402,8 @@
             display: block;
         }
 
-        /* ===== BOTONES DE PAGO CON ICONOS ===== */
-        .pago-botones {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .pago-btn {
-            flex: 1;
-            min-width: 80px;
-            padding: 12px 8px;
-            background: #11522c;
-            border: 2px solid #3a5a3a;
-            border-radius: 16px;
-            color: #b8d0b8;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .pago-btn .icono {
-            font-size: 1.8rem;
-            line-height: 1;
-        }
-
-        .pago-btn .label {
-            font-size: 0.75rem;
-            line-height: 1.2;
-            color: #b8d0b8;
-        }
-
-        .pago-btn:hover {
-            border-color: #6a8a6a;
-            background: #1f331f;
-        }
-
-        .pago-btn.activo {
-            border-color: #ffffff;
-            background: #1f331f;
-            color: #ffffff;
-            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2), 0 0 20px rgba(255, 255, 255, 0.1);
-        }
-
-        .pago-btn.activo .label {
-            color: #ffffff;
-        }
-
-        .pago-btn.oculto {
-            display: none !important;
-        }
-
-        .envio-leyenda {
-            font-size: 0.85rem;
-            color: #ffb703;
-            background: #11522c;
-            padding: 8px 12px;
-            border-radius: 10px;
-            border: 1px solid #3a5a3a;
-            margin-top: 6px;
-            text-align: center;
-        }
-
         .total-box {
-            background: #11522c;
+            background: #1a2e1a;
             border-radius: 60px;
             padding: 14px 20px;
             display: flex;
@@ -743,18 +465,6 @@
             display: block;
         }
 
-        .footnote .sc-link {
-            margin-top: 8px;
-            display: block;
-            font-size: 0.75rem;
-            color: #6a8a6a;
-        }
-
-        .footnote .sc-link a {
-            color: #ffb703;
-            text-decoration: underline;
-        }
-
         .text-muted {
             color: #8aaa8a;
             font-size: 0.75rem;
@@ -768,329 +478,13 @@
             width: 4px;
         }
         ::-webkit-scrollbar-track {
-            background: #11522c;
+            background: #1a2e1a;
         }
         ::-webkit-scrollbar-thumb {
             background: #e63946;
             border-radius: 10px;
         }
 
-        /* ===== MODAL DE CANTIDAD (con título) ===== */
-        .qty-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(4px);
-        }
-
-        .qty-modal.active {
-            display: flex;
-        }
-
-        .qty-modal-content {
-            background: #1f331f;
-            border-radius: 24px;
-            padding: 28px 20px 20px;
-            border: 2px solid #3a5a3a;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-            max-width: 320px;
-            width: 90%;
-            text-align: center;
-        }
-
-        .qty-modal-title {
-            color: #ffb703;
-            font-weight: 700;
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            letter-spacing: 0.5px;
-            text-align: center;
-        }
-
-        .qty-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            justify-items: center;
-            margin-bottom: 12px;
-        }
-
-        .qty-grid button {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            max-width: 80px;
-            border: none;
-            border-radius: 50%;
-            background: #2a4a2a;
-            color: #fff;
-            font-size: 1.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .qty-grid button:active {
-            transform: scale(0.92);
-            background: #3a6a3a;
-        }
-
-        .qty-grid .qty-empty {
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        /* ===== MODAL DE MEDALLONES EXTRA ===== */
-        .med-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 10000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(4px);
-        }
-
-        .med-modal.active {
-            display: flex;
-        }
-
-        .med-modal-content {
-            background: #1f331f;
-            border-radius: 24px;
-            padding: 28px 20px 20px;
-            border: 2px solid #3a5a3a;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-            max-width: 280px;
-            width: 85%;
-            text-align: center;
-        }
-
-        .med-modal-title {
-            color: #ffb703;
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
-        }
-
-        .med-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            justify-items: center;
-            margin-bottom: 16px;
-        }
-
-        .med-grid button {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            max-width: 70px;
-            border: none;
-            border-radius: 50%;
-            background: #2a4a2a;
-            color: #fff;
-            font-size: 1.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .med-grid button:active {
-            transform: scale(0.92);
-            background: #3a6a3a;
-        }
-
-        .med-cancelar {
-            width: 100%;
-            border: 2px solid #f44336;
-            border-radius: 40px;
-            background: #3a1a1a;
-            color: #ff6b6b;
-            font-size: 1rem;
-            font-weight: 600;
-            padding: 12px 10px;
-            cursor: pointer;
-            transition: background 0.15s, transform 0.1s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            line-height: 1.3;
-        }
-
-        .med-cancelar:active {
-            background: #5a2a2a;
-            transform: scale(0.97);
-        }
-
-        /* ===== BOTÓN FLOTANTE INSTAGRAM (derecha) ===== */
-        .btn-instagram {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 9999;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-instagram:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-        }
-
-        .btn-instagram:active {
-            transform: scale(0.95);
-        }
-
-        .btn-instagram svg {
-            width: 32px;
-            height: 32px;
-            fill: #ffffff;
-            display: block;
-        }
-
-        /* ===== BOTÓN FLOTANTE COMPARTIR (izquierda) ===== */
-        .btn-share {
-            position: fixed;
-            bottom: 24px;
-            left: 24px;
-            z-index: 9999;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #1f331f;
-            border: 2px solid #3a5a3a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            color: #e8f0e8;
-        }
-
-        .btn-share:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-            background: #2a4a2a;
-        }
-
-        .btn-share:active {
-            transform: scale(0.95);
-        }
-
-        .btn-share svg {
-            width: 32px;
-            height: 32px;
-            fill: #e8f0e8;
-            display: block;
-        }
-
-        /* ===== BANNER DE COOKIES ===== */
-        .cookie-banner {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #1f331f;
-            border-top: 3px solid #ffb703;
-            padding: 16px 20px;
-            z-index: 99999;
-            box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.6);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            text-align: center;
-        }
-
-        .cookie-banner.active {
-            display: flex;
-        }
-
-        .cookie-banner p {
-            font-size: 0.9rem;
-            color: #d0e0d0;
-            max-width: 500px;
-            margin: 0;
-        }
-
-        .cookie-banner p a {
-            color: #ffb703;
-            text-decoration: underline;
-        }
-
-        .cookie-banner .cookie-botones {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .cookie-banner .cookie-botones button {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
-
-        .cookie-banner .cookie-botones .btn-aceptar {
-            background: #ffb703;
-            color: #1a1a1a;
-        }
-
-        .cookie-banner .cookie-botones .btn-aceptar:hover {
-            background: #e6a500;
-        }
-
-        .cookie-banner .cookie-botones .btn-aceptar:active {
-            transform: scale(0.97);
-        }
-
-        .cookie-banner .cookie-botones .btn-mas-info {
-            background: transparent;
-            color: #b8d0b8;
-            border: 2px solid #3a5a3a;
-        }
-
-        .cookie-banner .cookie-botones .btn-mas-info:hover {
-            background: #2a4a2a;
-            border-color: #6a8a6a;
-        }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             body {
                 font-size: 17px;
@@ -1131,7 +525,7 @@
             .form-section h2 {
                 font-size: 1.2rem;
             }
-            .logo-video-container {
+            .brand .logo {
                 max-width: 260px;
                 margin-bottom: 10px;
             }
@@ -1145,115 +539,10 @@
             .footnote {
                 font-size: 0.75rem;
             }
-            .footnote .sc-link {
-                font-size: 0.7rem;
-            }
-            .envio-leyenda {
-                font-size: 0.8rem;
-                padding: 6px 10px;
-            }
-            .toast-confirm .toast-content {
+            .image-modal .close-btn {
                 font-size: 2.2rem;
-                padding: 30px 24px;
-            }
-            .toast-confirm .toast-content .emoji {
-                font-size: 3.2rem;
-            }
-            .qty-grid button {
-                font-size: 1.6rem;
-                max-width: 70px;
-            }
-            .qty-modal-content {
-                padding: 24px 16px 16px;
-            }
-            .qty-modal-title {
-                font-size: 1.1rem;
-                margin-bottom: 16px;
-            }
-            .med-grid button {
-                font-size: 1.6rem;
-                max-width: 60px;
-            }
-            .med-modal-content {
-                padding: 24px 16px 16px;
-                max-width: 250px;
-            }
-            .med-cancelar {
-                font-size: 0.9rem;
-                padding: 10px 8px;
-            }
-            .resumen-modal-content {
-                padding: 18px 14px;
-            }
-            .resumen-modal-content h3 {
-                font-size: 1.3rem;
-            }
-            .resumen-item {
-                font-size: 0.8rem;
-            }
-            .resumen-total {
-                font-size: 1rem;
-            }
-            .resumen-botones button {
-                font-size: 0.9rem;
-                padding: 12px;
-            }
-            .cancel-modal-content {
-                padding: 30px 20px 20px;
-            }
-            .cancel-modal-content .emoji {
-                font-size: 3.2rem;
-            }
-            .cancel-modal-content .mensaje {
-                font-size: 1.2rem;
-            }
-            .btn-cancelar-item {
-                width: 28px;
-                height: 28px;
-                font-size: 1rem;
-                top: 6px;
-                right: 6px;
-            }
-            .pago-btn {
-                min-width: 60px;
-                padding: 10px 6px;
-                font-size: 0.8rem;
-            }
-            .pago-btn .icono {
-                font-size: 1.5rem;
-            }
-            .pago-btn .label {
-                font-size: 0.65rem;
-            }
-            .btn-instagram {
-                width: 50px;
-                height: 50px;
-                bottom: 16px;
-                right: 16px;
-            }
-            .btn-instagram svg {
-                width: 26px;
-                height: 26px;
-            }
-            .btn-share {
-                width: 50px;
-                height: 50px;
-                bottom: 16px;
-                left: 16px;
-            }
-            .btn-share svg {
-                width: 26px;
-                height: 26px;
-            }
-            .cookie-banner {
-                padding: 14px 16px;
-            }
-            .cookie-banner p {
-                font-size: 0.8rem;
-            }
-            .cookie-banner .cookie-botones button {
-                padding: 8px 18px;
-                font-size: 0.8rem;
+                top: 12px;
+                right: 18px;
             }
         }
     </style>
@@ -1263,9 +552,7 @@
 
         <!-- BRAND -->
         <div class="brand">
-            <div class="logo-video-container">
-                <img src="images/icon-512.png" alt="Tech Classic Burgers" />
-            </div>
+            <img src="images/logo_tech.png" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
             <div class="status-card" id="statusCard">
                 <div id="statusText">⏳ Cargando...</div>
@@ -1292,20 +579,12 @@
 
             <div class="form-group">
                 <label for="metodoPago">Método de pago</label>
-                <div class="pago-botones" id="pagoBotones">
-                    <div class="pago-btn" data-value="Efectivo">
-                        <span class="icono">💵</span>
-                        <span class="label">Efectivo</span>
-                    </div>
-                    <div class="pago-btn" data-value="Transferencia">
-                        <span class="icono">🏦</span>
-                        <span class="label">Transferencia</span>
-                    </div>
-                    <div class="pago-btn" data-value="QR">
-                        <span class="icono">📱</span>
-                        <span class="label">QR</span>
-                    </div>
-                </div>
+                <select id="metodoPago">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Débito/Crédito">Débito/Crédito</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="QR">QR</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -1317,9 +596,6 @@
                 <div class="address-field" id="addressField">
                     <label for="direccion">Dirección de entrega</label>
                     <input type="text" id="direccion" placeholder="Calle, número, piso, etc." autocomplete="street-address" />
-                    <div class="envio-leyenda">
-                        🚚 La entrega tiene un costo adicional de <strong>$2.000</strong> que se suma al total de tu compra.
-                    </div>
                 </div>
             </div>
 
@@ -1331,133 +607,20 @@
             <button class="btn-send" id="sendBtn">📲 ENVIAR PEDIDO</button>
 
             <div class="footnote">
-                <span><strong>Todas nuestras burgers vienen con papas</strong></span>
+                <span>Todas nuestras burgers vienen con papas</span>
                 <span>Tu hambre, nuestro ritmo</span>
-                <span class="sc-link">
-                    <a href="https://wa.me/5493518692251?text=Hola%2C%20Quiero%20algo%20similar%20al%20proyecto%20de%20Tech%20Classic%20Burguers" target="_blank">SC Photo</a>
-                </span>
             </div>
         </div>
 
     </div>
 
-    <!-- ===== TOAST DE CONFIRMACIÓN ===== -->
-    <div id="toastConfirm" class="toast-confirm">
-        <div class="toast-content" id="toastContent"></div>
+    <!-- ===== IMAGE MODAL (POPUP) ===== -->
+    <div id="imageModal" class="image-modal">
+        <span class="close-btn" id="closeModalBtn">&times;</span>
+        <img id="modalImage" src="" alt="Vista ampliada" />
     </div>
-
-    <!-- ===== MODAL DE CANTIDAD (con título) ===== -->
-    <div id="qtyModal" class="qty-modal">
-        <div class="qty-modal-content">
-            <div class="qty-modal-title">➕ Cuantas querés..?</div>
-            <div class="qty-grid">
-                <button data-value="1">1</button>
-                <button data-value="2">2</button>
-                <button data-value="3">3</button>
-                <button data-value="4">4</button>
-                <button data-value="5">5</button>
-                <button data-value="6">6</button>
-                <button data-value="7">7</button>
-                <button data-value="8">8</button>
-                <button data-value="9">9</button>
-                <span class="qty-empty"></span>
-                <span class="qty-empty"></span>
-                <span class="qty-empty"></span>
-            </div>
-            <!-- Botón Cerrar eliminado -->
-        </div>
-    </div>
-
-    <!-- ===== MODAL DE MEDALLONES EXTRA ===== -->
-    <div id="medModal" class="med-modal">
-        <div class="med-modal-content">
-            <div class="med-modal-title">➕ Medallones extra</div>
-            <div class="med-grid">
-                <button data-value="1">1</button>
-                <button data-value="2">2</button>
-                <button data-value="3">3</button>
-            </div>
-            <button class="med-cancelar" id="medCancelar">Cancelar</button>
-        </div>
-    </div>
-
-    <!-- ===== MODAL DE CONFIRMACIÓN PARA CANCELAR (sin botones) ===== -->
-    <div id="cancelModal" class="cancel-modal">
-        <div class="cancel-modal-content">
-            <span class="emoji">👍</span>
-            <div class="mensaje">Elegí tranquilo</div>
-        </div>
-    </div>
-
-    <!-- ===== MODAL DE RESUMEN DEL PEDIDO ===== -->
-    <div id="resumenModal" class="resumen-modal">
-        <div class="resumen-modal-content">
-            <h3>📋 Revisá tu pedido</h3>
-            <div id="resumenDetalle"></div>
-            <div class="resumen-total" id="resumenTotal"></div>
-            <div class="resumen-botones">
-                <button class="btn-cancelar-resumen" id="btnCancelarResumen">✖ Cancelar</button>
-                <button class="btn-confirmar-resumen" id="btnConfirmarResumen">✅ Confirmar y enviar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== BANNER DE COOKIES ===== -->
-    <div id="cookieBanner" class="cookie-banner">
-        <p>
-            🍪 Usamos cookies propias y de terceros para mejorar tu experiencia.
-            Al continuar navegando, aceptas su uso.
-            <a href="#" target="_blank">Más información</a>
-        </p>
-        <div class="cookie-botones">
-            <button class="btn-aceptar" id="aceptarCookies">Aceptar</button>
-            <button class="btn-mas-info" id="masInfoCookies">Más info</button>
-        </div>
-    </div>
-
-    <!-- ===== BOTÓN FLOTANTE INSTAGRAM (derecha) ===== -->
-    <a href="https://www.instagram.com/techburger__" target="_blank" rel="noopener noreferrer" class="btn-instagram" aria-label="Síguenos en Instagram">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-        </svg>
-    </a>
-
-    <!-- ===== BOTÓN FLOTANTE COMPARTIR (izquierda) ===== -->
-    <button class="btn-share" id="shareBtn" aria-label="Compartir esta app">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-        </svg>
-    </button>
 
     <script>
-        // ============================================================
-        //  COOKIES BANNER
-        // ============================================================
-        const cookieBanner = document.getElementById('cookieBanner');
-        const aceptarBtn = document.getElementById('aceptarCookies');
-        const masInfoBtn = document.getElementById('masInfoCookies');
-
-        function checkCookies() {
-            const cookiesAceptadas = localStorage.getItem('cookies_aceptadas');
-            if (cookiesAceptadas === 'true') {
-                cookieBanner.classList.remove('active');
-            } else {
-                cookieBanner.classList.add('active');
-            }
-        }
-
-        function aceptarCookies() {
-            localStorage.setItem('cookies_aceptadas', 'true');
-            cookieBanner.classList.remove('active');
-        }
-
-        aceptarBtn.addEventListener('click', aceptarCookies);
-        masInfoBtn.addEventListener('click', function() {
-            alert('📄 Política de cookies: Usamos cookies para mejorar tu experiencia. Podés gestionarlas desde la configuración de tu navegador.');
-        });
-
-        checkCookies();
-
         // ============================================================
         //  REGISTRO DE SERVICE WORKER (PWA)
         // ============================================================
@@ -1512,23 +675,7 @@
         setInterval(actualizarEstado, 60000);
 
         // ============================================================
-        //  TOAST DE CONFIRMACIÓN
-        // ============================================================
-        var toastTimer = null;
-
-        function mostrarToast(mensaje) {
-            var toast = document.getElementById('toastConfirm');
-            var content = document.getElementById('toastContent');
-            content.innerHTML = mensaje + ' <span class="emoji">👍</span>';
-            toast.classList.add('show');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(function() {
-                toast.classList.remove('show');
-            }, 750);
-        }
-
-        // ============================================================
-        //  DATOS DE PRODUCTOS
+        //  DATOS DE PRODUCTOS (con imágenes .webp)
         // ============================================================
         const PRODUCTS = [{
             id: 'armatuburger',
@@ -1537,42 +684,42 @@
             desc: '1 medallón 120gr · doble cheddar · salsa Tech. Agregá medallones y toppings.',
             hasExtras: true,
             badge: 'BASE',
-            imagen: 'images/arm.jpg'
+            imagen: 'images/bn1.webp'
         }, {
             id: 'doblep',
             name: 'Doble Provoleta',
             price: 18000,
             desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.',
             hasExtras: false,
-            imagen: 'images/pro.jpg'
+            imagen: 'images/bn2.webp'
         }, {
             id: 'intense',
             name: 'Intense',
             price: 18000,
             desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.',
             hasExtras: false,
-            imagen: 'images/int.jpg'
+            imagen: 'images/bn3.webp'
         }, {
             id: 'techmex',
             name: 'Tech Mex',
             price: 18000,
             desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.',
             hasExtras: false,
-            imagen: 'images/mex.jpg'
+            imagen: 'images/bn4.webp'
         }, {
             id: 'yankee',
             name: 'Yankee',
             price: 16000,
             desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.',
             hasExtras: false,
-            imagen: 'images/yan.jpg'
+            imagen: 'images/bn5.webp'
         }, {
             id: 'clasica',
             name: 'Clásica',
             price: 16000,
             desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.',
             hasExtras: false,
-            imagen: 'images/cla.jpg'
+            imagen: 'images/bn6.webp'
         }];
 
         const TOPPINGS = [
@@ -1591,13 +738,8 @@
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.dataset.id = p.id;
-
-                const cancelBtn = document.createElement('button');
-                cancelBtn.className = 'btn-cancelar-item';
-                cancelBtn.dataset.productId = p.id;
-                cancelBtn.innerHTML = '✕';
-                cancelBtn.title = 'Cancelar esta Tech';
-                card.appendChild(cancelBtn);
+                // Guardamos la ruta de la imagen para el popup
+                card.dataset.image = p.imagen;
 
                 const imgDiv = document.createElement('div');
                 imgDiv.className = 'product-img';
@@ -1606,7 +748,6 @@
                 img.alt = p.name;
                 img.loading = 'lazy';
                 imgDiv.appendChild(img);
-                card.appendChild(imgDiv);
 
                 const info = document.createElement('div');
                 info.className = 'product-info';
@@ -1621,25 +762,25 @@
                 priceSpan.textContent = `$${p.price.toLocaleString()}`;
                 header.appendChild(nameSpan);
                 header.appendChild(priceSpan);
-                info.appendChild(header);
 
                 const desc = document.createElement('div');
                 desc.className = 'product-desc';
                 desc.textContent = p.desc;
-                info.appendChild(desc);
 
                 const extras = document.createElement('div');
                 extras.className = 'product-extras';
 
                 const qtyWrap = document.createElement('div');
                 qtyWrap.className = 'qty-wrap';
+                const qtyLabel = document.createElement('label');
+                qtyLabel.textContent = 'Cant.';
                 const qtyInput = document.createElement('input');
                 qtyInput.type = 'number';
                 qtyInput.min = 0;
                 qtyInput.value = 0;
                 qtyInput.dataset.productId = p.id;
                 qtyInput.className = 'qty-input';
-                qtyInput.readOnly = true;
+                qtyWrap.appendChild(qtyLabel);
                 qtyWrap.appendChild(qtyInput);
                 extras.appendChild(qtyWrap);
 
@@ -1652,7 +793,6 @@
                     medInput.value = 0;
                     medInput.className = 'med-extra-input';
                     medInput.dataset.productId = p.id;
-                    medInput.readOnly = true;
                     extraMed.appendChild(medInput);
                     extras.appendChild(extraMed);
 
@@ -1672,8 +812,11 @@
                     extras.appendChild(toppingsDiv);
                 }
 
+                info.appendChild(header);
+                info.appendChild(desc);
                 info.appendChild(extras);
 
+                card.appendChild(imgDiv);
                 card.appendChild(info);
                 grid.appendChild(card);
             });
@@ -1682,258 +825,65 @@
         renderProducts();
 
         // ============================================================
-        //  MANEJAR VISIBILIDAD DEL BOTÓN DE CANCELAR
+        //  POPUP DE IMAGEN (clic en la tarjeta, excepto en inputs)
         // ============================================================
-        function actualizarVisibilidadCancelar() {
-            document.querySelectorAll('.product-card').forEach(card => {
-                const qtyInput = card.querySelector('.qty-input');
-                const cancelBtn = card.querySelector('.btn-cancelar-item');
-                if (qtyInput && cancelBtn) {
-                    const val = parseInt(qtyInput.value) || 0;
-                    if (val > 0) {
-                        cancelBtn.classList.add('visible');
-                    } else {
-                        cancelBtn.classList.remove('visible');
-                    }
-                }
-            });
-        }
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const closeBtn = document.getElementById('closeModalBtn');
 
-        // ============================================================
-        //  FUNCIÓN PARA RESETEAR UN PRODUCTO COMPLETO
-        // ============================================================
-        function resetearProducto(productId) {
-            const qtyInput = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
-            if (qtyInput) {
-                qtyInput.value = 0;
-                const evt = new Event('input', { bubbles: true });
-                qtyInput.dispatchEvent(evt);
-            }
-            const medInput = document.querySelector(`.med-extra-input[data-product-id="${productId}"]`);
-            if (medInput) {
-                medInput.value = 0;
-                const evt = new Event('input', { bubbles: true });
-                medInput.dispatchEvent(evt);
-            }
-            const checks = document.querySelectorAll(`.topping-check[data-product-id="${productId}"]:checked`);
-            checks.forEach(cb => {
-                cb.checked = false;
-                const evt = new Event('change', { bubbles: true });
-                cb.dispatchEvent(evt);
-            });
-            actualizarVisibilidadCancelar();
-            updateTotal();
-        }
-
-        // ============================================================
-        //  MODALES Y EVENTOS DE CLIC
-        // ============================================================
-
-        // --- Modal de cancelación (sin botones, se cierra automáticamente) ---
-        const cancelModal = document.getElementById('cancelModal');
-
-        function mostrarCancelModal() {
-            cancelModal.classList.add('active');
-            // Cerrar automáticamente después de 0.9 segundos
-            clearTimeout(cancelModal._timer);
-            cancelModal._timer = setTimeout(function() {
-                cancelModal.classList.remove('active');
-            }, 900);
-        }
-
-        // Cerrar modal al hacer clic fuera (por si el usuario toca el fondo)
-        cancelModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                cancelModal.classList.remove('active');
-                clearTimeout(cancelModal._timer);
-            }
-        });
-
-        // --- Modales de cantidad y medallones ---
-        let currentInput = null;
-        let currentProductId = null;
-        const modal = document.getElementById('qtyModal');
-        const modalButtons = modal.querySelectorAll('.qty-grid button');
-
-        let currentMedInput = null;
-        const medModal = document.getElementById('medModal');
-        const medButtons = medModal.querySelectorAll('.med-grid button');
-        const medCancelar = document.getElementById('medCancelar');
-
-        function openModalForInput(input) {
-            if (input) {
-                currentInput = input;
-                currentProductId = input.dataset.productId;
-                modal.classList.add('active');
-            }
-        }
-
-        function closeModal() {
-            modal.classList.remove('active');
-            currentInput = null;
-            currentProductId = null;
-        }
-
-        function openMedModalForInput(input) {
-            if (input) {
-                currentMedInput = input;
-                medModal.classList.add('active');
-            }
-        }
-
-        function closeMedModal() {
-            medModal.classList.remove('active');
-            currentMedInput = null;
-        }
-
+        // Abrir modal al hacer clic en la tarjeta (si no se hizo clic en un input/checkbox)
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
 
-            if (target.classList.contains('qty-input')) {
-                openModalForInput(target);
+            // Si el clic fue en un input, checkbox o label, no abrimos el popup
+            if (target.closest('input') || target.closest('label') || target.closest('.product-extras')) {
                 return;
             }
 
-            if (target.classList.contains('med-extra-input')) {
-                openMedModalForInput(target);
-                return;
-            }
+            const card = target.closest('.product-card');
+            if (!card) return;
 
-            if (target.classList.contains('btn-cancelar-item')) {
-                const productId = target.dataset.productId;
-                if (productId) {
-                    // Ejecutar reset inmediatamente
-                    resetearProducto(productId);
-                    // Mostrar modal de "Elegí tranquilo" (sin toast)
-                    mostrarCancelModal();
-                }
-                return;
+            const imageSrc = card.dataset.image;
+            if (imageSrc) {
+                modalImg.src = imageSrc;
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // evitar scroll
             }
         });
 
-        modalButtons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const val = parseInt(this.dataset.value, 10);
-                if (!isNaN(val) && val >= 1 && val <= 9) {
-                    if (currentInput) {
-                        currentInput.value = val;
-                        const product = PRODUCTS.find(p => p.id === currentProductId);
-                        if (product) {
-                            mostrarToast(val + ' ' + product.name);
-                        }
-                        const evt = new Event('input', { bubbles: true });
-                        currentInput.dispatchEvent(evt);
-                        actualizarVisibilidadCancelar();
-                    }
-                }
-                closeModal();
-            });
-        });
-
-        // Cerrar modal al hacer clic en el fondo
+        // Cerrar modal al hacer clic en el fondo (overlay)
         modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
+            // Si el clic fue en la imagen, no cerramos (para que el usuario pueda ver la imagen y cerrar con el botón o fuera)
+            if (e.target === modalImg) return;
+            cerrarModal();
         });
 
-        medButtons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const val = parseInt(this.dataset.value, 10);
-                if (!isNaN(val) && val >= 1 && val <= 3) {
-                    if (currentMedInput) {
-                        currentMedInput.value = val;
-                        const evt = new Event('input', { bubbles: true });
-                        currentMedInput.dispatchEvent(evt);
-                    }
-                }
-                closeMedModal();
-            });
-        });
-
-        medCancelar.addEventListener('click', function(e) {
+        // Cerrar con el botón X
+        closeBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            closeMedModal();
+            cerrarModal();
         });
 
-        medModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeMedModal();
+        // Cerrar con la tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                cerrarModal();
             }
         });
 
-        // ============================================================
-        //  CONTROL DE BOTONES DE PAGO SEGÚN ENVÍO
-        // ============================================================
-        const formaEnvioSelect = document.getElementById('formaEnvio');
-        const pagoBotones = document.querySelectorAll('.pago-btn');
-        let pagoSeleccionado = null;
-
-        function seleccionarPago(valor) {
-            pagoBotones.forEach(btn => {
-                btn.classList.remove('activo');
-                if (btn.dataset.value === valor) {
-                    btn.classList.add('activo');
-                }
-            });
-            pagoSeleccionado = valor;
+        function cerrarModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
         }
-
-        function obtenerPagoSeleccionado() {
-            return pagoSeleccionado || null;
-        }
-
-        pagoBotones.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const valor = this.dataset.value;
-                if (this.classList.contains('activo')) {
-                    this.classList.remove('activo');
-                    pagoSeleccionado = null;
-                } else {
-                    pagoBotones.forEach(b => b.classList.remove('activo'));
-                    this.classList.add('activo');
-                    pagoSeleccionado = valor;
-                }
-            });
-        });
-
-        function actualizarPagosSegunEnvio() {
-            const esEntrega = formaEnvioSelect.value === 'entrega';
-            pagoBotones.forEach(btn => {
-                const valor = btn.dataset.value;
-                if (esEntrega) {
-                    if (valor === 'Efectivo' || valor === 'Transferencia') {
-                        btn.classList.remove('oculto');
-                    } else {
-                        btn.classList.add('oculto');
-                        if (btn.classList.contains('activo')) {
-                            btn.classList.remove('activo');
-                            pagoSeleccionado = null;
-                        }
-                    }
-                } else {
-                    btn.classList.remove('oculto');
-                }
-            });
-        }
-
-        formaEnvioSelect.addEventListener('change', function() {
-            toggleAddress();
-            actualizarPagosSegunEnvio();
-            updateTotal();
-        });
-
-        setTimeout(actualizarPagosSegunEnvio, 100);
 
         // ============================================================
         //  TOTAL Y ENVÍO
         // ============================================================
+        const formaEnvioSelect = document.getElementById('formaEnvio');
         const addressField = document.getElementById('addressField');
         const direccionInput = document.getElementById('direccion');
         const totalDisplay = document.getElementById('totalDisplay');
-        const COSTO_ENVIO = 2000;
+        const COSTO_ENVIO = 2500;
 
         function isEntregaSelected() {
             return formaEnvioSelect.value === 'entrega';
@@ -1946,6 +896,13 @@
                 addressField.classList.remove('active');
             }
         }
+
+        formaEnvioSelect.addEventListener('change', function() {
+            toggleAddress();
+            updateTotal();
+        });
+
+        document.getElementById('metodoPago').addEventListener('change', updateTotal);
 
         toggleAddress();
 
@@ -1966,7 +923,6 @@
 
         function updateTotal() {
             totalDisplay.textContent = `$${calcularTotal().toLocaleString()}`;
-            actualizarVisibilidadCancelar();
         }
 
         document.addEventListener('input', function(e) {
@@ -1978,85 +934,9 @@
         updateTotal();
 
         // ============================================================
-        //  MODAL DE RESUMEN DEL PEDIDO
+        //  ENVÍO POR WHATSAPP
         // ============================================================
-        const resumenModal = document.getElementById('resumenModal');
-        const resumenDetalle = document.getElementById('resumenDetalle');
-        const resumenTotal = document.getElementById('resumenTotal');
-        const btnCancelarResumen = document.getElementById('btnCancelarResumen');
-        const btnConfirmarResumen = document.getElementById('btnConfirmarResumen');
-
-        function generarResumen() {
-            let html = '';
-            let total = 0;
-            let tieneProductos = false;
-
-            document.querySelectorAll('.qty-input').forEach(input => {
-                const cant = parseInt(input.value) || 0;
-                if (cant > 0) {
-                    const product = PRODUCTS.find(p => p.id === input.dataset.productId);
-                    if (product) {
-                        const subtotal = cant * product.price;
-                        total += subtotal;
-                        tieneProductos = true;
-                        html += `<div class="resumen-item">`;
-                        html += `<span class="cantidad">${cant}x</span> ${product.name}`;
-                        html += `<span class="precio">$${subtotal.toLocaleString()}</span>`;
-
-                        const medInput = document.querySelector(`.med-extra-input[data-product-id="${product.id}"]`);
-                        if (medInput) {
-                            const mc = parseInt(medInput.value) || 0;
-                            if (mc > 0) {
-                                const medSubtotal = mc * 4000;
-                                total += medSubtotal;
-                                html += `<br><span style="font-size:0.8rem;color:#b8d0b8;padding-left:16px;">➕ Medallones extra: ${mc} ($${medSubtotal.toLocaleString()})</span>`;
-                            }
-                        }
-
-                        const checks = document.querySelectorAll(`.topping-check[data-product-id="${product.id}"]:checked`);
-                        if (checks.length > 0) {
-                            const tops = Array.from(checks).map(cb => cb.value).join(', ');
-                            html += `<br><span style="font-size:0.8rem;color:#b8d0b8;padding-left:16px;">🧂 Toppings: ${tops}</span>`;
-                        }
-
-                        html += `</div>`;
-                    }
-                }
-            });
-
-            if (!tieneProductos) {
-                alert('Agregá al menos un producto con cantidad > 0.');
-                return false;
-            }
-
-            if (isEntregaSelected()) {
-                total += COSTO_ENVIO;
-                html += `<div class="resumen-item" style="border-bottom:1px solid #2f4a2f;">`;
-                html += `🚚 Envío a domicilio`;
-                html += `<span class="precio">$${COSTO_ENVIO.toLocaleString()}</span>`;
-                if (direccionInput.value.trim()) {
-                    html += `<br><span style="font-size:0.8rem;color:#b8d0b8;padding-left:16px;">📍 ${direccionInput.value.trim()}</span>`;
-                }
-                html += `</div>`;
-            } else {
-                html += `<div class="resumen-item" style="border-bottom:1px solid #2f4a2f;">`;
-                html += `📍 Retiro en local`;
-                html += `</div>`;
-            }
-
-            const pagoValue = obtenerPagoSeleccionado() || 'No especificado';
-            html += `<div class="resumen-item" style="border-bottom:1px solid #2f4a2f;">`;
-            html += `💳 Pago: ${pagoValue}`;
-            if (pagoValue === 'Transferencia') {
-                html += `<br><span style="font-size:0.8rem;color:#b8d0b8;padding-left:16px;">📌 Alias: Tech.burguer</span>`;
-                html += `<br><span style="font-size:0.8rem;color:#b8d0b8;padding-left:16px;">📎 Enviá el comprobante para confirmar</span>`;
-            }
-            html += `</div>`;
-
-            resumenDetalle.innerHTML = html;
-            resumenTotal.textContent = `💰 TOTAL: $${total.toLocaleString()}`;
-            return true;
-        }
+        const BUSINESS_PHONE = '5493518692251';
 
         document.getElementById('sendBtn').addEventListener('click', function() {
             const nombre = document.getElementById('nombre').value.trim();
@@ -2071,71 +951,13 @@
                 return;
             }
 
-            if (generarResumen()) {
-                resumenModal.classList.add('active');
-            }
-        });
-
-        btnCancelarResumen.addEventListener('click', function() {
-            resumenModal.classList.remove('active');
-        });
-
-        btnConfirmarResumen.addEventListener('click', function() {
-            resumenModal.classList.remove('active');
-            enviarPedido();
-        });
-
-        resumenModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                resumenModal.classList.remove('active');
-            }
-        });
-
-        // ============================================================
-        //  LIMPIAR PEDIDO DESPUÉS DE ENVIAR
-        // ============================================================
-        function limpiarPedido() {
-            // Resetear cantidades de productos
-            document.querySelectorAll('.qty-input').forEach(input => input.value = 0);
-            document.querySelectorAll('.med-extra-input').forEach(input => input.value = 0);
-            document.querySelectorAll('.topping-check').forEach(cb => cb.checked = false);
-
-            // Limpiar campos del formulario
-            document.getElementById('nombre').value = '';
-            document.getElementById('telefono').value = '';
-            document.getElementById('direccion').value = '';
-
-            // Resetear método de pago
-            pagoBotones.forEach(btn => btn.classList.remove('activo'));
-            pagoSeleccionado = null;
-
-            // Actualizar total y visibilidad de botones cancelar
-            updateTotal();
-
-            // Mostrar toast de confirmación
-            mostrarToast('✅ Pedido enviado. ¡Todo listo para otro!');
-        }
-
-        // ============================================================
-        //  ENVÍO POR WHATSAPP
-        // ============================================================
-        const BUSINESS_PHONE = '5493518692251';
-        const MAPS_URL_LOCAL = 'https://bit.ly/4xOCf1o';
-
-        function enviarPedido() {
-            const nombre = document.getElementById('nombre').value.trim();
-            const telefono = document.getElementById('telefono').value.trim();
-
             let mensaje = '🍔 *NUEVO PEDIDO - TECH CLASSIC BURGERS* 🍔\n\n';
             mensaje += `👤 *Nombre:* ${nombre}\n`;
             mensaje += `📱 *Teléfono:* ${telefono}\n`;
 
             let tieneProductos = false;
-            let totalHamburguesas = 0;
-
             document.querySelectorAll('.qty-input').forEach(input => {
                 const cant = parseInt(input.value) || 0;
-                totalHamburguesas += cant;
                 if (cant > 0) {
                     const product = PRODUCTS.find(p => p.id === input.dataset.productId);
                     if (product) {
@@ -2161,75 +983,26 @@
                 return;
             }
 
-            // Papas individuales
-            mensaje += `\n🍟 *Papas Individuales:* ${totalHamburguesas} GRATIS !!`;
+            const metodoPago = document.getElementById('metodoPago').value;
+            mensaje += `\n\n💳 *Pago:* ${metodoPago}`;
 
-            const pagoValue = obtenerPagoSeleccionado() || 'No especificado';
-            mensaje += `\n\n💳 *Pago:* ${pagoValue}`;
-
-            if (pagoValue === 'Transferencia') {
+            if (metodoPago === 'Transferencia') {
                 mensaje += `\n📌 *Alias:* Tech.burguer`;
                 mensaje += `\n📎 *Importante:* Por favor, enviá el comprobante de transferencia para confirmar el pedido.`;
             }
 
-            mensaje += `\n`;
-
             const envioLabel = isEntregaSelected() ? 'Entrega a domicilio' : 'Retiro en local';
             mensaje += `\n🚚 *Envío:* ${envioLabel}`;
-
             if (isEntregaSelected()) {
-                const direccion = direccionInput.value.trim();
-                const direccionEncoded = encodeURIComponent(direccion);
-                const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${direccionEncoded}`;
-                mensaje += `\n📍 *Dirección:* ${direccion}`;
-                mensaje += `\n🗺️ *Ver ruta:* ${mapsUrl}`;
+                mensaje += `\n📍 *Dirección:* ${direccionInput.value.trim()}`;
                 mensaje += `\n🚚 *Costo envío:* $${COSTO_ENVIO.toLocaleString()}`;
-            } else {
-                mensaje += `\n📍 *Retirala en este lugar!* ${MAPS_URL_LOCAL}`;
             }
 
             mensaje += `\n\n💰 *TOTAL:* $${calcularTotal().toLocaleString()}`;
             mensaje += '\n\n📲 ¡Gracias por tu pedido!';
 
-            // Abrir WhatsApp
             window.open(`https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(mensaje)}`, '_blank');
-
-            // Limpiar todo después de enviar
-            limpiarPedido();
-        }
-
-        // ============================================================
-        //  BOTÓN DE COMPARTIR (Web Share API / copia al portapapeles)
-        // ============================================================
-        document.getElementById('shareBtn').addEventListener('click', function() {
-            const url = window.location.href;
-            const title = document.title || 'Tech Classic Burgers';
-
-            if (navigator.share) {
-                navigator.share({
-                    title: title,
-                    text: '🍔 Pedí tus burgers favoritas en Tech Classic Burgers',
-                    url: url
-                }).catch(err => {
-                    // Si el usuario cancela, no hacemos nada
-                });
-            } else {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(url).then(() => {
-                        alert('✅ Enlace copiado al portapapeles. ¡Compartilo con tus amigos!');
-                    }).catch(() => {
-                        prompt('Copiá este enlace para compartir:', url);
-                    });
-                } else {
-                    prompt('Copiá este enlace para compartir:', url);
-                }
-            }
         });
-
-        // ============================================================
-        //  INICIALIZAR VISIBILIDAD DEL BOTÓN DE CANCELAR
-        // ============================================================
-        setTimeout(actualizarVisibilidadCancelar, 100);
     </script>
 </body>
 </html>
