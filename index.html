@@ -4,85 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
 
-    <!-- ===== SEO Y META TAGS ===== -->
-    <title>Tech Classic Burgers · Las mejores hamburguesas artesanales en Córdoba</title>
-    <meta name="description" content="Pedí las mejores hamburguesas Tech de Córdoba. Doble medallón 120gr, papas gratis, envío a domicilio. Horario: Mar–Dom 20:00 a 00:00." />
-    <meta name="keywords" content="hamburguesas, burgers, tech classic, comida rápida, Córdoba, delivery, pedidos, hamburguesas artesanales" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://techclassicburgers.com/" />
-
-    <!-- Open Graph -->
-    <meta property="og:title" content="Tech Classic Burgers · Pedí tu hamburguesa artesanal" />
-    <meta property="og:description" content="Doble medallón, papas gratis y el mejor sabor Tech. ¡Hacé tu pedido ahora!" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://techclassicburgers.com/" />
-    <meta property="og:image" content="https://techclassicburgers.com/images/icon-512.png" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta property="og:locale" content="es_AR" />
-
-    <!-- Twitter Cards -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Tech Classic Burgers · Pedí tu hamburguesa artesanal" />
-    <meta name="twitter:description" content="Doble medallón, papas gratis y el mejor sabor Tech. ¡Hacé tu pedido ahora!" />
-    <meta name="twitter:image" content="https://techclassicburgers.com/images/icon-512.png" />
-
     <!-- ===== META TAGS PARA PWA ===== -->
     <meta name="theme-color" content="#1a2e1a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="manifest.json" />
 
-    <!-- ===== MARCADO ESTRUCTURADO JSON-LD ===== -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "Restaurant",
-            "name": "Tech Classic Burgers",
-            "description": "Las mejores hamburguesas artesanales de Córdoba. Especialidad en doble medallón de 120gr, papas gratis y salsas exclusivas.",
-            "image": "https://techclassicburgers.com/images/icon-512.png",
-            "telephone": "+5493518692251",
-            "email": "contacto@techclassicburgers.com",
-            "url": "https://techclassicburgers.com/",
-            "priceRange": "$12000 - $18000",
-            "servesCuisine": "Hamburguesería artesanal",
-            "address": {
-                "@type": "PostalAddress",
-                "addressLocality": "Córdoba",
-                "addressCountry": "AR"
-            },
-            "geo": {
-                "@type": "GeoCoordinates",
-                "latitude": "-31.4201",
-                "longitude": "-64.1888"
-            },
-            "openingHoursSpecification": [
-                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Monday", "opens": "00:00", "closes": "00:00" },
-                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Tuesday", "opens": "20:00", "closes": "00:00" },
-                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Wednesday", "opens": "20:00", "closes": "00:00" },
-                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Thursday", "opens": "20:00", "closes": "00:00" },
-                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Friday", "opens": "20:00", "closes": "00:00" },
-                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "20:00", "closes": "00:00" },
-                { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "20:00", "closes": "00:00" }
-            ],
-            "menu": {
-                "@type": "Menu",
-                "name": "Menú Tech Classic",
-                "hasMenuItems": [
-                    { "@type": "MenuItem", "name": "Armá tu Burger", "description": "1 medallón 120gr · doble cheddar · salsa Tech. Agregá medallones y toppings.", "price": "12000", "priceCurrency": "ARS" },
-                    { "@type": "MenuItem", "name": "Doble Provoleta", "description": "Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.", "price": "18000", "priceCurrency": "ARS" },
-                    { "@type": "MenuItem", "name": "Intense", "description": "Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.", "price": "18000", "priceCurrency": "ARS" },
-                    { "@type": "MenuItem", "name": "Tech Mex", "description": "Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.", "price": "18000", "priceCurrency": "ARS" },
-                    { "@type": "MenuItem", "name": "Yankee", "description": "Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.", "price": "16000", "priceCurrency": "ARS" },
-                    { "@type": "MenuItem", "name": "Clásica", "description": "Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.", "price": "16000", "priceCurrency": "ARS" }
-                ]
-            },
-            "potentialAction": {
-                "@type": "OrderAction",
-                "target": "https://wa.me/5493518692251?text=Hola%2C%20Quiero%20hacer%20un%20pedido"
-            }
-        }
-    </script>
+    <!-- ===== TÍTULO (solo para la pestaña) ===== -->
+    <title>Tech Classic Burgers · Pedido</title>
 
     <style>
         /* ===== RESET & BASE ===== */
@@ -2030,7 +1959,7 @@
         setTimeout(actualizarVisibilidadCancelar, 100);
 
         // ============================================================
-        //  POPUP DE IMAGEN (CARRUSEL CON FLECHAS MEJORADAS)
+        //  POPUP DE IMAGEN (CARRUSEL CON FLECHAS)
         // ============================================================
         const imagePopup = document.getElementById('imagePopup');
         const popupSlider = document.getElementById('popupSlider');
@@ -2101,11 +2030,10 @@
             }
         });
 
-        // **CAMBIADO: Al hacer clic en una imagen, se cierra el popup**
+        // **Clic en imagen cierra el popup**
         popupTrack.addEventListener('click', function(e) {
             const img = e.target.closest('img');
             if (!img) return;
-            // Cerrar el popup al hacer clic en la imagen
             cerrarPopup();
         });
 
