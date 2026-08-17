@@ -362,7 +362,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            pointer-events: none;
+            cursor: pointer;
+            transition: transform 0.15s ease, border-color 0.2s;
+        }
+
+        .product-img:hover {
+            transform: scale(1.04);
+            border-color: #ffb703;
         }
 
         .product-img img {
@@ -370,6 +376,7 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            pointer-events: none;
         }
 
         .product-info {
@@ -773,6 +780,36 @@
         ::-webkit-scrollbar-thumb {
             background: #e63946;
             border-radius: 10px;
+        }
+
+        /* ===== POPUP DE IMAGEN ===== */
+        .image-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100000;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+        }
+
+        .image-popup.active {
+            display: flex;
+        }
+
+        .image-popup img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            transition: transform 0.2s ease;
+            cursor: pointer;
         }
 
         /* ===== MODAL DE CANTIDAD (con título) ===== */
@@ -1364,7 +1401,6 @@
                 <span class="qty-empty"></span>
                 <span class="qty-empty"></span>
             </div>
-            <!-- Botón Cerrar eliminado -->
         </div>
     </div>
 
@@ -1413,6 +1449,11 @@
             <button class="btn-aceptar" id="aceptarCookies">Aceptar</button>
             <button class="btn-mas-info" id="masInfoCookies">Más info</button>
         </div>
+    </div>
+
+    <!-- ===== POPUP DE IMAGEN ===== -->
+    <div id="imagePopup" class="image-popup">
+        <img id="popupImage" src="" alt="Vista ampliada" />
     </div>
 
     <!-- ===== BOTÓN FLOTANTE INSTAGRAM (derecha) ===== -->
@@ -1528,7 +1569,7 @@
         }
 
         // ============================================================
-        //  DATOS DE PRODUCTOS
+        //  DATOS DE PRODUCTOS (con popupImg agregado)
         // ============================================================
         const PRODUCTS = [{
             id: 'armatuburger',
@@ -1537,42 +1578,48 @@
             desc: '1 medallón 120gr · doble cheddar · salsa Tech. Agregá medallones y toppings.',
             hasExtras: true,
             badge: 'BASE',
-            imagen: 'images/arm.jpg'
+            imagen: 'images/arm.jpg',
+            popupImg: 'images/bn1.webp'
         }, {
             id: 'doblep',
             name: 'Doble Provoleta',
             price: 18000,
             desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.',
             hasExtras: false,
-            imagen: 'images/pro.jpg'
+            imagen: 'images/pro.jpg',
+            popupImg: 'images/bn2.webp'
         }, {
             id: 'intense',
             name: 'Intense',
             price: 18000,
             desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.',
             hasExtras: false,
-            imagen: 'images/int.jpg'
+            imagen: 'images/int.jpg',
+            popupImg: 'images/bn3.webp'
         }, {
             id: 'techmex',
             name: 'Tech Mex',
             price: 18000,
             desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.',
             hasExtras: false,
-            imagen: 'images/mex.jpg'
+            imagen: 'images/mex.jpg',
+            popupImg: 'images/bn4.webp'
         }, {
             id: 'yankee',
             name: 'Yankee',
             price: 16000,
             desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.',
             hasExtras: false,
-            imagen: 'images/yan.jpg'
+            imagen: 'images/yan.jpg',
+            popupImg: 'images/bn5.webp'
         }, {
             id: 'clasica',
             name: 'Clásica',
             price: 16000,
             desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.',
             hasExtras: false,
-            imagen: 'images/cla.jpg'
+            imagen: 'images/cla.jpg',
+            popupImg: 'images/bn6.webp'
         }];
 
         const TOPPINGS = [
@@ -1734,14 +1781,12 @@
 
         function mostrarCancelModal() {
             cancelModal.classList.add('active');
-            // Cerrar automáticamente después de 0.9 segundos
             clearTimeout(cancelModal._timer);
             cancelModal._timer = setTimeout(function() {
                 cancelModal.classList.remove('active');
             }, 900);
         }
 
-        // Cerrar modal al hacer clic fuera (por si el usuario toca el fondo)
         cancelModal.addEventListener('click', function(e) {
             if (e.target === this) {
                 cancelModal.classList.remove('active');
@@ -1802,9 +1847,7 @@
             if (target.classList.contains('btn-cancelar-item')) {
                 const productId = target.dataset.productId;
                 if (productId) {
-                    // Ejecutar reset inmediatamente
                     resetearProducto(productId);
-                    // Mostrar modal de "Elegí tranquilo" (sin toast)
                     mostrarCancelModal();
                 }
                 return;
@@ -1831,7 +1874,6 @@
             });
         });
 
-        // Cerrar modal al hacer clic en el fondo
         modal.addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
@@ -2095,24 +2137,18 @@
         //  LIMPIAR PEDIDO DESPUÉS DE ENVIAR
         // ============================================================
         function limpiarPedido() {
-            // Resetear cantidades de productos
             document.querySelectorAll('.qty-input').forEach(input => input.value = 0);
             document.querySelectorAll('.med-extra-input').forEach(input => input.value = 0);
             document.querySelectorAll('.topping-check').forEach(cb => cb.checked = false);
 
-            // Limpiar campos del formulario
             document.getElementById('nombre').value = '';
             document.getElementById('telefono').value = '';
             document.getElementById('direccion').value = '';
 
-            // Resetear método de pago
             pagoBotones.forEach(btn => btn.classList.remove('activo'));
             pagoSeleccionado = null;
 
-            // Actualizar total y visibilidad de botones cancelar
             updateTotal();
-
-            // Mostrar toast de confirmación
             mostrarToast('✅ Pedido enviado. ¡Todo listo para otro!');
         }
 
@@ -2161,7 +2197,6 @@
                 return;
             }
 
-            // Papas individuales
             mensaje += `\n🍟 *Papas Individuales:* ${totalHamburguesas} GRATIS !!`;
 
             const pagoValue = obtenerPagoSeleccionado() || 'No especificado';
@@ -2191,10 +2226,7 @@
             mensaje += `\n\n💰 *TOTAL:* $${calcularTotal().toLocaleString()}`;
             mensaje += '\n\n📲 ¡Gracias por tu pedido!';
 
-            // Abrir WhatsApp
             window.open(`https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(mensaje)}`, '_blank');
-
-            // Limpiar todo después de enviar
             limpiarPedido();
         }
 
@@ -2210,9 +2242,7 @@
                     title: title,
                     text: '🍔 Pedí tus burgers favoritas en Tech Classic Burgers',
                     url: url
-                }).catch(err => {
-                    // Si el usuario cancela, no hacemos nada
-                });
+                }).catch(err => {});
             } else {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(url).then(() => {
@@ -2230,6 +2260,44 @@
         //  INICIALIZAR VISIBILIDAD DEL BOTÓN DE CANCELAR
         // ============================================================
         setTimeout(actualizarVisibilidadCancelar, 100);
+
+        // ============================================================
+        //  POPUP DE IMAGEN AL HACER CLIC EN LA MINIATURA
+        // ============================================================
+        const imagePopup = document.getElementById('imagePopup');
+        const popupImage = document.getElementById('popupImage');
+
+        function abrirPopupImagen(url) {
+            popupImage.src = url;
+            imagePopup.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        imagePopup.addEventListener('click', function(e) {
+            imagePopup.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        document.getElementById('productGrid').addEventListener('click', function(e) {
+            const target = e.target;
+            if (target.tagName === 'IMG' && target.closest('.product-img')) {
+                const card = target.closest('.product-card');
+                if (card) {
+                    const productId = card.dataset.id;
+                    const product = PRODUCTS.find(p => p.id === productId);
+                    if (product && product.popupImg) {
+                        abrirPopupImagen(product.popupImg);
+                    }
+                }
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && imagePopup.classList.contains('active')) {
+                imagePopup.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
     </script>
 </body>
 </html>
