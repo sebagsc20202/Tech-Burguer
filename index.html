@@ -888,7 +888,6 @@
             padding: 0 10px;
             box-sizing: border-box;
             border-radius: 8px;
-            /* Sin borde rojo */
         }
 
         /* Ocultar scrollbar */
@@ -2040,13 +2039,16 @@
         setTimeout(actualizarVisibilidadCancelar, 100);
 
         // ============================================================
-        //  POPUP DE IMAGEN (CARRUSEL TÁCTIL SIN SELECCIÓN)
+        //  POPUP DE IMAGEN (CARRUSEL TÁCTIL CON FLECHAS MEJORADAS)
         // ============================================================
         const imagePopup = document.getElementById('imagePopup');
         const popupSlider = document.getElementById('popupSlider');
         const popupTrack = document.getElementById('popupTrack');
         const arrowLeft = document.getElementById('arrowLeft');
         const arrowRight = document.getElementById('arrowRight');
+
+        // Variables para el intervalo de actualización de flechas
+        let arrowInterval = null;
 
         // Generar todas las imágenes del carrusel a partir de los productos
         function generarTrack() {
@@ -2071,8 +2073,8 @@
                     if (w > 0) popupSlider.scrollLeft = index * w;
                 });
             }
-            // Actualizar flechas después de centrar
-            setTimeout(actualizarFlechas, 50);
+            // Actualizar flechas después de un retraso para asegurar que el scroll termine
+            setTimeout(actualizarFlechas, 250);
         }
 
         // Función para mostrar/ocultar flechas según la posición del scroll
@@ -2092,14 +2094,24 @@
             centrarImagen(index);
             imagePopup.classList.add('active');
             document.body.style.overflow = 'hidden';
-            // Actualizar flechas después de un momento
-            setTimeout(actualizarFlechas, 100);
+
+            // Iniciar un intervalo para actualizar flechas mientras el popup está abierto
+            if (arrowInterval) clearInterval(arrowInterval);
+            arrowInterval = setInterval(actualizarFlechas, 300);
+
+            // Actualizar flechas después de abrir
+            setTimeout(actualizarFlechas, 250);
         }
 
         // Cerrar popup
         function cerrarPopup() {
             imagePopup.classList.remove('active');
             document.body.style.overflow = '';
+            // Detener el intervalo
+            if (arrowInterval) {
+                clearInterval(arrowInterval);
+                arrowInterval = null;
+            }
         }
 
         // Evento de clic en el fondo (cierra)
@@ -2109,7 +2121,7 @@
             }
         });
 
-        // Al hacer clic en una imagen, solo centramos sin borde
+        // Al hacer clic en una imagen, centramos
         popupTrack.addEventListener('click', function(e) {
             const img = e.target.closest('img');
             if (!img) return;
@@ -2122,6 +2134,15 @@
 
         // Escuchar scroll para actualizar las flechas
         popupSlider.addEventListener('scroll', actualizarFlechas);
+
+        // También escuchar eventos táctiles para asegurar la actualización en móviles
+        popupSlider.addEventListener('touchmove', function() {
+            // Se actualizará con el intervalo, pero forzamos una vez
+            actualizarFlechas();
+        });
+        popupSlider.addEventListener('touchend', function() {
+            setTimeout(actualizarFlechas, 150);
+        });
 
         // Cerrar con ESC
         document.addEventListener('keydown', function(e) {
@@ -2156,7 +2177,6 @@
                     const sliderWidth = popupSlider.clientWidth;
                     if (sliderWidth > 0) {
                         const index = Math.round(currentScroll / sliderWidth);
-                        // Solo centramos sin selección
                         centrarImagen(index);
                     }
                     actualizarFlechas();
