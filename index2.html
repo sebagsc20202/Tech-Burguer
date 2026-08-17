@@ -1734,7 +1734,7 @@
 
         function mostrarCancelModal() {
             cancelModal.classList.add('active');
-            // Cerrar automáticamente después de 1.5 segundos
+            // Cerrar automáticamente después de 0.9 segundos
             clearTimeout(cancelModal._timer);
             cancelModal._timer = setTimeout(function() {
                 cancelModal.classList.remove('active');
@@ -1804,9 +1804,7 @@
                 if (productId) {
                     // Ejecutar reset inmediatamente
                     resetearProducto(productId);
-                    // Mostrar toast de confirmación
-                    mostrarToast('✅ Tech cancelada');
-                    // Mostrar modal de "Elegí tranquilo"
+                    // Mostrar modal de "Elegí tranquilo" (sin toast)
                     mostrarCancelModal();
                 }
                 return;
