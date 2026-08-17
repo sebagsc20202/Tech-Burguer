@@ -89,6 +89,7 @@
             font-size: 1rem;
             letter-spacing: 0.5px;
             transition: border-color 0.3s, background 0.3s;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7); /* ← misma sombra que productos */
         }
 
         .status-card.abierto {
@@ -504,6 +505,7 @@
             padding: 20px 18px;
             border: 1px solid #3a5a3a;
             margin-top: 10px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7); /* ← misma sombra que productos */
         }
 
         .form-section h2 {
@@ -1720,7 +1722,7 @@
         const addressField = document.getElementById('addressField');
         const direccionInput = document.getElementById('direccion');
         const totalDisplay = document.getElementById('totalDisplay');
-        const COSTO_ENVIO = 2000;   // ← cambiado a $2.000
+        const COSTO_ENVIO = 2000;
 
         function isEntregaSelected() {
             return formaEnvioSelect.value === 'entrega';
