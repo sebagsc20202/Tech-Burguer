@@ -437,7 +437,7 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            pointer-events: none; /* Para que el clic pase al contenedor */
+            pointer-events: none;
         }
 
         .product-info {
@@ -887,10 +887,17 @@
             cursor: pointer;
             padding: 0 10px;
             box-sizing: border-box;
-            pointer-events: auto; /* para cerrar al hacer clic en la imagen */
+            transition: border 0.2s ease;
+            border: 3px solid transparent; /* base transparente */
+            border-radius: 8px;
         }
 
-        /* Ocultar scrollbar en móviles y escritorio (opcional) */
+        /* Estilo para la imagen seleccionada */
+        .popup-track img.selected {
+            border-color: #ff0000; /* rojo fino */
+        }
+
+        /* Ocultar scrollbar */
         .popup-slider::-webkit-scrollbar {
             display: none;
         }
@@ -1089,7 +1096,6 @@
 
         <!-- BRAND -->
         <div class="brand">
-            <!-- Logo ya está en icon-512.png según tu petición -->
             <img src="images/icon-512.png" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
             <div class="status-card" id="statusCard">
@@ -1318,7 +1324,7 @@
         }
 
         // ============================================================
-        //  DATOS DE PRODUCTOS (con popupImg agregado)
+        //  DATOS DE PRODUCTOS
         // ============================================================
         const PRODUCTS = [{
             id: 'armatuburger',
@@ -2000,7 +2006,7 @@
         setTimeout(actualizarVisibilidadCancelar, 100);
 
         // ============================================================
-        //  POPUP DE IMAGEN (CARRUSEL TÁCTIL)
+        //  POPUP DE IMAGEN (CARRUSEL TÁCTIL CON SELECCIÓN)
         // ============================================================
         const imagePopup = document.getElementById('imagePopup');
         const popupSlider = document.getElementById('popupSlider');
@@ -2018,23 +2024,31 @@
             });
         }
 
-        // Abrir popup en el índice del producto clickeado
-        function abrirPopupImagen(index) {
-            // Asegurar que el track esté generado
-            if (popupTrack.children.length === 0) {
-                generarTrack();
-            }
-            // Posicionar el scroll en la imagen correspondiente
+        // Función para seleccionar una imagen (aplica borde rojo y centra)
+        function seleccionarImagen(index) {
+            const imagenes = popupTrack.querySelectorAll('img');
+            imagenes.forEach((img, i) => {
+                img.classList.toggle('selected', i === index);
+            });
+            // Centrar la imagen en el viewport
             const sliderWidth = popupSlider.clientWidth;
             if (sliderWidth > 0) {
                 popupSlider.scrollLeft = index * sliderWidth;
             } else {
-                // Si aún no está visible, esperar un frame
                 requestAnimationFrame(() => {
                     const w = popupSlider.clientWidth;
                     if (w > 0) popupSlider.scrollLeft = index * w;
                 });
             }
+        }
+
+        // Abrir popup en el índice del producto clickeado
+        function abrirPopupImagen(index) {
+            if (popupTrack.children.length === 0) {
+                generarTrack();
+            }
+            // Seleccionar la imagen al abrir
+            seleccionarImagen(index);
             imagePopup.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
@@ -2045,11 +2059,21 @@
             document.body.style.overflow = '';
         }
 
-        // Evento de clic para cerrar: tanto en el fondo como en la imagen
+        // Evento de clic en el fondo (cierra)
         imagePopup.addEventListener('click', function(e) {
-            // Si el clic es en el fondo o en una imagen (que está dentro del track)
-            if (e.target === imagePopup || e.target.tagName === 'IMG') {
+            if (e.target === imagePopup) {
                 cerrarPopup();
+            }
+        });
+
+        // Evento de clic en las imágenes (selecciona y centra)
+        popupTrack.addEventListener('click', function(e) {
+            const img = e.target.closest('img');
+            if (!img) return;
+            const imagenes = popupTrack.querySelectorAll('img');
+            const index = Array.from(imagenes).indexOf(img);
+            if (index !== -1) {
+                seleccionarImagen(index);
             }
         });
 
@@ -2086,14 +2110,21 @@
                     const sliderWidth = popupSlider.clientWidth;
                     if (sliderWidth > 0) {
                         const index = Math.round(currentScroll / sliderWidth);
-                        popupSlider.scrollLeft = index * sliderWidth;
+                        // Re-seleccionar para mantener el borde y el centro
+                        const imagenes = popupTrack.querySelectorAll('img');
+                        if (index >= 0 && index < imagenes.length) {
+                            seleccionarImagen(index);
+                        }
                     }
                 }, 200);
             }
         });
 
-        // Generar track al inicio (para tener las imágenes listas, pero se puede hacer solo al abrir)
+        // Generar track al inicio
         generarTrack();
+
+        // Si no hay ninguna imagen seleccionada al abrir, seleccionar la primera (por defecto)
+        // Pero lo manejamos desde abrirPopupImagen
     </script>
 </body>
 </html>
