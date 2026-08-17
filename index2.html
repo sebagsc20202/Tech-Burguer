@@ -199,7 +199,7 @@
 
         .resumen-modal-content h3 {
             color: #ffb703;
-            font-size: 1.6rem;   /* ← más grande */
+            font-size: 1.6rem;
             text-align: center;
             margin-bottom: 16px;
             letter-spacing: 0.5px;
@@ -282,7 +282,7 @@
             transform: scale(0.97);
         }
 
-        /* ===== MODAL DE CONFIRMACIÓN PARA CANCELAR ===== */
+        /* ===== MODAL DE CONFIRMACIÓN PARA CANCELAR (sin botones) ===== */
         .cancel-modal {
             display: none;
             position: fixed;
@@ -305,7 +305,7 @@
         .cancel-modal-content {
             background: #1f331f;
             border-radius: 24px;
-            padding: 30px 24px 24px;
+            padding: 40px 30px 30px;
             border: 2px solid #3a5a3a;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
             max-width: 340px;
@@ -314,65 +314,16 @@
         }
 
         .cancel-modal-content .emoji {
-            font-size: 3.5rem;
+            font-size: 4rem;
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .cancel-modal-content .mensaje {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: #e8f0e8;
-            margin-bottom: 20px;
             line-height: 1.4;
-        }
-
-        .cancel-modal-botones {
-            display: flex;
-            gap: 12px;
-        }
-
-        .cancel-modal-botones button {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            border-radius: 40px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
-
-        .cancel-modal-botones .btn-cancelar-cancel {
-            background: #ffffff;
-            color: #1a1a1a;
-            border: 2px solid #cccccc;
-        }
-
-        .cancel-modal-botones .btn-cancelar-cancel:hover {
-            background: #f0f0f0;
-            border-color: #aaaaaa;
-        }
-
-        .cancel-modal-botones .btn-cancelar-cancel:active {
-            background: #e0e0e0;
-            transform: scale(0.97);
-        }
-
-        .cancel-modal-botones .btn-confirmar-cancel {
-            background: #ffb703;
-            color: #1a1a1a;
-            border: 2px solid #ffb703;
-        }
-
-        .cancel-modal-botones .btn-confirmar-cancel:hover {
-            background: #e6a500;
-            border-color: #e6a500;
-        }
-
-        .cancel-modal-botones .btn-confirmar-cancel:active {
-            background: #d49a00;
-            transform: scale(0.97);
         }
 
         /* ===== PRODUCT CARDS ===== */
@@ -1064,6 +1015,81 @@
             display: block;
         }
 
+        /* ===== BANNER DE COOKIES ===== */
+        .cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #1f331f;
+            border-top: 3px solid #ffb703;
+            padding: 16px 20px;
+            z-index: 99999;
+            box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.6);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            text-align: center;
+        }
+
+        .cookie-banner.active {
+            display: flex;
+        }
+
+        .cookie-banner p {
+            font-size: 0.9rem;
+            color: #d0e0d0;
+            max-width: 500px;
+            margin: 0;
+        }
+
+        .cookie-banner p a {
+            color: #ffb703;
+            text-decoration: underline;
+        }
+
+        .cookie-banner .cookie-botones {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .cookie-banner .cookie-botones button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .cookie-banner .cookie-botones .btn-aceptar {
+            background: #ffb703;
+            color: #1a1a1a;
+        }
+
+        .cookie-banner .cookie-botones .btn-aceptar:hover {
+            background: #e6a500;
+        }
+
+        .cookie-banner .cookie-botones .btn-aceptar:active {
+            transform: scale(0.97);
+        }
+
+        .cookie-banner .cookie-botones .btn-mas-info {
+            background: transparent;
+            color: #b8d0b8;
+            border: 2px solid #3a5a3a;
+        }
+
+        .cookie-banner .cookie-botones .btn-mas-info:hover {
+            background: #2a4a2a;
+            border-color: #6a8a6a;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             body {
@@ -1160,7 +1186,7 @@
                 padding: 18px 14px;
             }
             .resumen-modal-content h3 {
-                font-size: 1.3rem;   /* ← más grande en móvil también */
+                font-size: 1.3rem;
             }
             .resumen-item {
                 font-size: 0.8rem;
@@ -1172,11 +1198,14 @@
                 font-size: 0.9rem;
                 padding: 12px;
             }
-            .cancel-modal-content .mensaje {
-                font-size: 1rem;
+            .cancel-modal-content {
+                padding: 30px 20px 20px;
             }
             .cancel-modal-content .emoji {
-                font-size: 2.8rem;
+                font-size: 3.2rem;
+            }
+            .cancel-modal-content .mensaje {
+                font-size: 1.2rem;
             }
             .btn-cancelar-item {
                 width: 28px;
@@ -1215,6 +1244,16 @@
             .btn-share svg {
                 width: 26px;
                 height: 26px;
+            }
+            .cookie-banner {
+                padding: 14px 16px;
+            }
+            .cookie-banner p {
+                font-size: 0.8rem;
+            }
+            .cookie-banner .cookie-botones button {
+                padding: 8px 18px;
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -1342,15 +1381,11 @@
         </div>
     </div>
 
-    <!-- ===== MODAL DE CONFIRMACIÓN PARA CANCELAR ===== -->
+    <!-- ===== MODAL DE CONFIRMACIÓN PARA CANCELAR (sin botones) ===== -->
     <div id="cancelModal" class="cancel-modal">
         <div class="cancel-modal-content">
             <span class="emoji">👍</span>
             <div class="mensaje">Elegí tranquilo</div>
-            <div class="cancel-modal-botones">
-                <button class="btn-cancelar-cancel" id="btnCancelarCancel">Seguir pidiendo</button>
-                <button class="btn-confirmar-cancel" id="btnConfirmarCancel">Sí, cancelar</button>
-            </div>
         </div>
     </div>
 
@@ -1364,6 +1399,19 @@
                 <button class="btn-cancelar-resumen" id="btnCancelarResumen">✖ Cancelar</button>
                 <button class="btn-confirmar-resumen" id="btnConfirmarResumen">✅ Confirmar y enviar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ===== BANNER DE COOKIES ===== -->
+    <div id="cookieBanner" class="cookie-banner">
+        <p>
+            🍪 Usamos cookies propias y de terceros para mejorar tu experiencia.
+            Al continuar navegando, aceptas su uso.
+            <a href="#" target="_blank">Más información</a>
+        </p>
+        <div class="cookie-botones">
+            <button class="btn-aceptar" id="aceptarCookies">Aceptar</button>
+            <button class="btn-mas-info" id="masInfoCookies">Más info</button>
         </div>
     </div>
 
@@ -1382,6 +1430,34 @@
     </button>
 
     <script>
+        // ============================================================
+        //  COOKIES BANNER
+        // ============================================================
+        const cookieBanner = document.getElementById('cookieBanner');
+        const aceptarBtn = document.getElementById('aceptarCookies');
+        const masInfoBtn = document.getElementById('masInfoCookies');
+
+        function checkCookies() {
+            const cookiesAceptadas = localStorage.getItem('cookies_aceptadas');
+            if (cookiesAceptadas === 'true') {
+                cookieBanner.classList.remove('active');
+            } else {
+                cookieBanner.classList.add('active');
+            }
+        }
+
+        function aceptarCookies() {
+            localStorage.setItem('cookies_aceptadas', 'true');
+            cookieBanner.classList.remove('active');
+        }
+
+        aceptarBtn.addEventListener('click', aceptarCookies);
+        masInfoBtn.addEventListener('click', function() {
+            alert('📄 Política de cookies: Usamos cookies para mejorar tu experiencia. Podés gestionarlas desde la configuración de tu navegador.');
+        });
+
+        checkCookies();
+
         // ============================================================
         //  REGISTRO DE SERVICE WORKER (PWA)
         // ============================================================
@@ -1653,41 +1729,23 @@
         //  MODALES Y EVENTOS DE CLIC
         // ============================================================
 
-        // --- Variable para manejar la cancelación ---
-        let pendingCancelProductId = null;
-
-        // --- Modal de cancelación ---
+        // --- Modal de cancelación (sin botones, se cierra automáticamente) ---
         const cancelModal = document.getElementById('cancelModal');
-        const btnCancelarCancel = document.getElementById('btnCancelarCancel');
-        const btnConfirmarCancel = document.getElementById('btnConfirmarCancel');
 
-        function mostrarCancelModal(productId) {
-            pendingCancelProductId = productId;
+        function mostrarCancelModal() {
             cancelModal.classList.add('active');
+            // Cerrar automáticamente después de 1.5 segundos
+            clearTimeout(cancelModal._timer);
+            cancelModal._timer = setTimeout(function() {
+                cancelModal.classList.remove('active');
+            }, 1500);
         }
 
-        function cerrarCancelModal() {
-            cancelModal.classList.remove('active');
-            pendingCancelProductId = null;
-        }
-
-        btnCancelarCancel.addEventListener('click', function(e) {
-            e.stopPropagation();
-            cerrarCancelModal();
-        });
-
-        btnConfirmarCancel.addEventListener('click', function(e) {
-            e.stopPropagation();
-            if (pendingCancelProductId) {
-                resetearProducto(pendingCancelProductId);
-                mostrarToast('✅ Tech cancelada');
-            }
-            cerrarCancelModal();
-        });
-
+        // Cerrar modal al hacer clic fuera (por si el usuario toca el fondo)
         cancelModal.addEventListener('click', function(e) {
             if (e.target === this) {
-                cerrarCancelModal();
+                cancelModal.classList.remove('active');
+                clearTimeout(cancelModal._timer);
             }
         });
 
@@ -1744,7 +1802,12 @@
             if (target.classList.contains('btn-cancelar-item')) {
                 const productId = target.dataset.productId;
                 if (productId) {
-                    mostrarCancelModal(productId);
+                    // Ejecutar reset inmediatamente
+                    resetearProducto(productId);
+                    // Mostrar toast de confirmación
+                    mostrarToast('✅ Tech cancelada');
+                    // Mostrar modal de "Elegí tranquilo"
+                    mostrarCancelModal();
                 }
                 return;
             }
