@@ -11,7 +11,7 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://techclassicburgers.com/" />
 
-    <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
+    <!-- Open Graph -->
     <meta property="og:title" content="Tech Classic Burgers · Pedí tu hamburguesa artesanal" />
     <meta property="og:description" content="Doble medallón, papas gratis y el mejor sabor Tech. ¡Hacé tu pedido ahora!" />
     <meta property="og:type" content="website" />
@@ -33,7 +33,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="manifest.json" />
 
-    <!-- ===== MARCADO ESTRUCTURADO JSON-LD (SEO para Google AI) ===== -->
+    <!-- ===== MARCADO ESTRUCTURADO JSON-LD ===== -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -178,7 +178,7 @@
             margin-top: 4px;
         }
 
-        /* ===== TOAST DE CONFIRMACIÓN ===== */
+        /* ===== TOAST ===== */
         .toast-confirm {
             position: fixed;
             top: 0;
@@ -226,7 +226,7 @@
             margin-top: 8px;
         }
 
-        /* ===== MODAL DE RESUMEN DEL PEDIDO ===== */
+        /* ===== MODALES ===== */
         .resumen-modal {
             display: none;
             position: fixed;
@@ -343,7 +343,6 @@
             transform: scale(0.97);
         }
 
-        /* ===== MODAL DE CONFIRMACIÓN PARA CANCELAR (sin botones) ===== */
         .cancel-modal {
             display: none;
             position: fixed;
@@ -672,7 +671,7 @@
             display: block;
         }
 
-        /* ===== BOTONES DE PAGO CON ICONOS ===== */
+        /* ===== BOTONES DE PAGO ===== */
         .pago-botones {
             display: flex;
             gap: 12px;
@@ -890,7 +889,6 @@
             border-radius: 8px;
         }
 
-        /* Ocultar scrollbar */
         .popup-slider::-webkit-scrollbar {
             display: none;
         }
@@ -899,36 +897,38 @@
             scrollbar-width: none;
         }
 
-        /* ===== FLECHAS INDICADORAS (sin interacción) ===== */
+        /* ===== FLECHAS INDICADORAS (MÁS GRANDES E INTENSAS) ===== */
         .nav-arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 3.5rem;
-            font-weight: 300;
-            color: rgba(255, 255, 255, 0.25);
+            font-size: 5.5rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.9);
             pointer-events: none;
             user-select: none;
             z-index: 10;
             animation: pulse 1.8s ease-in-out infinite;
-            text-shadow: 0 0 15px rgba(0,0,0,0.5);
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.6), 0 0 60px rgba(255, 255, 255, 0.3);
             transition: opacity 0.3s ease;
             opacity: 0;
+            line-height: 1;
+            font-family: 'Segoe UI', sans-serif;
         }
         .nav-arrow-left {
-            left: 12px;
+            left: 16px;
         }
         .nav-arrow-right {
-            right: 12px;
+            right: 16px;
         }
         .nav-arrow.visible {
-            opacity: 0.7;
+            opacity: 1;
         }
 
         @keyframes pulse {
-            0% { transform: translateY(-50%) scale(0.9); opacity: 0.4; }
-            50% { transform: translateY(-50%) scale(1.1); opacity: 0.9; }
-            100% { transform: translateY(-50%) scale(0.9); opacity: 0.4; }
+            0% { transform: translateY(-50%) scale(0.95); opacity: 0.7; }
+            50% { transform: translateY(-50%) scale(1.1); opacity: 1; }
+            100% { transform: translateY(-50%) scale(0.95); opacity: 0.7; }
         }
 
         /* ===== RESPONSIVE ===== */
@@ -1039,13 +1039,13 @@
                 height: 26px;
             }
             .nav-arrow {
-                font-size: 2.8rem;
+                font-size: 4.5rem;
             }
-            .nav-arrow-left { left: 6px; }
-            .nav-arrow-right { right: 6px; }
+            .nav-arrow-left { left: 8px; }
+            .nav-arrow-right { right: 8px; }
         }
 
-        /* ===== BOTÓN FLOTANTE INSTAGRAM (derecha) ===== */
+        /* ===== BOTONES FLOTANTES ===== */
         .btn-instagram {
             position: fixed;
             bottom: 24px;
@@ -1081,7 +1081,6 @@
             display: block;
         }
 
-        /* ===== BOTÓN FLOTANTE COMPARTIR (izquierda) ===== */
         .btn-share {
             position: fixed;
             bottom: 24px;
@@ -1126,7 +1125,7 @@
 
         <!-- BRAND -->
         <div class="brand">
-            <img src="images/logo_tech.webp" alt="Tech Classic Burgers" class="logo" />
+            <img src="images/icon-512.png" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
             <div class="status-card" id="statusCard">
                 <div id="statusText">⏳ Cargando...</div>
@@ -1202,12 +1201,12 @@
 
     </div>
 
-    <!-- ===== TOAST DE CONFIRMACIÓN ===== -->
+    <!-- ===== TOAST ===== -->
     <div id="toastConfirm" class="toast-confirm">
         <div class="toast-content" id="toastContent"></div>
     </div>
 
-    <!-- ===== MODAL DE CANTIDAD (con título) ===== -->
+    <!-- ===== MODALES ===== -->
     <div id="qtyModal" class="qty-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center; backdrop-filter:blur(4px);">
         <div style="background:#1f331f; border-radius:24px; padding:28px 20px 20px; border:2px solid #3a5a3a; max-width:320px; width:90%; text-align:center;">
             <div style="color:#ffb703; font-weight:700; font-size:1.4rem; margin-bottom:20px;">➕ Cuantas querés..?</div>
@@ -1228,7 +1227,6 @@
         </div>
     </div>
 
-    <!-- ===== MODAL DE MEDALLONES EXTRA ===== -->
     <div id="medModal" class="med-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; justify-content:center; align-items:center; backdrop-filter:blur(4px);">
         <div style="background:#1f331f; border-radius:24px; padding:28px 20px 20px; border:2px solid #3a5a3a; max-width:280px; width:85%; text-align:center;">
             <div style="color:#ffb703; font-weight:700; font-size:1rem; margin-bottom:16px;">➕ Medallones extra</div>
@@ -1241,7 +1239,6 @@
         </div>
     </div>
 
-    <!-- ===== MODAL DE CONFIRMACIÓN PARA CANCELAR (sin botones) ===== -->
     <div id="cancelModal" class="cancel-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:99998; justify-content:center; align-items:center; backdrop-filter:blur(4px); padding:16px;">
         <div style="background:#1f331f; border-radius:24px; padding:40px 30px 30px; border:2px solid #3a5a3a; max-width:340px; width:100%; text-align:center;">
             <span style="font-size:4rem; display:block; margin-bottom:12px;">👍</span>
@@ -1249,7 +1246,6 @@
         </div>
     </div>
 
-    <!-- ===== MODAL DE RESUMEN DEL PEDIDO ===== -->
     <div id="resumenModal" class="resumen-modal">
         <div class="resumen-modal-content">
             <h3>📋 Revisá tu pedido</h3>
@@ -1262,24 +1258,22 @@
         </div>
     </div>
 
-    <!-- ===== POPUP DE IMAGEN (CARRUSEL TÁCTIL) ===== -->
+    <!-- ===== POPUP DE IMAGEN (CARRUSEL) ===== -->
     <div id="imagePopup" class="image-popup">
         <div class="popup-slider" id="popupSlider">
             <div class="popup-track" id="popupTrack"></div>
         </div>
-        <!-- Flechas indicadoras (solo visuales) -->
         <div class="nav-arrow nav-arrow-left" id="arrowLeft">‹</div>
         <div class="nav-arrow nav-arrow-right" id="arrowRight">›</div>
     </div>
 
-    <!-- ===== BOTÓN FLOTANTE INSTAGRAM (derecha) ===== -->
+    <!-- ===== BOTONES FLOTANTES ===== -->
     <a href="https://www.instagram.com/techburger__" target="_blank" rel="noopener noreferrer" class="btn-instagram" aria-label="Síguenos en Instagram">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
         </svg>
     </a>
 
-    <!-- ===== BOTÓN FLOTANTE COMPARTIR (izquierda) ===== -->
     <button class="btn-share" id="shareBtn" aria-label="Compartir esta app">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
@@ -1341,7 +1335,7 @@
         setInterval(actualizarEstado, 60000);
 
         // ============================================================
-        //  TOAST DE CONFIRMACIÓN
+        //  TOAST
         // ============================================================
         var toastTimer = null;
 
@@ -1566,8 +1560,6 @@
         // ============================================================
         //  MODALES Y EVENTOS DE CLIC
         // ============================================================
-
-        // --- Modal de cancelación ---
         const cancelModal = document.getElementById('cancelModal');
 
         function mostrarCancelModal() {
@@ -1585,7 +1577,6 @@
             }
         });
 
-        // --- Modales de cantidad y medallones ---
         let currentInput = null;
         let currentProductId = null;
         const qtyModal = document.getElementById('qtyModal');
@@ -2008,7 +1999,7 @@
         }
 
         // ============================================================
-        //  BOTÓN DE COMPARTIR (Web Share API / copia al portapapeles)
+        //  BOTÓN DE COMPARTIR
         // ============================================================
         document.getElementById('shareBtn').addEventListener('click', function() {
             const url = window.location.href;
@@ -2039,7 +2030,7 @@
         setTimeout(actualizarVisibilidadCancelar, 100);
 
         // ============================================================
-        //  POPUP DE IMAGEN (CARRUSEL TÁCTIL CON FLECHAS MEJORADAS)
+        //  POPUP DE IMAGEN (CARRUSEL CON FLECHAS MEJORADAS)
         // ============================================================
         const imagePopup = document.getElementById('imagePopup');
         const popupSlider = document.getElementById('popupSlider');
@@ -2047,10 +2038,8 @@
         const arrowLeft = document.getElementById('arrowLeft');
         const arrowRight = document.getElementById('arrowRight');
 
-        // Variables para el intervalo de actualización de flechas
         let arrowInterval = null;
 
-        // Generar todas las imágenes del carrusel a partir de los productos
         function generarTrack() {
             popupTrack.innerHTML = '';
             PRODUCTS.forEach(p => {
@@ -2062,7 +2051,6 @@
             });
         }
 
-        // Función para centrar una imagen (sin borde)
         function centrarImagen(index) {
             const sliderWidth = popupSlider.clientWidth;
             if (sliderWidth > 0) {
@@ -2073,55 +2061,49 @@
                     if (w > 0) popupSlider.scrollLeft = index * w;
                 });
             }
-            // Actualizar flechas después de un retraso para asegurar que el scroll termine
             setTimeout(actualizarFlechas, 250);
         }
 
-        // Función para mostrar/ocultar flechas según la posición del scroll
         function actualizarFlechas() {
             const scrollLeft = popupSlider.scrollLeft;
             const maxScroll = popupSlider.scrollWidth - popupSlider.clientWidth;
+            // Mostrar flecha izquierda solo si hay scroll a la izquierda (no estamos en la primera imagen)
             arrowLeft.classList.toggle('visible', scrollLeft > 10);
+            // Mostrar flecha derecha solo si hay scroll a la derecha (no estamos en la última)
             arrowRight.classList.toggle('visible', maxScroll - scrollLeft > 10);
         }
 
-        // Abrir popup en el índice del producto clickeado
         function abrirPopupImagen(index) {
             if (popupTrack.children.length === 0) {
                 generarTrack();
             }
-            // Centrar la imagen sin selección
             centrarImagen(index);
             imagePopup.classList.add('active');
             document.body.style.overflow = 'hidden';
 
-            // Iniciar un intervalo para actualizar flechas mientras el popup está abierto
             if (arrowInterval) clearInterval(arrowInterval);
             arrowInterval = setInterval(actualizarFlechas, 300);
 
-            // Actualizar flechas después de abrir
             setTimeout(actualizarFlechas, 250);
         }
 
-        // Cerrar popup
         function cerrarPopup() {
             imagePopup.classList.remove('active');
             document.body.style.overflow = '';
-            // Detener el intervalo
             if (arrowInterval) {
                 clearInterval(arrowInterval);
                 arrowInterval = null;
             }
         }
 
-        // Evento de clic en el fondo (cierra)
+        // Solo cerrar al hacer clic en el fondo (no en las imágenes)
         imagePopup.addEventListener('click', function(e) {
             if (e.target === imagePopup) {
                 cerrarPopup();
             }
         });
 
-        // Al hacer clic en una imagen, centramos
+        // Al hacer clic en una imagen, centrar (no cerrar)
         popupTrack.addEventListener('click', function(e) {
             const img = e.target.closest('img');
             if (!img) return;
@@ -2132,26 +2114,18 @@
             }
         });
 
-        // Escuchar scroll para actualizar las flechas
         popupSlider.addEventListener('scroll', actualizarFlechas);
-
-        // También escuchar eventos táctiles para asegurar la actualización en móviles
-        popupSlider.addEventListener('touchmove', function() {
-            // Se actualizará con el intervalo, pero forzamos una vez
-            actualizarFlechas();
-        });
+        popupSlider.addEventListener('touchmove', actualizarFlechas);
         popupSlider.addEventListener('touchend', function() {
             setTimeout(actualizarFlechas, 150);
         });
 
-        // Cerrar con ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && imagePopup.classList.contains('active')) {
                 cerrarPopup();
             }
         });
 
-        // Detectar clic en miniaturas para abrir
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
             const imgDiv = target.closest('.product-img');
@@ -2167,7 +2141,6 @@
             }
         });
 
-        // Ajustar al cambiar el tamaño de la ventana
         let resizeTimeout;
         window.addEventListener('resize', function() {
             if (imagePopup.classList.contains('active')) {
@@ -2184,10 +2157,7 @@
             }
         });
 
-        // Generar track al inicio
         generarTrack();
-
-        // Inicializar flechas (ocultas por defecto)
         actualizarFlechas();
     </script>
 </body>
