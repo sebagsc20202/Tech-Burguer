@@ -23,7 +23,7 @@
             justify-content: center;
             align-items: flex-start;
         }
-        .container { max-width: 1000px; width: 100%; padding-top: 20px; }
+        .container { max-width: 1100px; width: 100%; padding-top: 20px; }
         h1 { color: #ffb703; text-align: center; margin-bottom: 30px; font-size: 2rem; }
         h2 { color: #ffb703; margin: 20px 0 10px; border-bottom: 1px solid #2f4a2f; padding-bottom: 6px; }
 
@@ -368,7 +368,7 @@
         .estado-rapido .btn-estado.activo { box-shadow: 0 0 0 2px #fff, 0 0 20px rgba(255,255,255,0.2); }
 
         /* ===== LISTAS ===== */
-        .product-item, .promo-item, .excepcion-item {
+        .product-item, .promo-item, .excepcion-item, .pedido-item {
             background: #1f331f;
             border: 1px solid #3a5a3a;
             border-radius: 12px;
@@ -394,7 +394,6 @@
         }
         .product-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #ffb703; cursor: pointer; }
 
-        /* CONTENEDOR DE ACCIONES - SEPARACIÓN DEL BOTÓN ELIMINAR */
         .product-item .actions {
             display: flex;
             flex-wrap: wrap;
@@ -402,7 +401,6 @@
             gap: 6px;
             margin-left: auto;
         }
-        /* Separador vertical antes del botón eliminar */
         .product-item .actions .separator {
             color: #4a6a4a;
             font-weight: 300;
@@ -559,23 +557,52 @@
         }
         .excepcion-item .actions .btn-eliminar-excepcion:hover { background: #d32f2f; }
 
+        /* PEDIDOS */
+        .pedido-item .info { flex: 2; min-width: 200px; }
+        .pedido-item .estado-label { font-weight: 600; min-width: 80px; }
+        .pedido-item .actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+        .pedido-item .actions .btn-eliminar-pedido {
+            background: #f44336;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .pedido-item .actions .btn-eliminar-pedido:hover { background: #d32f2f; }
+        .pedido-item select {
+            background: #1a2e1a;
+            color: #fff;
+            border: 1px solid #3a5a3a;
+            border-radius: 30px;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            outline: none;
+            cursor: pointer;
+        }
+        .pedido-item select:focus { border-color: #ffb703; }
+
         .hidden { display: none !important; }
 
         @media (max-width: 600px) {
-            .product-item, .promo-item, .excepcion-item {
+            .product-item, .promo-item, .excepcion-item, .pedido-item {
                 flex-direction: column;
                 align-items: stretch;
             }
             .product-item label { justify-content: space-between; }
-            .product-item .actions {
-                margin-left: 0;
-                justify-content: flex-end;
-            }
-            .promo-item .actions {
-                margin-left: 0;
-                justify-content: flex-end;
-            }
-            .excepcion-item .actions {
+            .product-item .actions,
+            .promo-item .actions,
+            .excepcion-item .actions,
+            .pedido-item .actions {
                 margin-left: 0;
                 justify-content: flex-end;
             }
@@ -584,7 +611,6 @@
             .form-actions { flex-direction: column; }
             .filtro-container { flex-direction: column; align-items: stretch; }
             .estado-rapido { flex-direction: column; }
-            /* En móvil, el separador se oculta y el botón eliminar ocupa toda la línea */
             .product-item .actions .separator,
             .promo-item .actions .separator,
             .excepcion-item .actions .separator {
@@ -592,7 +618,8 @@
             }
             .product-item .actions .btn-eliminar,
             .promo-item .actions .btn-eliminar-promo,
-            .excepcion-item .actions .btn-eliminar-excepcion {
+            .excepcion-item .actions .btn-eliminar-excepcion,
+            .pedido-item .actions .btn-eliminar-pedido {
                 margin-left: 0;
                 width: 100%;
                 text-align: center;
@@ -612,6 +639,10 @@
             .excepcion-item .actions .btn-editar-excepcion,
             .excepcion-item .actions .btn-eliminar-excepcion {
                 flex: 1;
+                text-align: center;
+            }
+            .pedido-item .actions .btn-eliminar-pedido {
+                width: 100%;
                 text-align: center;
             }
         }
@@ -738,14 +769,11 @@
                 <h2>⏰ Horario excepcional</h2>
                 <button class="btn-add" id="addExcepcionBtn">➕ Agregar excepción</button>
             </div>
-
-            <!-- Botones de acción rápida -->
             <div class="estado-rapido">
                 <button class="btn-estado btn-abrir" id="btnAbrirAhora" title="Abrir el local ahora (crea excepción para hoy)">🔓 Abrir ahora</button>
                 <button class="btn-estado btn-cerrar" id="btnCerrarAhora" title="Cerrar el local ahora (crea excepción para hoy)">🔒 Cerrar ahora</button>
                 <button class="btn-estado btn-normal" id="btnVolverNormal" title="Eliminar excepción de hoy y volver al horario normal">⏰ Horario normal</button>
             </div>
-
             <div id="excepcionList"></div>
             <div id="formExcepcion" class="form-producto">
                 <h3 id="formExcepcionTitulo">✏️ Nueva excepción</h3>
@@ -789,6 +817,25 @@
                     <button class="btn-cancel" id="cancelExcepcionBtn">Cancelar</button>
                 </div>
             </div>
+
+            <hr style="border-color:#2f4a2f; margin:20px 0;">
+
+            <!-- ===== PEDIDOS ===== -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <h2>📦 Pedidos</h2>
+                <div class="filtro-container" style="margin:0;">
+                    <label for="filtroEstado">Filtrar por estado:</label>
+                    <select id="filtroEstado">
+                        <option value="todos">Todos</option>
+                        <option value="pendiente">⏳ Pendiente</option>
+                        <option value="preparando">👨‍🍳 Preparando</option>
+                        <option value="listo">✅ Listo</option>
+                        <option value="entregado">🚚 Entregado</option>
+                        <option value="cancelado">❌ Cancelado</option>
+                    </select>
+                </div>
+            </div>
+            <div id="pedidoList"></div>
 
             <hr style="border-color:#2f4a2f; margin:20px 0;">
             <div style="font-size:0.8rem; color:#6a8a6a; text-align:center;">
@@ -875,7 +922,6 @@
             if (confirmResolve) confirmResolve(false);
         });
 
-        // Cerrar modal al hacer clic fuera del contenido
         confirmModal.addEventListener('click', (e) => {
             if (e.target === confirmModal) {
                 confirmModal.classList.remove('active');
@@ -922,8 +968,9 @@
         const btnCerrarAhora = document.getElementById('btnCerrarAhora');
         const btnVolverNormal = document.getElementById('btnVolverNormal');
 
-        // Filtro
+        // Filtros
         const filtroCategoria = document.getElementById('filtroCategoria');
+        const filtroEstado = document.getElementById('filtroEstado');
 
         // ============================================================
         //  AUTENTICACIÓN
@@ -962,6 +1009,7 @@
                 db.ref('products').off();
                 db.ref('promotions').off();
                 db.ref('excepciones').off();
+                db.ref('pedidos').off();
             }
         });
 
@@ -973,11 +1021,13 @@
         let productosCompletos = [];
         let categoriasUnicas = [];
         let excepcionesActuales = [];
+        let pedidosActuales = [];
 
         function cargarDatos() {
             cargarProductos();
             cargarPromociones();
             cargarExcepciones();
+            cargarPedidos();
         }
 
         // ---- PRODUCTOS ----
@@ -1511,7 +1561,6 @@
             }
         });
 
-        // ---- Funciones de edición/eliminación de excepciones ----
         window.editarExcepcion = async function(id) {
             try {
                 const snapshot = await db.ref('excepciones/' + id).once('value');
@@ -1611,6 +1660,108 @@
                 mostrarToast('Error: ' + error.message, 'error');
             }
         });
+
+        // ============================================================
+        //  PEDIDOS
+        // ============================================================
+        function cargarPedidos() {
+            db.ref('pedidos').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    pedidosActuales = [];
+                    document.getElementById('pedidoList').innerHTML = '<p style="color:#b8d0b8;">No hay pedidos aún.</p>';
+                    return;
+                }
+                pedidosActuales = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                pedidosActuales.sort((a, b) => (a.fecha < b.fecha ? 1 : -1));
+                aplicarFiltroPedidos();
+            });
+        }
+
+        function aplicarFiltroPedidos() {
+            const filtro = filtroEstado.value;
+            const pedidosFiltrados = filtro === 'todos'
+                ? pedidosActuales
+                : pedidosActuales.filter(p => p.estado === filtro);
+            renderPedidos(pedidosFiltrados);
+        }
+
+        filtroEstado.addEventListener('change', aplicarFiltroPedidos);
+
+        function renderPedidos(pedidos) {
+            const list = document.getElementById('pedidoList');
+            list.innerHTML = '';
+            if (pedidos.length === 0) {
+                list.innerHTML = '<p style="color:#b8d0b8;">No hay pedidos con este filtro.</p>';
+                return;
+            }
+            pedidos.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'pedido-item';
+                const fecha = p.fecha ? new Date(p.fecha).toLocaleString('es-AR') : 'Fecha desconocida';
+                const productosResumen = p.productos ? p.productos.map(prod => `${prod.cantidad}x ${prod.nombre}`).join(', ') : 'Sin productos';
+                const total = p.total ? `$${p.total.toLocaleString()}` : '$0';
+                const estadoColor = p.estado === 'pendiente' ? '#ffb703' :
+                                    p.estado === 'preparando' ? '#4caf50' :
+                                    p.estado === 'listo' ? '#2196F3' :
+                                    p.estado === 'entregado' ? '#8aaa8a' : '#f44336';
+                div.innerHTML = `
+                    <div class="info">
+                        <div><strong>${p.nombre}</strong> (${p.telefono})</div>
+                        <div style="font-size:0.8rem; color:#b8d0b8;">${fecha}</div>
+                        <div style="font-size:0.8rem; color:#b8d0b8;">📦 ${productosResumen}</div>
+                        <div style="font-size:0.8rem; color:#b8d0b8;">💳 ${p.metodoPago || 'N/E'} · 🚚 ${p.envio || 'N/E'}</div>
+                        ${p.direccion ? `<div style="font-size:0.8rem; color:#b8d0b8;">📍 ${p.direccion}</div>` : ''}
+                    </div>
+                    <div class="estado-label" style="color:${estadoColor};">${p.estado || 'pendiente'}</div>
+                    <label style="display:flex; align-items:center; gap:4px; font-size:0.8rem;">
+                        Estado:
+                        <select class="estado-select" data-id="${p.id}">
+                            <option value="pendiente" ${p.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                            <option value="preparando" ${p.estado === 'preparando' ? 'selected' : ''}>Preparando</option>
+                            <option value="listo" ${p.estado === 'listo' ? 'selected' : ''}>Listo</option>
+                            <option value="entregado" ${p.estado === 'entregado' ? 'selected' : ''}>Entregado</option>
+                            <option value="cancelado" ${p.estado === 'cancelado' ? 'selected' : ''}>Cancelado</option>
+                        </select>
+                    </label>
+                    <div class="actions">
+                        <button class="btn-eliminar-pedido" onclick="eliminarPedido('${p.id}')" title="Eliminar pedido permanentemente">🗑️</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+
+            // Event listeners para cambios de estado
+            document.querySelectorAll('.estado-select').forEach(select => {
+                select.removeEventListener('change', handleEstadoChange);
+                select.addEventListener('change', handleEstadoChange);
+            });
+        }
+
+        function handleEstadoChange(e) {
+            const select = e.target;
+            const id = select.dataset.id;
+            const nuevoEstado = select.value;
+            db.ref('pedidos/' + id).update({ estado: nuevoEstado })
+                .then(() => mostrarToast('Estado actualizado', 'success'))
+                .catch(err => mostrarToast('Error: ' + err.message, 'error'));
+        }
+
+        window.eliminarPedido = async function(id) {
+            const confirmado = await mostrarConfirm('Eliminar pedido', '¿Eliminar este pedido permanentemente?');
+            if (!confirmado) return;
+            try {
+                await db.ref('pedidos/' + id).remove();
+                mostrarToast('Pedido eliminado', 'success');
+            } catch (error) {
+                mostrarToast('Error: ' + error.message, 'error');
+            }
+        };
+
+        // ============================================================
+        //  INICIO
+        // ============================================================
+        // Ya se llama cargarDatos en onAuthStateChanged
     </script>
 </body>
 </html>
