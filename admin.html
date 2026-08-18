@@ -130,6 +130,82 @@
         .toast-admin-content.error { border-color: #f44336; }
         .toast-admin-content.info { border-color: #2196F3; }
 
+        /* ===== MODAL DE CONFIRMACIÓN ===== */
+        #confirmModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(6px);
+            padding: 20px;
+        }
+        #confirmModal.active {
+            display: flex;
+        }
+        .confirm-modal-content {
+            background: #3a1e1e;
+            border: 3px solid #f44336;
+            border-radius: 20px;
+            padding: 30px 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+        }
+        .confirm-modal-content .icon {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 12px;
+        }
+        .confirm-modal-content .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ff6b6b;
+            margin-bottom: 8px;
+        }
+        .confirm-modal-content .message {
+            font-size: 1rem;
+            color: #f0d0d0;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .confirm-modal-content .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .confirm-modal-content .actions button {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            flex: 1;
+        }
+        .confirm-modal-content .actions button:active { transform: scale(0.97); }
+        .confirm-modal-content .btn-confirm-yes {
+            background: #f44336;
+            color: #fff;
+        }
+        .confirm-modal-content .btn-confirm-yes:hover {
+            background: #d32f2f;
+        }
+        .confirm-modal-content .btn-confirm-no {
+            background: #555;
+            color: #fff;
+        }
+        .confirm-modal-content .btn-confirm-no:hover {
+            background: #444;
+        }
+
         /* ===== FORMULARIOS ===== */
         .form-producto {
             background: #1f331f;
@@ -326,9 +402,15 @@
             gap: 6px;
             margin-left: auto;
         }
+        /* Separador vertical antes del botón eliminar */
+        .product-item .actions .separator {
+            color: #4a6a4a;
+            font-weight: 300;
+            margin: 0 4px 0 10px;
+            font-size: 1.2rem;
+            user-select: none;
+        }
         .product-item .actions .btn-eliminar {
-            margin-left: 8px;
-            order: 10; /* Para que vaya al final */
             background: #f44336;
             color: #fff;
             padding: 6px 14px;
@@ -338,6 +420,7 @@
             font-size: 0.8rem;
             cursor: pointer;
             transition: background 0.2s;
+            margin-left: 4px;
         }
         .product-item .actions .btn-eliminar:hover { background: #d32f2f; }
         .product-item .actions .btn-mover {
@@ -400,6 +483,13 @@
             gap: 6px;
             margin-left: auto;
         }
+        .promo-item .actions .separator {
+            color: #4a6a4a;
+            font-weight: 300;
+            margin: 0 4px 0 10px;
+            font-size: 1.2rem;
+            user-select: none;
+        }
         .promo-item .actions .btn-editar-promo {
             background: #2196F3;
             color: #fff;
@@ -422,8 +512,7 @@
             font-size: 0.8rem;
             cursor: pointer;
             transition: background 0.2s;
-            margin-left: 8px;
-            order: 10;
+            margin-left: 4px;
         }
         .promo-item .actions .btn-eliminar-promo:hover { background: #d32f2f; }
 
@@ -436,6 +525,13 @@
             align-items: center;
             gap: 6px;
             margin-left: auto;
+        }
+        .excepcion-item .actions .separator {
+            color: #4a6a4a;
+            font-weight: 300;
+            margin: 0 4px 0 10px;
+            font-size: 1.2rem;
+            user-select: none;
         }
         .excepcion-item .actions .btn-editar-excepcion {
             background: #2196F3;
@@ -459,8 +555,7 @@
             font-size: 0.8rem;
             cursor: pointer;
             transition: background 0.2s;
-            margin-left: 8px;
-            order: 10;
+            margin-left: 4px;
         }
         .excepcion-item .actions .btn-eliminar-excepcion:hover { background: #d32f2f; }
 
@@ -489,12 +584,16 @@
             .form-actions { flex-direction: column; }
             .filtro-container { flex-direction: column; align-items: stretch; }
             .estado-rapido { flex-direction: column; }
-            /* En móvil, los botones de eliminar se ponen en una línea aparte */
+            /* En móvil, el separador se oculta y el botón eliminar ocupa toda la línea */
+            .product-item .actions .separator,
+            .promo-item .actions .separator,
+            .excepcion-item .actions .separator {
+                display: none;
+            }
             .product-item .actions .btn-eliminar,
             .promo-item .actions .btn-eliminar-promo,
             .excepcion-item .actions .btn-eliminar-excepcion {
                 margin-left: 0;
-                order: 0;
                 width: 100%;
                 text-align: center;
                 margin-top: 4px;
@@ -527,6 +626,19 @@
             <div class="toast-admin-content" id="toastAdminContent">
                 <span class="toast-icon" id="toastIcon">✅</span>
                 <span class="toast-message" id="toastMessage">Mensaje</span>
+            </div>
+        </div>
+
+        <!-- ===== MODAL DE CONFIRMACIÓN ===== -->
+        <div id="confirmModal">
+            <div class="confirm-modal-content">
+                <span class="icon">⚠️</span>
+                <div class="title" id="confirmTitle">Eliminar</div>
+                <div class="message" id="confirmMessage">¿Estás seguro?</div>
+                <div class="actions">
+                    <button class="btn-confirm-yes" id="confirmYes">Sí, eliminar</button>
+                    <button class="btn-confirm-no" id="confirmNo">Cancelar</button>
+                </div>
             </div>
         </div>
 
@@ -629,9 +741,9 @@
 
             <!-- Botones de acción rápida -->
             <div class="estado-rapido">
-                <button class="btn-estado btn-abrir" id="btnAbrirAhora">🔓 Abrir ahora</button>
-                <button class="btn-estado btn-cerrar" id="btnCerrarAhora">🔒 Cerrar ahora</button>
-                <button class="btn-estado btn-normal" id="btnVolverNormal">⏰ Horario normal</button>
+                <button class="btn-estado btn-abrir" id="btnAbrirAhora" title="Abrir el local ahora (crea excepción para hoy)">🔓 Abrir ahora</button>
+                <button class="btn-estado btn-cerrar" id="btnCerrarAhora" title="Cerrar el local ahora (crea excepción para hoy)">🔒 Cerrar ahora</button>
+                <button class="btn-estado btn-normal" id="btnVolverNormal" title="Eliminar excepción de hoy y volver al horario normal">⏰ Horario normal</button>
             </div>
 
             <div id="excepcionList"></div>
@@ -714,7 +826,6 @@
             const icon = document.getElementById('toastIcon');
             const message = document.getElementById('toastMessage');
 
-            // Limpiar clases previas
             content.classList.remove('success', 'error', 'info');
             if (tipo === 'success') {
                 content.classList.add('success');
@@ -729,12 +840,48 @@
 
             message.textContent = mensaje;
             toast.classList.add('show');
-
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
         }
+
+        // ============================================================
+        //  MODAL DE CONFIRMACIÓN PERSONALIZADO
+        // ============================================================
+        let confirmResolve = null;
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmTitle = document.getElementById('confirmTitle');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const confirmYes = document.getElementById('confirmYes');
+        const confirmNo = document.getElementById('confirmNo');
+
+        function mostrarConfirm(titulo, mensaje) {
+            return new Promise((resolve) => {
+                confirmTitle.textContent = titulo || 'Eliminar';
+                confirmMessage.textContent = mensaje || '¿Estás seguro de eliminar este registro?';
+                confirmModal.classList.add('active');
+                confirmResolve = resolve;
+            });
+        }
+
+        confirmYes.addEventListener('click', () => {
+            confirmModal.classList.remove('active');
+            if (confirmResolve) confirmResolve(true);
+        });
+
+        confirmNo.addEventListener('click', () => {
+            confirmModal.classList.remove('active');
+            if (confirmResolve) confirmResolve(false);
+        });
+
+        // Cerrar modal al hacer clic fuera del contenido
+        confirmModal.addEventListener('click', (e) => {
+            if (e.target === confirmModal) {
+                confirmModal.classList.remove('active');
+                if (confirmResolve) confirmResolve(false);
+            }
+        });
 
         // ============================================================
         //  REFERENCIAS DOM
@@ -888,11 +1035,12 @@
                     <label>💰 Precio: <input type="number" value="${p.price}" data-id="${p.id}" class="price-input" /></label>
                     <label>📦 Disponible: <input type="checkbox" ${p.available !== false ? 'checked' : ''} data-id="${p.id}" class="avail-input" /></label>
                     <div class="actions">
-                        <button class="btn-mover" onclick="moverProducto('${p.id}', -1)" ${isFirst ? 'disabled' : ''}>⬆</button>
-                        <button class="btn-mover" onclick="moverProducto('${p.id}', 1)" ${isLast ? 'disabled' : ''}>⬇</button>
-                        <button class="btn-editar" onclick="editarProducto('${p.id}')">✏️</button>
-                        <button class="btn-guardar" onclick="actualizarProducto('${p.id}')">💾</button>
-                        <button class="btn-eliminar" onclick="eliminarProducto('${p.id}')">🗑️</button>
+                        <button class="btn-mover" onclick="moverProducto('${p.id}', -1)" ${isFirst ? 'disabled' : ''} title="Subir producto">⬆</button>
+                        <button class="btn-mover" onclick="moverProducto('${p.id}', 1)" ${isLast ? 'disabled' : ''} title="Bajar producto">⬇</button>
+                        <button class="btn-editar" onclick="editarProducto('${p.id}')" title="Editar producto">✏️</button>
+                        <button class="btn-guardar" onclick="actualizarProducto('${p.id}')" title="Guardar cambios de precio/disponibilidad">💾</button>
+                        <span class="separator">|</span>
+                        <button class="btn-eliminar" onclick="eliminarProducto('${p.id}')" title="Eliminar producto permanentemente">🗑️</button>
                     </div>
                 `;
                 list.appendChild(div);
@@ -946,7 +1094,8 @@
         };
 
         window.eliminarProducto = async function(id) {
-            if (!confirm(`¿Eliminar el producto "${id}" permanentemente?`)) return;
+            const confirmado = await mostrarConfirm('Eliminar producto', `¿Eliminar el producto "${id}" permanentemente?`);
+            if (!confirmado) return;
             try {
                 await db.ref('products/' + id).remove();
                 mostrarToast('Producto eliminado', 'success');
@@ -1092,8 +1241,9 @@
                     <div class="dates">${fechaInicio} ${fechaInicio && fechaFin ? '→' : ''} ${fechaFin}</div>
                     <label><input type="checkbox" ${p.active !== false ? 'checked' : ''} data-id="${p.id}" class="promo-active-check" /> Activa</label>
                     <div class="actions">
-                        <button class="btn-editar-promo" onclick="editarPromocion('${p.id}')">✏️</button>
-                        <button class="btn-eliminar-promo" onclick="eliminarPromocion('${p.id}')">🗑️</button>
+                        <button class="btn-editar-promo" onclick="editarPromocion('${p.id}')" title="Editar promoción">✏️</button>
+                        <span class="separator">|</span>
+                        <button class="btn-eliminar-promo" onclick="eliminarPromocion('${p.id}')" title="Eliminar promoción permanentemente">🗑️</button>
                     </div>
                 `;
                 list.appendChild(div);
@@ -1153,11 +1303,12 @@
         });
 
         window.eliminarPromocion = async function(id) {
-            if (!confirm('¿Eliminar esta promoción?')) return;
-            try { 
-                await db.ref('promotions/' + id).remove(); 
+            const confirmado = await mostrarConfirm('Eliminar promoción', `¿Eliminar la promoción "${id}" permanentemente?`);
+            if (!confirmado) return;
+            try {
+                await db.ref('promotions/' + id).remove();
                 mostrarToast('Promoción eliminada', 'success');
-            } catch (error) { 
+            } catch (error) {
                 mostrarToast('Error: ' + error.message, 'error');
             }
         };
@@ -1244,8 +1395,9 @@
                         <strong>${rango}</strong> — ${tipoTexto} ${horario} ${mensaje}
                     </div>
                     <div class="actions">
-                        <button class="btn-editar-excepcion" onclick="editarExcepcion('${ex.id}')">✏️ Editar</button>
-                        <button class="btn-eliminar-excepcion" onclick="eliminarExcepcion('${ex.id}')">🗑️</button>
+                        <button class="btn-editar-excepcion" onclick="editarExcepcion('${ex.id}')" title="Editar excepción">✏️ Editar</button>
+                        <span class="separator">|</span>
+                        <button class="btn-eliminar-excepcion" onclick="eliminarExcepcion('${ex.id}')" title="Eliminar excepción permanentemente">🗑️</button>
                     </div>
                 `;
                 list.appendChild(div);
@@ -1348,7 +1500,8 @@
                 mostrarToast('Ya estás en horario normal', 'info');
                 return;
             }
-            if (!confirm('¿Eliminar la excepción de hoy y volver al horario normal?')) return;
+            const confirmado = await mostrarConfirm('Volver al horario normal', '¿Eliminar la excepción de hoy y volver al horario normal?');
+            if (!confirmado) return;
             try {
                 await db.ref('excepciones/' + exHoy.id).remove();
                 mostrarToast('Horario normal restaurado', 'success');
@@ -1390,7 +1543,8 @@
         };
 
         window.eliminarExcepcion = async function(id) {
-            if (!confirm('¿Eliminar esta excepción?')) return;
+            const confirmado = await mostrarConfirm('Eliminar excepción', `¿Eliminar esta excepción permanentemente?`);
+            if (!confirmado) return;
             try {
                 await db.ref('excepciones/' + id).remove();
                 mostrarToast('Excepción eliminada', 'success');
