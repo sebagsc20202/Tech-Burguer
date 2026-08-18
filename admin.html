@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin · Tech Burgers</title>
 
-    <!-- Firebase SDKs (compat) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -25,11 +25,12 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
         }
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             width: 100%;
+            padding-top: 20px;
         }
         h1 {
             color: #ffb703;
@@ -44,7 +45,7 @@
             padding-bottom: 6px;
         }
 
-        /* ===== CARD ===== */
+        /* ===== CARD (LOGIN) ===== */
         .card {
             background: #1f331f;
             border: 2px solid #3a5a3a;
@@ -136,6 +137,113 @@
             background: #5a2a2a;
         }
 
+        /* ===== FORMULARIO NUEVO PRODUCTO ===== */
+        .form-producto {
+            background: #1f331f;
+            border: 2px solid #3a5a3a;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            display: none;
+        }
+        .form-producto.active {
+            display: block;
+        }
+        .form-producto input,
+        .form-producto textarea,
+        .form-producto select {
+            width: 100%;
+            padding: 10px 14px;
+            margin: 6px 0;
+            border-radius: 40px;
+            border: 1px solid #3a5a3a;
+            background: #1a2e1a;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            appearance: none;
+        }
+        .form-producto textarea {
+            border-radius: 16px;
+            resize: vertical;
+            min-height: 60px;
+        }
+        .form-producto input:focus,
+        .form-producto textarea:focus,
+        .form-producto select:focus {
+            border-color: #ffb703;
+        }
+        .form-producto select option {
+            background: #1a2e1a;
+            color: #fff;
+        }
+        .form-producto .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .form-producto .row>* {
+            flex: 1;
+            min-width: 150px;
+        }
+        .form-producto .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+            margin: 8px 0;
+        }
+        .form-producto .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+        .form-producto .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        .form-producto .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .form-producto .actions button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-save {
+            background: #ffb703;
+            color: #1a1a1a;
+        }
+        .btn-save:hover {
+            background: #e6a500;
+        }
+        .btn-cancel {
+            background: #555;
+            color: #fff;
+        }
+        .btn-cancel:hover {
+            background: #444;
+        }
+        .btn-add {
+            background: #4caf50;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin: 10px 0;
+        }
+        .btn-add:hover {
+            background: #388e3c;
+        }
+
         /* ===== LISTAS ===== */
         .product-item,
         .promo-item {
@@ -153,6 +261,18 @@
             flex: 2;
             font-weight: 600;
             min-width: 120px;
+        }
+        .product-item .meta {
+            font-size: 0.8rem;
+            color: #b8d0b8;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .product-item .meta span {
+            background: #2a4a2a;
+            padding: 2px 10px;
+            border-radius: 30px;
         }
         .product-item label {
             display: flex;
@@ -175,7 +295,12 @@
             accent-color: #ffb703;
             cursor: pointer;
         }
-        .product-item button {
+        .product-item .actions {
+            display: flex;
+            gap: 6px;
+            margin-left: auto;
+        }
+        .product-item .actions button {
             background: #ffb703;
             border: none;
             padding: 6px 16px;
@@ -184,8 +309,16 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .product-item button:hover {
+        .product-item .actions button:hover {
             background: #e6a500;
+        }
+        .product-item .badge-preview {
+            background: #e63946;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
         }
 
         .promo-item .info {
@@ -218,81 +351,6 @@
         .btn-edit:hover {
             background: #1976D2 !important;
         }
-        .btn-add {
-            background: #4caf50;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 40px;
-            color: #fff;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin: 10px 0;
-        }
-        .btn-add:hover {
-            background: #388e3c;
-        }
-
-        /* ===== FORMULARIO PROMO ===== */
-        .form-promo {
-            background: #1f331f;
-            border: 2px solid #3a5a3a;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 15px 0;
-            display: none;
-        }
-        .form-promo.active {
-            display: block;
-        }
-        .form-promo input {
-            width: 100%;
-            padding: 10px 14px;
-            margin: 6px 0;
-            border-radius: 40px;
-            border: 1px solid #3a5a3a;
-            background: #1a2e1a;
-            color: #fff;
-        }
-        .form-promo input[type="checkbox"] {
-            width: auto;
-            margin-right: 8px;
-        }
-        .form-promo .row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .form-promo .row input {
-            flex: 1;
-            min-width: 150px;
-        }
-        .form-promo .actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 12px;
-        }
-        .form-promo .actions button {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 40px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .btn-save {
-            background: #ffb703;
-            color: #1a1a1a;
-        }
-        .btn-save:hover {
-            background: #e6a500;
-        }
-        .btn-cancel {
-            background: #555;
-            color: #fff;
-        }
-        .btn-cancel:hover {
-            background: #444;
-        }
 
         .hidden {
             display: none !important;
@@ -307,6 +365,10 @@
             .product-item label {
                 justify-content: space-between;
             }
+            .product-item .actions {
+                margin-left: 0;
+                justify-content: flex-end;
+            }
         }
     </style>
 </head>
@@ -317,11 +379,11 @@
         <!-- ===== LOGIN ===== -->
         <div id="authSection" class="card">
             <h2>🔐 Iniciar sesión</h2>
-            <input type="email" id="emailInput" placeholder="Correo electrónico" value="admin@techburgers.com" />
+            <input type="email" id="emailInput" placeholder="Correo electrónico" />
             <input type="password" id="passInput" placeholder="Contraseña" />
             <div id="authError" class="error"></div>
             <button id="authButton">Ingresar</button>
-            <div class="hint">Usá el correo y contraseña configurado en Firebase.</div>
+            <div class="hint">Usá el correo y contraseña configurados en Firebase.</div>
         </div>
 
         <!-- ===== PANEL DE ADMIN ===== -->
@@ -331,13 +393,59 @@
                 <button class="btn-logout" id="logoutBtn">🚪 Cerrar sesión</button>
             </div>
 
-            <!-- Productos -->
-            <h2>📋 Productos</h2>
+            <!-- ===== PRODUCTOS ===== -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <h2>📋 Productos</h2>
+                <button class="btn-add" id="addProductBtn">➕ Nuevo producto</button>
+            </div>
+
+            <!-- Formulario para crear producto -->
+            <div id="formProducto" class="form-producto">
+                <h3>✏️ Nuevo producto</h3>
+                <input type="text" id="prodNombre" placeholder="Nombre (ej: Doble Cheddar)" />
+                <input type="text" id="prodPrecio" placeholder="Precio (ej: 15000)" />
+                <textarea id="prodDesc" placeholder="Descripción"></textarea>
+                <div class="row">
+                    <input type="text" id="prodImagen" placeholder="URL imagen (ej: images/cheddar.jpg)" />
+                    <input type="text" id="prodPopupImg" placeholder="URL imagen popup (ej: images/cheddar-popup.jpg)" />
+                </div>
+                <!-- NUEVOS CAMPOS: Categoría y Tiempo de preparación -->
+                <div class="row">
+                    <select id="prodCategoria">
+                        <option value="Hamburguesas">🍔 Hamburguesas</option>
+                        <option value="Papas">🍟 Papas</option>
+                        <option value="Bebidas">🥤 Bebidas</option>
+                        <option value="Postres">🍰 Postres</option>
+                        <option value="Otros">📦 Otros</option>
+                    </select>
+                    <input type="number" id="prodTiempo" placeholder="Tiempo preparación (min)" value="15" min="1" />
+                </div>
+                <div class="row">
+                    <input type="text" id="prodBadge" placeholder="Badge (ej: NUEVO, BASE, etc.)" />
+                    <input type="text" id="prodId" placeholder="ID (sin espacios, ej: doble-cheddar)" />
+                </div>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="prodHasExtras" /> Tiene medallones extra y toppings
+                    </label>
+                    <label>
+                        <input type="checkbox" id="prodDisponible" checked /> Disponible
+                    </label>
+                </div>
+                <div class="actions">
+                    <button class="btn-save" id="saveProductBtn">💾 Guardar producto</button>
+                    <button class="btn-cancel" id="cancelProductBtn">Cancelar</button>
+                </div>
+                <div style="font-size:0.75rem; color:#6a8a6a; margin-top:8px;">
+                    ⚠️ El ID debe ser único y sin espacios. Se usará para identificar el producto en la app.
+                </div>
+            </div>
+
             <div id="productList"></div>
 
             <hr style="border-color:#2f4a2f; margin:20px 0;">
 
-            <!-- Promociones -->
+            <!-- ===== PROMOCIONES ===== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                 <h2>🎯 Promociones</h2>
                 <button class="btn-add" id="addPromoBtn">➕ Agregar promoción</button>
@@ -345,18 +453,18 @@
             <div id="promoList"></div>
 
             <!-- Formulario de promoción -->
-            <div id="formPromo" class="form-promo">
+            <div id="formPromo" class="form-producto">
                 <h3>✏️ Nueva promoción</h3>
-                <input type="text" id="promoTitulo" placeholder="Título (ej: 2x1)">
-                <input type="text" id="promoDesc" placeholder="Descripción (ej: Llevá dos burgers)">
-                <input type="text" id="promoImagen" placeholder="URL imagen (ej: images/promo1.jpg)">
+                <input type="text" id="promoTitulo" placeholder="Título (ej: 2x1)" />
+                <input type="text" id="promoDesc" placeholder="Descripción (ej: Llevá dos burgers)" />
+                <input type="text" id="promoImagen" placeholder="URL imagen (ej: images/promo1.jpg)" />
                 <div class="row">
-                    <input type="date" id="promoInicio">
-                    <input type="date" id="promoFin">
+                    <input type="date" id="promoInicio" />
+                    <input type="date" id="promoFin" />
                 </div>
-                <div style="margin: 10px 0;">
-                    <label style="display:flex; align-items:center; gap:8px;">
-                        <input type="checkbox" id="promoActiva" checked> Activa
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="promoActiva" checked /> Activa
                     </label>
                 </div>
                 <div class="actions">
@@ -366,7 +474,7 @@
             </div>
 
             <hr style="border-color:#2f4a2f; margin:20px 0;">
-            <div style="font-size:0.8rem; color:#6a8a6a;">
+            <div style="font-size:0.8rem; color:#6a8a6a; text-align:center;">
                 Los cambios se guardan automáticamente en Firebase.
             </div>
         </div>
@@ -374,7 +482,7 @@
 
     <script>
         // ============================================================
-        //  CONFIGURACIÓN DE FIREBASE (TUS DATOS)
+        //  CONFIGURACIÓN DE FIREBASE
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCbS9zdQcpj0HThGqQVKcfsNjMFQ9gjf9U",
@@ -395,12 +503,22 @@
         // ============================================================
         const authSection = document.getElementById('authSection');
         const adminPanel = document.getElementById('adminPanel');
-        const authButton = document.getElementById('authButton');
         const authError = document.getElementById('authError');
         const emailInput = document.getElementById('emailInput');
         const passInput = document.getElementById('passInput');
+        const authButton = document.getElementById('authButton');
         const userEmail = document.getElementById('userEmail');
         const logoutBtn = document.getElementById('logoutBtn');
+
+        const addProductBtn = document.getElementById('addProductBtn');
+        const formProducto = document.getElementById('formProducto');
+        const saveProductBtn = document.getElementById('saveProductBtn');
+        const cancelProductBtn = document.getElementById('cancelProductBtn');
+
+        const addPromoBtn = document.getElementById('addPromoBtn');
+        const formPromo = document.getElementById('formPromo');
+        const savePromoBtn = document.getElementById('savePromoBtn');
+        const cancelPromoBtn = document.getElementById('cancelPromoBtn');
 
         // ============================================================
         //  AUTENTICACIÓN
@@ -412,24 +530,13 @@
                 authError.textContent = 'Completá ambos campos.';
                 return;
             }
-            if (pass.length < 6) {
-                authError.textContent = 'La contraseña debe tener al menos 6 caracteres.';
-                return;
-            }
-
             authError.textContent = '';
-
-            // Login
             auth.signInWithEmailAndPassword(email, pass)
-                .then(userCredential => {
-                    // Éxito
-                })
                 .catch(error => {
                     authError.textContent = error.message;
                 });
         });
 
-        // Enter para enviar
         passInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') authButton.click();
         });
@@ -437,26 +544,20 @@
             if (e.key === 'Enter') authButton.click();
         });
 
-        // ============================================================
-        //  ESTADO DE AUTENTICACIÓN
-        // ============================================================
         auth.onAuthStateChanged(user => {
             if (user) {
-                // Usuario autenticado
                 authSection.style.display = 'none';
                 adminPanel.classList.add('active');
                 userEmail.textContent = user.email;
                 cargarDatos();
-                // Resetear formulario de promoción
+                ocultarFormProducto();
                 ocultarFormPromo();
             } else {
-                // No autenticado
                 authSection.style.display = 'block';
                 adminPanel.classList.remove('active');
                 authError.textContent = '';
-                // Limpiar campos (pero mantener el email prellenado)
+                emailInput.value = '';
                 passInput.value = '';
-                // Desconectar listeners de Firebase
                 db.ref('products').off();
                 db.ref('promotions').off();
             }
@@ -479,7 +580,6 @@
             db.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) {
-                    // Si no hay productos, crear por defecto
                     crearProductosDefault();
                     return;
                 }
@@ -498,15 +598,45 @@
             productos.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'product-item';
+
+                const badgeHtml = p.badge ?
+                    `<span class="badge-preview">${p.badge}</span>` :
+                    '';
+
+                // Mostrar categoría y tiempo si existen
+                const metaHtml = `
+                    <div class="meta">
+                        ${p.categoria ? `<span>📂 ${p.categoria}</span>` : ''}
+                        ${p.tiempoPreparacion ? `<span>⏱️ ${p.tiempoPreparacion} min</span>` : ''}
+                    </div>
+                `;
+
                 div.innerHTML = `
-                    <span class="name">${p.name} ${p.badge ? '<span style="background:#e63946;padding:2px 8px;border-radius:20px;font-size:0.7rem;color:#fff;">'+p.badge+'</span>' : ''}</span>
-                    <label>💰 Precio: <input type="number" value="${p.price}" data-id="${p.id}" class="price-input"></label>
-                    <label>📦 Disponible: <input type="checkbox" ${p.available !== false ? 'checked' : ''} data-id="${p.id}" class="avail-input"></label>
-                    <button onclick="actualizarProducto('${p.id}')">Guardar</button>
+                    <div style="flex:1; min-width:150px;">
+                        <div class="name">${p.name} ${badgeHtml}</div>
+                        ${metaHtml}
+                    </div>
+                    <label>💰 Precio: <input type="number" value="${p.price}" data-id="${p.id}" class="price-input" /></label>
+                    <label>📦 Disponible: <input type="checkbox" ${p.available !== false ? 'checked' : ''} data-id="${p.id}" class="avail-input" /></label>
+                    <div class="actions">
+                        <button onclick="actualizarProducto('${p.id}')">Guardar</button>
+                        <button onclick="eliminarProducto('${p.id}')" style="background:#f44336; color:#fff;">🗑️</button>
+                    </div>
                 `;
                 list.appendChild(div);
             });
         }
+
+        // Función para eliminar producto
+        window.eliminarProducto = async function(id) {
+            if (!confirm(`¿Eliminar el producto "${id}" permanentemente?`)) return;
+            try {
+                await db.ref('products/' + id).remove();
+                alert('✅ Producto eliminado');
+            } catch (error) {
+                alert('❌ Error al eliminar: ' + error.message);
+            }
+        };
 
         window.actualizarProducto = async function(id) {
             const priceInput = document.querySelector(`.price-input[data-id="${id}"]`);
@@ -516,25 +646,25 @@
             const available = availInput.checked;
             try {
                 await db.ref('products/' + id).update({ price, available });
-                alert('✅ Producto actualizado correctamente');
+                alert('✅ Producto actualizado');
             } catch (error) {
-                alert('❌ Error al actualizar: ' + error.message);
+                alert('❌ Error: ' + error.message);
             }
         };
 
         function crearProductosDefault() {
             const defaultProducts = [
-                { id: 'armatuburger', name: 'Armá tu Burger', price: 12000, desc: '1 medallón 120gr · doble cheddar · salsa Tech.', hasExtras: true, badge: 'BASE', imagen: 'images/arm.jpg', popupImg: 'images/bn1.webp', available: true },
-                { id: 'doblep', name: 'Doble Provoleta', price: 18000, desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.', hasExtras: false, badge: null, imagen: 'images/pro.jpg', popupImg: 'images/bn2.webp', available: true },
-                { id: 'intense', name: 'Intense', price: 18000, desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/int.jpg', popupImg: 'images/bn3.webp', available: true },
-                { id: 'techmex', name: 'Tech Mex', price: 18000, desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/mex.jpg', popupImg: 'images/bn4.webp', available: true },
-                { id: 'yankee', name: 'Yankee', price: 16000, desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.', hasExtras: false, badge: null, imagen: 'images/yan.jpg', popupImg: 'images/bn5.webp', available: true },
-                { id: 'clasica', name: 'Clásica', price: 16000, desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.', hasExtras: false, badge: null, imagen: 'images/cla.jpg', popupImg: 'images/bn6.webp', available: true }
+                { id: 'armatuburger', name: 'Armá tu Burger', price: 12000, desc: '1 medallón 120gr · doble cheddar · salsa Tech.', hasExtras: true, badge: 'BASE', imagen: 'images/arm.jpg', popupImg: 'images/bn1.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15 },
+                { id: 'doblep', name: 'Doble Provoleta', price: 18000, desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.', hasExtras: false, badge: null, imagen: 'images/pro.jpg', popupImg: 'images/bn2.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20 },
+                { id: 'intense', name: 'Intense', price: 18000, desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/int.jpg', popupImg: 'images/bn3.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20 },
+                { id: 'techmex', name: 'Tech Mex', price: 18000, desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/mex.jpg', popupImg: 'images/bn4.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20 },
+                { id: 'yankee', name: 'Yankee', price: 16000, desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.', hasExtras: false, badge: null, imagen: 'images/yan.jpg', popupImg: 'images/bn5.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 18 },
+                { id: 'clasica', name: 'Clásica', price: 16000, desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.', hasExtras: false, badge: null, imagen: 'images/cla.jpg', popupImg: 'images/bn6.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15 }
             ];
             defaultProducts.forEach(p => {
                 db.ref('products/' + p.id).set(p);
             });
-            // Crear una promoción de ejemplo
+            // Promoción de ejemplo
             db.ref('promotions').push({
                 title: 'Promo 2x1',
                 description: 'Llevá dos burgers por el precio de una',
@@ -545,12 +675,91 @@
             });
         }
 
+        // ---- CREAR NUEVO PRODUCTO ----
+        function mostrarFormProducto() {
+            formProducto.classList.add('active');
+            document.getElementById('prodNombre').value = '';
+            document.getElementById('prodPrecio').value = '';
+            document.getElementById('prodDesc').value = '';
+            document.getElementById('prodImagen').value = '';
+            document.getElementById('prodPopupImg').value = '';
+            document.getElementById('prodBadge').value = '';
+            document.getElementById('prodId').value = '';
+            document.getElementById('prodCategoria').value = 'Hamburguesas';
+            document.getElementById('prodTiempo').value = 15;
+            document.getElementById('prodHasExtras').checked = false;
+            document.getElementById('prodDisponible').checked = true;
+        }
+
+        function ocultarFormProducto() {
+            formProducto.classList.remove('active');
+        }
+
+        addProductBtn.addEventListener('click', mostrarFormProducto);
+        cancelProductBtn.addEventListener('click', ocultarFormProducto);
+
+        saveProductBtn.addEventListener('click', async function() {
+            const nombre = document.getElementById('prodNombre').value.trim();
+            const precio = parseInt(document.getElementById('prodPrecio').value.trim());
+            const desc = document.getElementById('prodDesc').value.trim();
+            const imagen = document.getElementById('prodImagen').value.trim();
+            const popupImg = document.getElementById('prodPopupImg').value.trim();
+            const badge = document.getElementById('prodBadge').value.trim() || null;
+            const id = document.getElementById('prodId').value.trim().toLowerCase().replace(/\s+/g, '-');
+            const categoria = document.getElementById('prodCategoria').value;
+            const tiempoPreparacion = parseInt(document.getElementById('prodTiempo').value) || 15;
+            const hasExtras = document.getElementById('prodHasExtras').checked;
+            const disponible = document.getElementById('prodDisponible').checked;
+
+            if (!nombre || !precio || !id) {
+                alert('❌ Nombre, precio e ID son obligatorios.');
+                return;
+            }
+            if (isNaN(precio) || precio <= 0) {
+                alert('❌ Ingresá un precio válido.');
+                return;
+            }
+            if (!/^[a-z0-9\-]+$/.test(id)) {
+                alert('❌ El ID solo puede contener letras minúsculas, números y guiones. Sin espacios.');
+                return;
+            }
+
+            const snapshot = await db.ref('products/' + id).once('value');
+            if (snapshot.exists()) {
+                alert('❌ Ya existe un producto con ese ID. Usá otro.');
+                return;
+            }
+
+            const nuevoProducto = {
+                id: id,
+                name: nombre,
+                price: precio,
+                desc: desc || '',
+                imagen: imagen || 'images/placeholder.jpg',
+                popupImg: popupImg || imagen || 'images/placeholder.jpg',
+                badge: badge,
+                categoria: categoria,
+                tiempoPreparacion: tiempoPreparacion,
+                hasExtras: hasExtras,
+                available: disponible
+            };
+
+            try {
+                await db.ref('products/' + id).set(nuevoProducto);
+                alert('✅ Producto creado correctamente');
+                ocultarFormProducto();
+            } catch (error) {
+                alert('❌ Error al crear: ' + error.message);
+            }
+        });
+
         // ---- PROMOCIONES ----
         function cargarPromociones() {
             db.ref('promotions').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) {
-                    document.getElementById('promoList').innerHTML = '<p style="color:#b8d0b8;">No hay promociones aún.</p>';
+                    document.getElementById('promoList').innerHTML =
+                    '<p style="color:#b8d0b8;">No hay promociones aún.</p>';
                     return;
                 }
                 const promos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
@@ -579,9 +788,8 @@
             });
         }
 
-        // ---- CRUD Promociones ----
         function mostrarFormPromo() {
-            document.getElementById('formPromo').classList.add('active');
+            formPromo.classList.add('active');
             document.getElementById('promoTitulo').value = '';
             document.getElementById('promoDesc').value = '';
             document.getElementById('promoImagen').value = '';
@@ -591,13 +799,13 @@
         }
 
         function ocultarFormPromo() {
-            document.getElementById('formPromo').classList.remove('active');
+            formPromo.classList.remove('active');
         }
 
-        document.getElementById('addPromoBtn').addEventListener('click', mostrarFormPromo);
-        document.getElementById('cancelPromoBtn').addEventListener('click', ocultarFormPromo);
+        addPromoBtn.addEventListener('click', mostrarFormPromo);
+        cancelPromoBtn.addEventListener('click', ocultarFormPromo);
 
-        document.getElementById('savePromoBtn').addEventListener('click', async function() {
+        savePromoBtn.addEventListener('click', async function() {
             const titulo = document.getElementById('promoTitulo').value.trim();
             const desc = document.getElementById('promoDesc').value.trim();
             if (!titulo || !desc) {
