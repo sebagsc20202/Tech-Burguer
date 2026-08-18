@@ -110,24 +110,6 @@
             margin-top: 4px;
         }
 
-        /* ===== BOTÓN DE RECARGA MANUAL (para depuración) ===== */
-        .btn-reload {
-            background: #3a5a3a;
-            color: #e8f0e8;
-            border: 2px solid #ffb703;
-            border-radius: 40px;
-            padding: 8px 16px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 6px;
-            display: inline-block;
-        }
-        .btn-reload:hover {
-            background: #4a6a4a;
-        }
-
         /* ===== PROMO BANNER ===== */
         #promoBanner {
             display: none;
@@ -1331,8 +1313,6 @@
                 <div id="statusText">⏳ Cargando...</div>
                 <div class="horario">Mar–Dom · 20:00 a 00:00</div>
             </div>
-            <!-- Botón de recarga manual (para depuración) -->
-            <button class="btn-reload" id="btnReloadEstado">🔄 Recargar estado</button>
         </div>
 
         <!-- ===== BANNER DE PROMOCIONES ===== -->
@@ -1529,7 +1509,7 @@
         }
 
         // ============================================================
-        //  INDICADOR ABIERTO/CERRADO (CON LOGS Y CORRECCIÓN DE ZONA)
+        //  INDICADOR ABIERTO/CERRADO
         // ============================================================
         function actualizarEstado() {
             const now = new Date();
@@ -1539,7 +1519,6 @@
             const horaMin = hora + minutos / 60;
             const hoyStr = getHoyLocal();
 
-            // ---- Verificar excepciones ----
             let excepcionesActivas = [];
             if (window.excepciones && window.excepciones.length > 0) {
                 excepcionesActivas = window.excepciones.filter(ex => {
@@ -1586,7 +1565,6 @@
                     estado = 'cerrado';
                 }
             } else {
-                // Comportamiento normal
                 if (dia === 1) {
                     estado = 'cerrado';
                 } else {
@@ -1638,24 +1616,6 @@
         }
 
         // ============================================================
-        //  BOTÓN DE RECARGA MANUAL
-        // ============================================================
-        document.getElementById('btnReloadEstado').addEventListener('click', function() {
-            db.ref('excepciones').once('value').then((snapshot) => {
-                const data = snapshot.val();
-                if (!data) {
-                    window.excepciones = [];
-                } else {
-                    window.excepciones = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                }
-                actualizarEstado();
-                alert('✅ Estado recargado');
-            }).catch(err => {
-                alert('❌ Error al recargar');
-            });
-        });
-
-        // ============================================================
         //  CARGAR PRODUCTOS (DESDE FIREBASE)
         // ============================================================
         function cargarProductos() {
@@ -1688,7 +1648,6 @@
                 card.className = 'product-card';
                 card.dataset.id = p.id;
 
-                // Botón cancelar
                 const cancelBtn = document.createElement('button');
                 cancelBtn.className = 'btn-cancelar-item';
                 cancelBtn.dataset.productId = p.id;
@@ -1696,7 +1655,6 @@
                 cancelBtn.title = 'Cancelar esta Tech';
                 card.appendChild(cancelBtn);
 
-                // Imagen
                 const imgDiv = document.createElement('div');
                 imgDiv.className = 'product-img';
                 const img = document.createElement('img');
@@ -1706,7 +1664,6 @@
                 imgDiv.appendChild(img);
                 card.appendChild(imgDiv);
 
-                // Info
                 const info = document.createElement('div');
                 info.className = 'product-info';
 
@@ -1725,7 +1682,6 @@
                 desc.className = 'product-desc';
                 desc.textContent = p.desc || '';
 
-                // Categoría y tiempo (si existen)
                 if (p.categoria || p.tiempoPreparacion) {
                     const meta = document.createElement('div');
                     meta.style.cssText = 'font-size:0.75rem; color:#8aaa8a; margin-top:4px; display:flex; gap:12px; flex-wrap:wrap;';
@@ -1745,7 +1701,6 @@
                 const extras = document.createElement('div');
                 extras.className = 'product-extras';
 
-                // Cantidad
                 const qtyWrap = document.createElement('div');
                 qtyWrap.className = 'qty-wrap';
                 const qtyLabel = document.createElement('label');
@@ -1761,7 +1716,6 @@
                 qtyWrap.appendChild(qtyInput);
                 extras.appendChild(qtyWrap);
 
-                // Extras (medallones y toppings)
                 if (p.hasExtras) {
                     const extraMed = document.createElement('label');
                     extraMed.innerHTML = '➕ Medallones extra <span style="color:#ffb703;">($4.000 c/u)</span>';
