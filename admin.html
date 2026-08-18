@@ -426,6 +426,7 @@
             font-weight: 600;
         }
 
+        /* ===== PROMOCIONES (con checkbox) ===== */
         .promo-item .info {
             flex: 1;
             min-width: 150px;
@@ -434,27 +435,47 @@
             font-size: 0.8rem;
             color: #b8d0b8;
         }
-        .promo-item .status {
-            font-weight: 600;
+        .promo-item label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+        .promo-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #ffb703;
+            cursor: pointer;
         }
         .promo-item .actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
+            align-items: center;
+            margin-left: auto;
         }
-        .btn-danger {
-            background: #f44336 !important;
-            color: #fff !important;
+        .promo-item .actions button {
+            border: none;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-        .btn-danger:hover {
-            background: #d32f2f !important;
+        .promo-item .actions .btn-editar-promo {
+            background: #2196F3;
+            color: #fff;
         }
-        .btn-edit-promo {
-            background: #2196F3 !important;
-            color: #fff !important;
+        .promo-item .actions .btn-editar-promo:hover {
+            background: #1976D2;
         }
-        .btn-edit-promo:hover {
-            background: #1976D2 !important;
+        .promo-item .actions .btn-eliminar-promo {
+            background: #f44336;
+            color: #fff;
+        }
+        .promo-item .actions .btn-eliminar-promo:hover {
+            background: #d32f2f;
         }
 
         .hidden {
@@ -471,6 +492,10 @@
                 justify-content: space-between;
             }
             .product-item .actions {
+                margin-left: 0;
+                justify-content: flex-end;
+            }
+            .promo-item .actions {
                 margin-left: 0;
                 justify-content: flex-end;
             }
@@ -522,7 +547,6 @@
                 <label for="filtroCategoria">🔍 Filtrar por categoría:</label>
                 <select id="filtroCategoria">
                     <option value="todas">Todas</option>
-                    <!-- Las opciones se llenarán dinámicamente -->
                 </select>
             </div>
 
@@ -708,7 +732,6 @@
         const savePromoBtn = document.getElementById('savePromoBtn');
         const cancelPromoBtn = document.getElementById('cancelPromoBtn');
 
-        // Filtro
         const filtroCategoria = document.getElementById('filtroCategoria');
 
         // ============================================================
@@ -761,7 +784,7 @@
         // ============================================================
         //  CARGA DE DATOS
         // ============================================================
-        let productosCompletos = []; // Guardamos todos los productos sin filtrar
+        let productosCompletos = [];
         let categoriasUnicas = [];
 
         function cargarDatos() {
@@ -778,26 +801,19 @@
                     return;
                 }
                 productosCompletos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                // Ordenar por 'orden'
                 productosCompletos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
 
-                // Extraer categorías únicas para el filtro
                 const categorias = new Set();
                 productosCompletos.forEach(p => {
                     if (p.categoria) categorias.add(p.categoria);
                 });
                 categoriasUnicas = Array.from(categorias).sort();
-
-                // Actualizar opciones del filtro
                 actualizarOpcionesFiltro();
-
-                // Aplicar filtro
                 aplicarFiltro();
             });
         }
 
         function actualizarOpcionesFiltro() {
-            // Mantener la selección actual si es posible
             const valorActual = filtroCategoria.value;
             filtroCategoria.innerHTML = '<option value="todas">Todas</option>';
             categoriasUnicas.forEach(cat => {
@@ -806,7 +822,6 @@
                 opt.textContent = cat;
                 filtroCategoria.appendChild(opt);
             });
-            // Restaurar selección
             if (categoriasUnicas.includes(valorActual) || valorActual === 'todas') {
                 filtroCategoria.value = valorActual;
             } else {
@@ -823,7 +838,6 @@
             renderProductos(productosFiltrados);
         }
 
-        // Escuchar cambios en el filtro
         filtroCategoria.addEventListener('change', aplicarFiltro);
 
         function renderProductos(productos) {
@@ -848,7 +862,6 @@
                     </div>
                 `;
 
-                // Deshabilitar botones de movimiento si es el primero o último (dentro del filtro)
                 const isFirst = index === 0;
                 const isLast = index === productos.length - 1;
 
@@ -871,7 +884,6 @@
             });
         }
 
-        // ---- MOVER PRODUCTO (orden) ----
         window.moverProducto = async function(id, direccion) {
             const snapshot = await db.ref('products').once('value');
             const data = snapshot.val();
@@ -894,7 +906,6 @@
             await db.ref().update(updates);
         };
 
-        // ---- EDITAR PRODUCTO ----
         window.editarProducto = async function(id) {
             try {
                 const snapshot = await db.ref('products/' + id).once('value');
@@ -927,7 +938,6 @@
             }
         };
 
-        // ---- ELIMINAR PRODUCTO ----
         window.eliminarProducto = async function(id) {
             if (!confirm(`¿Eliminar el producto "${id}" permanentemente?`)) return;
             try {
@@ -938,7 +948,6 @@
             }
         };
 
-        // ---- ACTUALIZAR PRECIO Y DISPONIBILIDAD ----
         window.actualizarProducto = async function(id) {
             const priceInput = document.querySelector(`.price-input[data-id="${id}"]`);
             const availInput = document.querySelector(`.avail-input[data-id="${id}"]`);
@@ -953,7 +962,6 @@
             }
         };
 
-        // ---- CREAR PRODUCTOS POR DEFECTO ----
         function crearProductosDefault() {
             const defaultProducts = [
                 { id: 'armatuburger', name: 'Armá tu Burger', price: 12000, desc: '1 medallón 120gr · doble cheddar · salsa Tech.', hasExtras: true, badge: 'BASE', imagen: 'images/arm.jpg', popupImg: 'images/bn1.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15, orden: 0 },
@@ -1079,7 +1087,9 @@
             }
         });
 
-        // ---- PROMOCIONES ----
+        // ============================================================
+        //  PROMOCIONES CON CHECKBOX "ACTIVA" EN LA LISTA
+        // ============================================================
         function cargarPromociones() {
             db.ref('promotions').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1099,21 +1109,59 @@
             promos.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'promo-item';
+
+                // Fechas formateadas
+                const fechaInicio = p.startDate ? new Date(p.startDate).toLocaleDateString('es-AR') : '';
+                const fechaFin = p.endDate ? new Date(p.endDate).toLocaleDateString('es-AR') : '';
+
                 div.innerHTML = `
                     <div class="info">
                         <strong>${p.title}</strong> — ${p.description}
                     </div>
-                    <div class="dates">${p.startDate || ''} → ${p.endDate || ''}</div>
-                    <div class="status">${p.active ? '✅ Activa' : '❌ Inactiva'}</div>
+                    <div class="dates">${fechaInicio} ${fechaInicio && fechaFin ? '→' : ''} ${fechaFin}</div>
+                    <label>
+                        <input type="checkbox" ${p.active !== false ? 'checked' : ''} data-id="${p.id}" class="promo-active-check" />
+                        Activa
+                    </label>
                     <div class="actions">
-                        <button class="btn-edit-promo" onclick="editarPromocion('${p.id}')">✏️ Editar</button>
-                        <button class="btn-danger" onclick="eliminarPromocion('${p.id}')">🗑️ Eliminar</button>
+                        <button class="btn-editar-promo" onclick="editarPromocion('${p.id}')">✏️ Editar</button>
+                        <button class="btn-eliminar-promo" onclick="eliminarPromocion('${p.id}')">🗑️</button>
                     </div>
                 `;
                 list.appendChild(div);
             });
+
+            // Agregar eventos a los checkboxes de promociones
+            document.querySelectorAll('.promo-active-check').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const id = this.dataset.id;
+                    const activa = this.checked;
+                    togglePromocion(id, activa);
+                });
+            });
         }
 
+        // Función para activar/desactivar promoción desde el checkbox
+        async function togglePromocion(id, activa) {
+            try {
+                await db.ref('promotions/' + id).update({ active: activa });
+                // Mostrar feedback visual (opcional)
+                const checkbox = document.querySelector(`.promo-active-check[data-id="${id}"]`);
+                if (checkbox) {
+                    checkbox.checked = activa;
+                }
+                // No mostramos alert para no interrumpir, solo actualizamos silenciosamente
+            } catch (error) {
+                alert('❌ Error al actualizar: ' + error.message);
+                // Revertir checkbox
+                const checkbox = document.querySelector(`.promo-active-check[data-id="${id}"]`);
+                if (checkbox) {
+                    checkbox.checked = !activa;
+                }
+            }
+        }
+
+        // ---- CRUD Promociones ----
         function mostrarFormPromo() {
             formPromo.classList.add('active');
             document.getElementById('promoTitulo').value = '';
