@@ -557,7 +557,7 @@
         }
         .excepcion-item .actions .btn-eliminar-excepcion:hover { background: #d32f2f; }
 
-        /* ===== PEDIDOS con scroll y botón WhatsApp ===== */
+        /* ===== PEDIDOS (con scroll y botón WhatsApp) ===== */
         .pedido-list-wrapper {
             max-height: 480px; /* 3 pedidos aprox */
             overflow-y: auto;
@@ -590,6 +590,7 @@
             gap: 12px;
         }
         .pedido-item .info { flex: 2; min-width: 200px; }
+        .pedido-item .info strong { color: #ffb703; }
         .pedido-item .estado-label { font-weight: 600; min-width: 80px; }
         .pedido-item .actions {
             display: flex;
@@ -1083,7 +1084,7 @@
             cargarPedidos();
         }
 
-        // ---- PRODUCTOS (código abreviado pero completo) ----
+        // ---- PRODUCTOS (código abreviado, pero completo) ----
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1715,10 +1716,8 @@
         });
 
         // ============================================================
-        //  PEDIDOS CON NOTIFICACIONES POR WHATSAPP PERSONALIZADAS
+        //  PEDIDOS (con total y hora en negrita + mensaje personalizado)
         // ============================================================
-        const MAPS_URL_LOCAL = 'https://bit.ly/4xOCf1o'; // Cambiar por la dirección real
-
         function cargarPedidos() {
             db.ref('pedidos').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1743,6 +1742,58 @@
 
         filtroEstado.addEventListener('change', aplicarFiltroPedidos);
 
+        // Función para generar mensaje de WhatsApp según estado y tipo de envío
+        function generarMensajeWhatsApp(pedido, estado) {
+            const nombreCliente = pedido.nombre || 'Cliente';
+            let mensaje = '';
+
+            // Determinar estado amigable
+            let estadoTexto = '';
+            switch (estado) {
+                case 'pendiente':
+                    estadoTexto = 'recibido y está en cola de preparación';
+                    break;
+                case 'preparando':
+                    estadoTexto = 'ya está en preparación. ¡En breve estará listo!';
+                    break;
+                case 'listo':
+                    estadoTexto = 'está listo para retirar. ¡Pasá a buscarlo cuando quieras!';
+                    break;
+                case 'entregado':
+                    estadoTexto = 'ya fue entregado. ¡Gracias por elegirnos!';
+                    break;
+                case 'cancelado':
+                    estadoTexto = 'ha sido cancelado. Si tenés dudas, contactanos.';
+                    break;
+                default:
+                    estadoTexto = 'está siendo procesado';
+            }
+
+            // Personalizar según tipo de envío
+            const envio = pedido.envio || 'Retiro en local';
+            const direccion = pedido.direccion || '';
+
+            if (envio.includes('Entrega') || envio.includes('domicilio')) {
+                mensaje = `🍔 *Tech Classic Burgers* 🍔\n\nHola ${nombreCliente}, tu pedido ${estadoTexto}\n\n🚚 *Envío a domicilio*\n📍 Dirección: ${direccion || 'No especificada'}\n\n📦 *Detalle del pedido:*\n`;
+            } else {
+                mensaje = `🍔 *Tech Classic Burgers* 🍔\n\nHola ${nombreCliente}, tu pedido ${estadoTexto}\n\n📍 *Retiro en local*\n📍 Dirección: https://bit.ly/4xOCf1o\n\n📦 *Detalle del pedido:*\n`;
+            }
+
+            // Agregar productos
+            if (pedido.productos && pedido.productos.length > 0) {
+                pedido.productos.forEach(prod => {
+                    mensaje += `• ${prod.cantidad}x ${prod.nombre}`;
+                    if (prod.medallonesExtra) mensaje += ` (+${prod.medallonesExtra} medallones extra)`;
+                    if (prod.toppings) mensaje += ` (${prod.toppings})`;
+                    mensaje += `\n`;
+                });
+            }
+
+            mensaje += `\n💰 *Total:* $${(pedido.total || 0).toLocaleString()}`;
+            mensaje += `\n\n📲 ¡Gracias por tu pedido!`;
+            return mensaje;
+        }
+
         function renderPedidos(pedidos) {
             const list = document.getElementById('pedidoList');
             list.innerHTML = '';
@@ -1753,27 +1804,40 @@
             pedidos.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'pedido-item';
-                const fecha = p.fecha ? new Date(p.fecha).toLocaleString('es-AR') : 'Fecha desconocida';
-                const productosResumen = p.productos ? p.productos.map(prod => `${prod.cantidad}x ${prod.nombre}`).join(', ') : 'Sin productos';
+
+                // Formatear fecha y hora
+                let fechaHora = 'Fecha desconocida';
+                let horaStr = '';
+                if (p.fecha) {
+                    const fechaObj = new Date(p.fecha);
+                    fechaHora = fechaObj.toLocaleDateString('es-AR') + ' ' + fechaObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+                    horaStr = fechaObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+                }
+
                 const total = p.total ? `$${p.total.toLocaleString()}` : '$0';
                 const estadoColor = p.estado === 'pendiente' ? '#ffb703' :
                                     p.estado === 'preparando' ? '#4caf50' :
                                     p.estado === 'listo' ? '#2196F3' :
                                     p.estado === 'entregado' ? '#8aaa8a' : '#f44336';
-                const telefono = p.telefono || '';
-                const nombreCliente = p.nombre || 'Cliente';
-                const tipoEnvio = p.envio || 'Retiro en local';
-                const direccion = p.direccion || '';
 
+                // Construir el HTML con total y hora en negrita
                 div.innerHTML = `
                     <div class="info">
-                        <div><strong>${nombreCliente}</strong> (${telefono})</div>
-                        <div style="font-size:0.8rem; color:#b8d0b8;">${fecha}</div>
-                        <div style="font-size:0.8rem; color:#b8d0b8;">📦 ${productosResumen}</div>
-                        <div style="font-size:0.8rem; color:#b8d0b8;">💳 ${p.metodoPago || 'N/E'} · 🚚 ${tipoEnvio}</div>
-                        ${p.direccion ? `<div style="font-size:0.8rem; color:#b8d0b8;">📍 ${direccion}</div>` : ''}
+                        <div><strong>${p.nombre || 'Sin nombre'}</strong> (${p.telefono || 'Sin teléfono'})</div>
+                        <div style="font-size:0.8rem; color:#b8d0b8;">
+                            <strong>${fechaHora}</strong> · <strong>${total}</strong>
+                        </div>
+                        <div style="font-size:0.8rem; color:#b8d0b8;">
+                            📦 ${p.productos ? p.productos.map(prod => `${prod.cantidad}x ${prod.nombre}`).join(', ') : 'Sin productos'}
+                        </div>
+                        <div style="font-size:0.8rem; color:#b8d0b8;">
+                            💳 ${p.metodoPago || 'N/E'} · 🚚 ${p.envio || 'N/E'}
+                            ${p.direccion ? ` · 📍 ${p.direccion}` : ''}
+                        </div>
                     </div>
-                    <div class="estado-label" style="color:${estadoColor};">${p.estado || 'pendiente'}</div>
+                    <div class="estado-label" style="color:${estadoColor};">
+                        ${p.estado || 'pendiente'}
+                    </div>
                     <label style="display:flex; align-items:center; gap:4px; font-size:0.8rem;">
                         Estado:
                         <select class="estado-select" data-id="${p.id}">
@@ -1785,10 +1849,10 @@
                         </select>
                     </label>
                     <div class="actions">
-                        <button class="btn-whatsapp" onclick="abrirWhatsAppPedido('${p.id}')" title="Notificar al cliente por WhatsApp">
-                            💬
+                        <button class="btn-whatsapp" onclick="abrirWhatsApp('${p.id}')" title="Enviar mensaje por WhatsApp">
+                            💬 WhatsApp
                         </button>
-                        <button class="btn-eliminar-pedido" onclick="eliminarPedido('${p.id}')" title="Eliminar pedido">🗑️</button>
+                        <button class="btn-eliminar-pedido" onclick="eliminarPedido('${p.id}')" title="Eliminar pedido permanentemente">🗑️</button>
                     </div>
                 `;
                 list.appendChild(div);
@@ -1799,7 +1863,42 @@
                 select.removeEventListener('change', handleEstadoChange);
                 select.addEventListener('change', handleEstadoChange);
             });
+
+            // Ajustar scroll wrapper si hay más de 3 pedidos
+            const wrapper = document.getElementById('pedidoListWrapper');
+            if (pedidos.length > 3) {
+                wrapper.style.maxHeight = '480px';
+            } else {
+                wrapper.style.maxHeight = 'auto';
+            }
         }
+
+        // Función para abrir WhatsApp con mensaje personalizado
+        window.abrirWhatsApp = function(id) {
+            const pedido = pedidosActuales.find(p => p.id === id);
+            if (!pedido) {
+                mostrarToast('Pedido no encontrado', 'error');
+                return;
+            }
+            const telefono = pedido.telefono;
+            if (!telefono) {
+                mostrarToast('El pedido no tiene número de teléfono', 'error');
+                return;
+            }
+            // Limpiar teléfono (solo dígitos)
+            const telefonoLimpio = telefono.replace(/\D/g, '');
+            if (telefonoLimpio.length < 8) {
+                mostrarToast('Número de teléfono inválido', 'error');
+                return;
+            }
+            // Obtener el estado actual (del select)
+            const select = document.querySelector(`.estado-select[data-id="${id}"]`);
+            const estado = select ? select.value : pedido.estado || 'pendiente';
+
+            const mensaje = generarMensajeWhatsApp(pedido, estado);
+            const url = `https://wa.me/${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+        };
 
         function handleEstadoChange(e) {
             const select = e.target;
@@ -1809,81 +1908,6 @@
                 .then(() => mostrarToast('Estado actualizado', 'success'))
                 .catch(err => mostrarToast('Error: ' + err.message, 'error'));
         }
-
-        // ===== FUNCIÓN PARA ABRIR WHATSAPP CON MENSAJE PERSONALIZADO =====
-        window.abrirWhatsAppPedido = function(id) {
-            const pedido = pedidosActuales.find(p => p.id === id);
-            if (!pedido) {
-                mostrarToast('Pedido no encontrado', 'error');
-                return;
-            }
-
-            const telefono = pedido.telefono || '';
-            if (!telefono) {
-                mostrarToast('El cliente no tiene número de teléfono', 'error');
-                return;
-            }
-
-            const nombre = pedido.nombre || 'Cliente';
-            const estado = pedido.estado || 'pendiente';
-            const tipoEnvio = pedido.envio || 'Retiro en local';
-            const direccion = pedido.direccion || '';
-
-            // Mensaje según estado y tipo de envío
-            let mensaje = `🍔 *Tech Classic Burgers* · Actualización de tu pedido\n\n`;
-            mensaje += `Hola *${nombre}*! 👋\n\n`;
-
-            // Estado con variante según envío
-            switch(estado) {
-                case 'pendiente':
-                    mensaje += `✅ Tu pedido ha sido recibido y está en cola de preparación.`;
-                    if (tipoEnvio.includes('domicilio') || tipoEnvio.includes('Entrega')) {
-                        mensaje += ` En breve te avisamos cuando salga el repartidor.`;
-                    } else {
-                        mensaje += ` Podés pasar a retirarlo cuando te avisemos.`;
-                    }
-                    break;
-                case 'preparando':
-                    mensaje += `👨‍🍳 Tu pedido ya está en preparación.`;
-                    if (tipoEnvio.includes('domicilio') || tipoEnvio.includes('Entrega')) {
-                        mensaje += ` En breve el repartidor saldrá con tu pedido.`;
-                    } else {
-                        mensaje += ` En unos minutos estará listo para que pases a buscarlo.`;
-                    }
-                    break;
-                case 'listo':
-                    mensaje += `🍔 Tu pedido está listo.`;
-                    if (tipoEnvio.includes('domicilio') || tipoEnvio.includes('Entrega')) {
-                        mensaje += ` El repartidor ya salió con tu pedido. ¡Llegará en breve!`;
-                    } else {
-                        mensaje += ` ¡Pasá a buscarlo cuando quieras! Te esperamos !!!`;
-                        mensaje += `\n📍 ${MAPS_URL_LOCAL}`;
-                    }
-                    break;
-                case 'entregado':
-                    mensaje += `🚚 Tu pedido ya fue entregado.`;
-                    if (tipoEnvio.includes('domicilio') || tipoEnvio.includes('Entrega')) {
-                        mensaje += ` ¡Disfrutá tu comida! 🍔`;
-                    } else {
-                        mensaje += ` ¡Gracias por elegir Tech Classic Burgers! 🍔`;
-                    }
-                    break;
-                case 'cancelado':
-                    mensaje += `❌ Tu pedido ha sido cancelado.`;
-                    mensaje += ` Si tenés dudas, contactanos al *351-8692251* o por este mismo chat.`;
-                    break;
-                default:
-                    mensaje += `Tu pedido está en estado: *${estado}*`;
-            }
-
-            mensaje += `\n\n¡Gracias por confiar en nosotros! 🙌`;
-            mensaje += `\n📲 *Tech Classic Burgers*`;
-
-            // Limpiar el número (solo dígitos)
-            const telefonoLimpio = telefono.replace(/\D/g, '');
-            // Abrir WhatsApp
-            window.open(`https://wa.me/${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
-        };
 
         window.eliminarPedido = async function(id) {
             const confirmado = await mostrarConfirm('Eliminar pedido', '¿Eliminar este pedido permanentemente?');
