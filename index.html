@@ -2228,7 +2228,25 @@
         }
 
         // ============================================================
-        //  ENVÍO POR WHATSAPP
+        //  GUARDAR PEDIDO EN FIREBASE
+        // ============================================================
+        function guardarPedidoEnFirebase(datosPedido) {
+            if (typeof db === 'undefined') {
+                console.warn('⚠️ Firebase no inicializado, no se guardó el pedido');
+                return;
+            }
+            const pedido = {
+                ...datosPedido,
+                fecha: new Date().toISOString(),
+                estado: 'pendiente'
+            };
+            db.ref('pedidos').push(pedido)
+                .then(() => console.log('✅ Pedido guardado en Firebase'))
+                .catch(err => console.error('❌ Error al guardar pedido:', err));
+        }
+
+        // ============================================================
+        //  ENVÍO POR WHATSAPP (CON GUARDADO EN FIREBASE)
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
 
@@ -2236,12 +2254,15 @@
             const nombre = document.getElementById('nombre').value.trim();
             const telefono = document.getElementById('telefono').value.trim();
 
+            // Construir mensaje de WhatsApp
             let mensaje = '🍔 *NUEVO PEDIDO - TECH CLASSIC BURGERS* 🍔\n\n';
             mensaje += `👤 *Nombre:* ${nombre}\n`;
             mensaje += `📱 *Teléfono:* ${telefono}\n`;
 
             let tieneProductos = false;
             let totalHamburguesas = 0;
+            const productosPedido = [];
+            let totalPedido = 0;
 
             document.querySelectorAll('.qty-input').forEach(input => {
                 const cant = parseInt(input.value) || 0;
@@ -2249,19 +2270,35 @@
                 if (cant > 0) {
                     const product = productos.find(p => p.id === input.dataset.productId);
                     if (product) {
-                        mensaje += `\n• *${product.name}* x${cant} — $${(cant * product.price).toLocaleString()}`;
+                        const subtotal = cant * product.price;
+                        totalPedido += subtotal;
+                        mensaje += `\n• *${product.name}* x${cant} — $${subtotal.toLocaleString()}`;
                         tieneProductos = true;
+
+                        const item = {
+                            nombre: product.name,
+                            cantidad: cant,
+                            precio: product.price,
+                            subtotal: subtotal
+                        };
+
                         if (product.hasExtras) {
                             const medInput = document.querySelector(`.med-extra-input[data-product-id="${product.id}"]`);
                             if (medInput) {
                                 const mc = parseInt(medInput.value) || 0;
-                                if (mc > 0) mensaje += `\n  ➕ Medallones extra: ${mc} ($${(mc * 4000).toLocaleString()})`;
+                                if (mc > 0) {
+                                    mensaje += `\n  ➕ Medallones extra: ${mc} ($${(mc * 4000).toLocaleString()})`;
+                                    item.medallonesExtra = mc;
+                                }
                             }
                             const checks = document.querySelectorAll(`.topping-check[data-product-id="${product.id}"]:checked`);
                             if (checks.length > 0) {
-                                mensaje += `\n  🧂 Toppings: ${Array.from(checks).map(cb => cb.value).join(', ')}`;
+                                const tops = Array.from(checks).map(cb => cb.value).join(', ');
+                                mensaje += `\n  🧂 Toppings: ${tops}`;
+                                item.toppings = tops;
                             }
                         }
+                        productosPedido.push(item);
                     }
                 }
             });
@@ -2286,19 +2323,35 @@
             const envioLabel = isEntregaSelected() ? 'Entrega a domicilio' : 'Retiro en local';
             mensaje += `\n🚚 *Envío:* ${envioLabel}`;
 
+            let direccion = '';
             if (isEntregaSelected()) {
-                const direccion = direccionInput.value.trim();
+                direccion = direccionInput.value.trim();
                 const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(direccion)}`;
                 mensaje += `\n📍 *Dirección:* ${direccion}`;
                 mensaje += `\n🗺️ *Ver ruta:* ${mapsUrl}`;
                 mensaje += `\n🚚 *Costo envío:* $${COSTO_ENVIO.toLocaleString()}`;
+                totalPedido += COSTO_ENVIO;
             } else {
                 mensaje += `\n📍 *Retirala en este lugar!* https://bit.ly/4xOCf1o`;
             }
 
-            mensaje += `\n\n💰 *TOTAL:* $${calcularTotal().toLocaleString()}`;
+            mensaje += `\n\n💰 *TOTAL:* $${totalPedido.toLocaleString()}`;
             mensaje += '\n\n📲 ¡Gracias por tu pedido!';
 
+            // ===== GUARDAR EN FIREBASE =====
+            const datosPedido = {
+                nombre: nombre,
+                telefono: telefono,
+                productos: productosPedido,
+                total: totalPedido,
+                metodoPago: pagoValue,
+                envio: envioLabel,
+                direccion: direccion || null,
+                totalHamburguesas: totalHamburguesas
+            };
+            guardarPedidoEnFirebase(datosPedido);
+
+            // Abrir WhatsApp
             window.open(`https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(mensaje)}`, '_blank');
             limpiarPedido();
         }
