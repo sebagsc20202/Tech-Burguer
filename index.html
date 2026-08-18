@@ -10,7 +10,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="manifest.json" />
 
-    <!-- ===== TÍTULO ===== -->
     <title>Tech Classic Burgers · Pedido</title>
 
     <!-- ===== FIREBASE SDK ===== -->
@@ -71,35 +70,6 @@
             color: #ffb703;
         }
 
-        /* ===== BANNER DE PROMOCIONES ===== */
-        .promo-banner {
-            background: #2a4a2a;
-            border: 2px solid #ffb703;
-            border-radius: 16px;
-            padding: 12px 16px;
-            margin: 10px 0 16px;
-            display: none;
-            /* se muestra con JS si hay promos activas */
-            text-align: center;
-            box-shadow: 0 0 20px rgba(255, 183, 3, 0.2);
-        }
-        .promo-banner.active {
-            display: block;
-        }
-        .promo-banner .promo-title {
-            color: #ffb703;
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-        .promo-banner .promo-desc {
-            color: #d0e0d0;
-            font-size: 0.9rem;
-        }
-        .promo-banner .promo-dates {
-            color: #8aaa8a;
-            font-size: 0.75rem;
-        }
-
         /* ===== TARJETA DE ESTADO ABIERTO/CERRADO ===== */
         .status-card {
             background: #1f331f;
@@ -138,6 +108,107 @@
             font-weight: 400;
             color: #b8d0b8;
             margin-top: 4px;
+        }
+
+        /* ===== PROMO BANNER (NUEVO) ===== */
+        #promoBanner {
+            display: none;
+            background: linear-gradient(135deg, #1f331f, #2a4a2a);
+            border: 2px solid #ffb703;
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 20px rgba(255, 183, 3, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #promoBanner.active {
+            display: block;
+        }
+
+        .promo-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 8px 0;
+        }
+
+        .promo-item:not(:last-child) {
+            border-bottom: 1px solid #2f4a2f;
+            margin-bottom: 8px;
+        }
+
+        .promo-img-container {
+            flex-shrink: 0;
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #2a4a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ffb703;
+        }
+
+        .promo-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .promo-img-container .emoji {
+            font-size: 3rem;
+        }
+
+        .promo-info {
+            flex: 1;
+        }
+
+        .promo-info h3 {
+            color: #ffb703;
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        .promo-info p {
+            color: #b8d0b8;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .promo-info .fechas {
+            font-size: 0.75rem;
+            color: #6a8a6a;
+            margin-top: 4px;
+        }
+
+        .promo-tag {
+            background: #ffb703;
+            color: #1a1a1a;
+            font-weight: 700;
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 480px) {
+            .promo-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            .promo-img-container {
+                width: 120px;
+                height: 120px;
+            }
+            .promo-tag {
+                align-self: center;
+            }
         }
 
         /* ===== TOAST ===== */
@@ -371,11 +442,6 @@
 
         .product-card:hover {
             border-color: #e63946;
-        }
-        .product-card.disabled {
-            opacity: 0.5;
-            border-color: #555;
-            filter: grayscale(0.6);
         }
 
         .product-img {
@@ -1008,8 +1074,12 @@
             .nav-arrow {
                 font-size: 4.5rem;
             }
-            .nav-arrow-left { left: 8px; }
-            .nav-arrow-right { right: 8px; }
+            .nav-arrow-left {
+                left: 8px;
+            }
+            .nav-arrow-right {
+                right: 8px;
+            }
         }
 
         /* ===== BOTONES FLOTANTES ===== */
@@ -1085,12 +1155,157 @@
             fill: #e8f0e8;
             display: block;
         }
+
+        /* ===== MODALES DE CANTIDAD (inline) ===== */
+        .qty-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .qty-modal.active {
+            display: flex;
+        }
+        .qty-modal-content {
+            background: #1f331f;
+            border-radius: 24px;
+            padding: 28px 20px 20px;
+            border: 2px solid #3a5a3a;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+        }
+        .qty-modal-title {
+            color: #ffb703;
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+        }
+        .qty-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            justify-items: center;
+            margin-bottom: 12px;
+        }
+        .qty-grid button {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-width: 80px;
+            border: none;
+            border-radius: 50%;
+            background: #2a4a2a;
+            color: #fff;
+            font-size: 1.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, transform 0.1s;
+        }
+        .qty-grid button:active {
+            transform: scale(0.92);
+            background: #3a6a3a;
+        }
+        .qty-grid .qty-empty {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .med-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .med-modal.active {
+            display: flex;
+        }
+        .med-modal-content {
+            background: #1f331f;
+            border-radius: 24px;
+            padding: 28px 20px 20px;
+            border: 2px solid #3a5a3a;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            max-width: 280px;
+            width: 85%;
+            text-align: center;
+        }
+        .med-modal-title {
+            color: #ffb703;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 16px;
+        }
+        .med-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            justify-items: center;
+            margin-bottom: 16px;
+        }
+        .med-grid button {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-width: 70px;
+            border: none;
+            border-radius: 50%;
+            background: #2a4a2a;
+            color: #fff;
+            font-size: 1.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, transform 0.1s;
+        }
+        .med-grid button:active {
+            transform: scale(0.92);
+            background: #3a6a3a;
+        }
+        .med-cancelar {
+            width: 100%;
+            border: 2px solid #f44336;
+            border-radius: 40px;
+            background: #3a1a1a;
+            color: #ff6b6b;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 12px 10px;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        .med-cancelar:active {
+            background: #5a2a2a;
+            transform: scale(0.97);
+        }
     </style>
 </head>
 <body>
     <div class="container">
 
-        <!-- BRAND -->
+        <!-- ===== BRAND ===== -->
         <div class="brand">
             <img src="images/icon-512.png" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
@@ -1101,20 +1316,12 @@
         </div>
 
         <!-- ===== BANNER DE PROMOCIONES ===== -->
-        <div id="promoBanner" class="promo-banner">
-            <div class="promo-title" id="promoTitulo">Promoción</div>
-            <div class="promo-desc" id="promoDesc">Descripción</div>
-            <div class="promo-dates" id="promoFechas"></div>
-        </div>
+        <div id="promoBanner"></div>
 
-        <!-- PRODUCTOS -->
-        <div class="product-grid" id="productGrid">
-            <div style="text-align:center; color:#8aaa8a; padding:20px;">
-                ⏳ Cargando productos...
-            </div>
-        </div>
+        <!-- ===== PRODUCTOS ===== -->
+        <div class="product-grid" id="productGrid"></div>
 
-        <!-- FORMULARIO -->
+        <!-- ===== FORMULARIO ===== -->
         <div class="form-section" id="formSection">
             <h2>📋 DATOS DEL PEDIDO</h2>
 
@@ -1185,42 +1392,42 @@
     </div>
 
     <!-- ===== MODALES ===== -->
-    <div id="qtyModal" class="qty-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center; backdrop-filter:blur(4px);">
-        <div style="background:#1f331f; border-radius:24px; padding:28px 20px 20px; border:2px solid #3a5a3a; max-width:320px; width:90%; text-align:center;">
-            <div style="color:#ffb703; font-weight:700; font-size:1.4rem; margin-bottom:20px;">➕ Cuantas querés..?</div>
-            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; justify-items:center; margin-bottom:12px;">
-                <button data-value="1" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">1</button>
-                <button data-value="2" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">2</button>
-                <button data-value="3" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">3</button>
-                <button data-value="4" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">4</button>
-                <button data-value="5" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">5</button>
-                <button data-value="6" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">6</button>
-                <button data-value="7" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">7</button>
-                <button data-value="8" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">8</button>
-                <button data-value="9" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">9</button>
-                <span style="visibility:hidden;"></span>
-                <span style="visibility:hidden;"></span>
-                <span style="visibility:hidden;"></span>
+    <div id="qtyModal" class="qty-modal">
+        <div class="qty-modal-content">
+            <div class="qty-modal-title">➕ Cuantas querés..?</div>
+            <div class="qty-grid">
+                <button data-value="1">1</button>
+                <button data-value="2">2</button>
+                <button data-value="3">3</button>
+                <button data-value="4">4</button>
+                <button data-value="5">5</button>
+                <button data-value="6">6</button>
+                <button data-value="7">7</button>
+                <button data-value="8">8</button>
+                <button data-value="9">9</button>
+                <span class="qty-empty"></span>
+                <span class="qty-empty"></span>
+                <span class="qty-empty"></span>
             </div>
         </div>
     </div>
 
-    <div id="medModal" class="med-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; justify-content:center; align-items:center; backdrop-filter:blur(4px);">
-        <div style="background:#1f331f; border-radius:24px; padding:28px 20px 20px; border:2px solid #3a5a3a; max-width:280px; width:85%; text-align:center;">
-            <div style="color:#ffb703; font-weight:700; font-size:1rem; margin-bottom:16px;">➕ Medallones extra</div>
-            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; justify-items:center; margin-bottom:16px;">
-                <button data-value="1" style="width:100%; aspect-ratio:1/1; max-width:70px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">1</button>
-                <button data-value="2" style="width:100%; aspect-ratio:1/1; max-width:70px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">2</button>
-                <button data-value="3" style="width:100%; aspect-ratio:1/1; max-width:70px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">3</button>
+    <div id="medModal" class="med-modal">
+        <div class="med-modal-content">
+            <div class="med-modal-title">➕ Medallones extra</div>
+            <div class="med-grid">
+                <button data-value="1">1</button>
+                <button data-value="2">2</button>
+                <button data-value="3">3</button>
             </div>
-            <button id="medCancelar" style="width:100%; border:2px solid #f44336; border-radius:40px; background:#3a1a1a; color:#ff6b6b; font-size:1rem; font-weight:600; padding:12px 10px; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">Cancelar</button>
+            <button class="med-cancelar" id="medCancelar">Cancelar</button>
         </div>
     </div>
 
-    <div id="cancelModal" class="cancel-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:99998; justify-content:center; align-items:center; backdrop-filter:blur(4px); padding:16px;">
-        <div style="background:#1f331f; border-radius:24px; padding:40px 30px 30px; border:2px solid #3a5a3a; max-width:340px; width:100%; text-align:center;">
-            <span style="font-size:4rem; display:block; margin-bottom:12px;">👍</span>
-            <div style="font-size:1.4rem; font-weight:700; color:#e8f0e8; line-height:1.4;">Elegí tranquilo</div>
+    <div id="cancelModal" class="cancel-modal">
+        <div class="cancel-modal-content">
+            <span class="emoji">👍</span>
+            <div class="mensaje">Elegí tranquilo</div>
         </div>
     </div>
 
@@ -1274,6 +1481,15 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+        // ============================================================
+        //  VARIABLES GLOBALES
+        // ============================================================
+        let productos = [];
+        const TOPPINGS = [
+            'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
+            'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
+        ];
 
         // ============================================================
         //  REGISTRO DE SERVICE WORKER (PWA)
@@ -1345,96 +1561,43 @@
         }
 
         // ============================================================
-        //  DATOS DESDE FIREBASE (REEMPLAZA EL ARRAY ESTÁTICO)
-        // ============================================================
-        let productos = [];
-        let productosOriginales = []; // para referencia
-        const TOPPINGS = [
-            'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
-            'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
-        ];
-
-        // ============================================================
         //  CARGAR PRODUCTOS DESDE FIREBASE
         // ============================================================
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) {
-                    // Si no hay datos, mostrar mensaje
-                    document.getElementById('productGrid').innerHTML =
-                        '<div style="text-align:center; color:#8aaa8a; padding:20px;">No hay productos disponibles</div>';
+                    console.warn('⚠️ No hay productos en Firebase');
                     return;
                 }
-                // Convertir objeto a array
-                const productosArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                // Filtrar solo los que están disponibles (si se quiere mostrar solo disponibles)
-                // Pero mostraremos todos, con estilo gris los no disponibles
-                productos = productosArray;
-                productosOriginales = productosArray.slice(); // copia
+                productos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 renderProducts();
-                updateTotal();
-                // También cargar promociones
-                cargarPromociones();
-            });
-        }
-
-        // ============================================================
-        //  CARGAR PROMOCIONES (ACTIVAS Y VIGENTES)
-        // ============================================================
-        function cargarPromociones() {
-            db.ref('promotions').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (!data) {
-                    document.getElementById('promoBanner').classList.remove('active');
-                    return;
-                }
-                const promos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                // Filtrar activas y vigentes
-                const now = new Date();
-                const activas = promos.filter(p => {
-                    if (!p.active) return false;
-                    if (p.startDate && new Date(p.startDate) > now) return false;
-                    if (p.endDate && new Date(p.endDate) < now) return false;
-                    return true;
-                });
-                if (activas.length === 0) {
-                    document.getElementById('promoBanner').classList.remove('active');
-                    return;
-                }
-                // Mostrar la primera promoción activa (o puedes mostrar un carrusel)
-                const promo = activas[0];
-                document.getElementById('promoTitulo').textContent = promo.title || 'Promoción';
-                document.getElementById('promoDesc').textContent = promo.description || '';
-                const fechas = [];
-                if (promo.startDate) fechas.push('Desde ' + new Date(promo.startDate).toLocaleDateString('es-AR'));
-                if (promo.endDate) fechas.push('Hasta ' + new Date(promo.endDate).toLocaleDateString('es-AR'));
-                document.getElementById('promoFechas').textContent = fechas.join(' · ');
-                document.getElementById('promoBanner').classList.add('active');
+                // Actualizar el carrusel de imágenes
+                generarTrack();
             });
         }
 
         // ============================================================
         //  RENDER PRODUCTOS
         // ============================================================
-        const grid = document.getElementById('productGrid');
-
         function renderProducts() {
+            const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
-            if (!productos || productos.length === 0) {
-                grid.innerHTML = '<div style="text-align:center; color:#8aaa8a; padding:20px;">No hay productos disponibles</div>';
+
+            // Filtrar solo disponibles
+            const disponibles = productos.filter(p => p.available !== false);
+
+            if (disponibles.length === 0) {
+                grid.innerHTML = '<p style="color:#b8d0b8; text-align:center;">No hay productos disponibles en este momento.</p>';
                 return;
             }
-            // Ordenar por nombre (opcional)
-            productos.sort((a, b) => a.name.localeCompare(b.name));
 
-            productos.forEach(p => {
-                // Verificar si el producto está disponible
-                const available = p.available !== false; // por defecto true
+            disponibles.forEach(p => {
                 const card = document.createElement('div');
-                card.className = 'product-card' + (available ? '' : ' disabled');
+                card.className = 'product-card';
                 card.dataset.id = p.id;
 
+                // Botón cancelar
                 const cancelBtn = document.createElement('button');
                 cancelBtn.className = 'btn-cancelar-item';
                 cancelBtn.dataset.productId = p.id;
@@ -1442,6 +1605,7 @@
                 cancelBtn.title = 'Cancelar esta Tech';
                 card.appendChild(cancelBtn);
 
+                // Imagen
                 const imgDiv = document.createElement('div');
                 imgDiv.className = 'product-img';
                 const img = document.createElement('img');
@@ -1451,6 +1615,7 @@
                 imgDiv.appendChild(img);
                 card.appendChild(imgDiv);
 
+                // Info
                 const info = document.createElement('div');
                 info.className = 'product-info';
 
@@ -1472,6 +1637,7 @@
                 const extras = document.createElement('div');
                 extras.className = 'product-extras';
 
+                // Cantidad
                 const qtyWrap = document.createElement('div');
                 qtyWrap.className = 'qty-wrap';
                 const qtyLabel = document.createElement('label');
@@ -1483,15 +1649,11 @@
                 qtyInput.dataset.productId = p.id;
                 qtyInput.className = 'qty-input';
                 qtyInput.readOnly = true;
-                // Si no disponible, deshabilitar el input
-                if (!available) {
-                    qtyInput.disabled = true;
-                    qtyInput.style.opacity = '0.5';
-                }
                 qtyWrap.appendChild(qtyLabel);
                 qtyWrap.appendChild(qtyInput);
                 extras.appendChild(qtyWrap);
 
+                // Extras (medallones y toppings)
                 if (p.hasExtras) {
                     const extraMed = document.createElement('label');
                     extraMed.innerHTML = '➕ Medallones extra <span style="color:#ffb703;">($4.000 c/u)</span>';
@@ -1502,10 +1664,6 @@
                     medInput.className = 'med-extra-input';
                     medInput.dataset.productId = p.id;
                     medInput.readOnly = true;
-                    if (!available) {
-                        medInput.disabled = true;
-                        medInput.style.opacity = '0.5';
-                    }
                     extraMed.appendChild(medInput);
                     extras.appendChild(extraMed);
 
@@ -1518,22 +1676,11 @@
                         cb.className = 'topping-check';
                         cb.dataset.productId = p.id;
                         cb.value = t;
-                        if (!available) {
-                            cb.disabled = true;
-                        }
                         label.appendChild(cb);
                         label.appendChild(document.createTextNode(t));
                         toppingsDiv.appendChild(label);
                     });
                     extras.appendChild(toppingsDiv);
-                }
-
-                // Si no disponible, añadir mensaje "No disponible"
-                if (!available) {
-                    const noDisponible = document.createElement('div');
-                    noDisponible.style.cssText = 'font-size:0.8rem; color:#f44336; font-weight:700; margin-top:4px;';
-                    noDisponible.textContent = '⛔ Producto no disponible temporalmente';
-                    extras.appendChild(noDisponible);
                 }
 
                 info.appendChild(header);
@@ -1543,8 +1690,96 @@
                 card.appendChild(info);
                 grid.appendChild(card);
             });
-            // Re-inicializar visibilidad de botones cancelar (no disponible por ahora, pero se llama desde updateTotal)
+
+            // Actualizar visibilidad del botón cancelar
             actualizarVisibilidadCancelar();
+        }
+
+        // ============================================================
+        //  CARGAR PROMOCIONES DESDE FIREBASE
+        // ============================================================
+        function cargarPromociones() {
+            db.ref('promotions').on('value', (snapshot) => {
+                const data = snapshot.val();
+                const container = document.getElementById('promoBanner');
+                if (!container) return;
+
+                if (!data) {
+                    container.classList.remove('active');
+                    return;
+                }
+
+                // Convertir a array y filtrar activas y vigentes
+                const promos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                const now = new Date();
+                const activas = promos.filter(p => {
+                    if (!p.active) return false;
+                    if (p.startDate && new Date(p.startDate) > now) return false;
+                    if (p.endDate && new Date(p.endDate) < now) return false;
+                    return true;
+                });
+
+                if (activas.length === 0) {
+                    container.classList.remove('active');
+                    return;
+                }
+
+                container.classList.add('active');
+                container.innerHTML = '';
+
+                activas.forEach((promo, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'promo-item';
+                    if (index > 0) {
+                        div.style.borderTop = '1px solid #2f4a2f';
+                        div.style.paddingTop = '12px';
+                        div.style.marginTop = '8px';
+                    }
+
+                    // Imagen
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'promo-img-container';
+
+                    const img = document.createElement('img');
+                    img.alt = promo.title || 'Promoción';
+                    if (promo.image && promo.image.trim() !== '') {
+                        img.src = promo.image;
+                        img.onerror = function() {
+                            this.style.display = 'none';
+                            const emoji = document.createElement('span');
+                            emoji.className = 'emoji';
+                            emoji.textContent = '🍔';
+                            imgContainer.appendChild(emoji);
+                        };
+                    } else {
+                        img.style.display = 'none';
+                        const emoji = document.createElement('span');
+                        emoji.className = 'emoji';
+                        emoji.textContent = '🍔';
+                        imgContainer.appendChild(emoji);
+                    }
+                    imgContainer.appendChild(img);
+                    div.appendChild(imgContainer);
+
+                    // Info
+                    const info = document.createElement('div');
+                    info.className = 'promo-info';
+                    info.innerHTML = `
+                        <h3>${promo.title || 'Promoción'}</h3>
+                        <p>${promo.description || ''}</p>
+                        ${promo.startDate && promo.endDate ? `<div class="fechas">📅 ${new Date(promo.startDate).toLocaleDateString('es-AR')} → ${new Date(promo.endDate).toLocaleDateString('es-AR')}</div>` : ''}
+                    `;
+                    div.appendChild(info);
+
+                    // Tag
+                    const tag = document.createElement('span');
+                    tag.className = 'promo-tag';
+                    tag.textContent = '🔥 Promo';
+                    div.appendChild(tag);
+
+                    container.appendChild(div);
+                });
+            });
         }
 
         // ============================================================
@@ -1556,11 +1791,7 @@
                 const cancelBtn = card.querySelector('.btn-cancelar-item');
                 if (qtyInput && cancelBtn) {
                     const val = parseInt(qtyInput.value) || 0;
-                    if (val > 0) {
-                        cancelBtn.classList.add('visible');
-                    } else {
-                        cancelBtn.classList.remove('visible');
-                    }
+                    cancelBtn.classList.toggle('visible', val > 0);
                 }
             });
         }
@@ -1572,20 +1803,16 @@
             const qtyInput = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
             if (qtyInput) {
                 qtyInput.value = 0;
-                const evt = new Event('input', { bubbles: true });
-                qtyInput.dispatchEvent(evt);
+                qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
             }
             const medInput = document.querySelector(`.med-extra-input[data-product-id="${productId}"]`);
             if (medInput) {
                 medInput.value = 0;
-                const evt = new Event('input', { bubbles: true });
-                medInput.dispatchEvent(evt);
+                medInput.dispatchEvent(new Event('input', { bubbles: true }));
             }
-            const checks = document.querySelectorAll(`.topping-check[data-product-id="${productId}"]:checked`);
-            checks.forEach(cb => {
+            document.querySelectorAll(`.topping-check[data-product-id="${productId}"]:checked`).forEach(cb => {
                 cb.checked = false;
-                const evt = new Event('change', { bubbles: true });
-                cb.dispatchEvent(evt);
+                cb.dispatchEvent(new Event('change', { bubbles: true }));
             });
             actualizarVisibilidadCancelar();
             updateTotal();
@@ -1597,16 +1824,14 @@
         const cancelModal = document.getElementById('cancelModal');
 
         function mostrarCancelModal() {
-            cancelModal.style.display = 'flex';
+            cancelModal.classList.add('active');
             clearTimeout(cancelModal._timer);
-            cancelModal._timer = setTimeout(function() {
-                cancelModal.style.display = 'none';
-            }, 900);
+            cancelModal._timer = setTimeout(() => cancelModal.classList.remove('active'), 900);
         }
 
         cancelModal.addEventListener('click', function(e) {
             if (e.target === this) {
-                cancelModal.style.display = 'none';
+                cancelModal.classList.remove('active');
                 clearTimeout(cancelModal._timer);
             }
         });
@@ -1614,23 +1839,23 @@
         let currentInput = null;
         let currentProductId = null;
         const qtyModal = document.getElementById('qtyModal');
-        const qtyModalButtons = qtyModal.querySelectorAll('button');
+        const qtyModalButtons = qtyModal.querySelectorAll('.qty-grid button');
 
         let currentMedInput = null;
         const medModal = document.getElementById('medModal');
-        const medModalButtons = medModal.querySelectorAll('button');
+        const medModalButtons = medModal.querySelectorAll('.med-grid button');
         const medCancelar = document.getElementById('medCancelar');
 
         function openQtyModal(input) {
             if (input) {
                 currentInput = input;
                 currentProductId = input.dataset.productId;
-                qtyModal.style.display = 'flex';
+                qtyModal.classList.add('active');
             }
         }
 
         function closeQtyModal() {
-            qtyModal.style.display = 'none';
+            qtyModal.classList.remove('active');
             currentInput = null;
             currentProductId = null;
         }
@@ -1638,35 +1863,25 @@
         function openMedModal(input) {
             if (input) {
                 currentMedInput = input;
-                medModal.style.display = 'flex';
+                medModal.classList.add('active');
             }
         }
 
         function closeMedModal() {
-            medModal.style.display = 'none';
+            medModal.classList.remove('active');
             currentMedInput = null;
         }
 
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
-
             if (target.classList.contains('qty-input')) {
-                // Verificar si el producto está disponible
-                const productId = target.dataset.productId;
-                const product = productos.find(p => p.id === productId);
-                if (product && product.available === false) {
-                    alert('Este producto no está disponible temporalmente');
-                    return;
-                }
                 openQtyModal(target);
                 return;
             }
-
             if (target.classList.contains('med-extra-input')) {
                 openMedModal(target);
                 return;
             }
-
             if (target.classList.contains('btn-cancelar-item')) {
                 const productId = target.dataset.productId;
                 if (productId) {
@@ -1681,40 +1896,30 @@
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const val = parseInt(this.dataset.value, 10);
-                if (!isNaN(val) && val >= 1 && val <= 9) {
-                    if (currentInput) {
-                        currentInput.value = val;
-                        const product = productos.find(p => p.id === currentProductId);
-                        if (product) {
-                            mostrarToast(val + ' ' + product.name);
-                        }
-                        const evt = new Event('input', { bubbles: true });
-                        currentInput.dispatchEvent(evt);
-                        actualizarVisibilidadCancelar();
-                        updateTotal();
-                    }
+                if (!isNaN(val) && val >= 1 && val <= 9 && currentInput) {
+                    currentInput.value = val;
+                    const product = productos.find(p => p.id === currentProductId);
+                    if (product) mostrarToast(val + ' ' + product.name);
+                    currentInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    actualizarVisibilidadCancelar();
+                    updateTotal();
                 }
                 closeQtyModal();
             });
         });
 
         qtyModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeQtyModal();
-            }
+            if (e.target === this) closeQtyModal();
         });
 
         medModalButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const val = parseInt(this.dataset.value, 10);
-                if (!isNaN(val) && val >= 1 && val <= 3) {
-                    if (currentMedInput) {
-                        currentMedInput.value = val;
-                        const evt = new Event('input', { bubbles: true });
-                        currentMedInput.dispatchEvent(evt);
-                        updateTotal();
-                    }
+                if (!isNaN(val) && val >= 1 && val <= 3 && currentMedInput) {
+                    currentMedInput.value = val;
+                    currentMedInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    updateTotal();
                 }
                 closeMedModal();
             });
@@ -1726,9 +1931,7 @@
         });
 
         medModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeMedModal();
-            }
+            if (e.target === this) closeMedModal();
         });
 
         // ============================================================
@@ -1793,11 +1996,7 @@
         }
 
         function toggleAddress() {
-            if (isEntregaSelected()) {
-                addressField.classList.add('active');
-            } else {
-                addressField.classList.remove('active');
-            }
+            addressField.classList.toggle('active', isEntregaSelected());
         }
 
         toggleAddress();
@@ -1807,11 +2006,10 @@
             document.querySelectorAll('.qty-input').forEach(input => {
                 const cant = parseInt(input.value) || 0;
                 const product = productos.find(p => p.id === input.dataset.productId);
-                if (product && !isNaN(product.price)) total += cant * product.price;
+                if (product) total += cant * product.price;
             });
             document.querySelectorAll('.med-extra-input').forEach(input => {
-                const cant = parseInt(input.value) || 0;
-                total += cant * 4000;
+                total += (parseInt(input.value) || 0) * 4000;
             });
             if (isEntregaSelected()) total += COSTO_ENVIO;
             return total;
@@ -1827,6 +2025,8 @@
                 updateTotal();
             }
         });
+
+        updateTotal();
 
         // ============================================================
         //  MODAL DE RESUMEN DEL PEDIDO
@@ -1846,7 +2046,7 @@
                 const cant = parseInt(input.value) || 0;
                 if (cant > 0) {
                     const product = productos.find(p => p.id === input.dataset.productId);
-                    if (product && product.available !== false) {
+                    if (product) {
                         const subtotal = cant * product.price;
                         total += subtotal;
                         tieneProductos = true;
@@ -1876,7 +2076,7 @@
             });
 
             if (!tieneProductos) {
-                alert('Agregá al menos un producto disponible con cantidad > 0.');
+                alert('Agregá al menos un producto con cantidad > 0.');
                 return false;
             }
 
@@ -1916,12 +2116,10 @@
                 alert('Completá nombre y teléfono.');
                 return;
             }
-
             if (isEntregaSelected() && !direccionInput.value.trim()) {
                 alert('Ingresá la dirección de entrega.');
                 return;
             }
-
             if (generarResumen()) {
                 resumenModal.classList.add('active');
             }
@@ -1937,9 +2135,7 @@
         });
 
         resumenModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                resumenModal.classList.remove('active');
-            }
+            if (e.target === this) resumenModal.classList.remove('active');
         });
 
         // ============================================================
@@ -1949,14 +2145,11 @@
             document.querySelectorAll('.qty-input').forEach(input => input.value = 0);
             document.querySelectorAll('.med-extra-input').forEach(input => input.value = 0);
             document.querySelectorAll('.topping-check').forEach(cb => cb.checked = false);
-
             document.getElementById('nombre').value = '';
             document.getElementById('telefono').value = '';
             document.getElementById('direccion').value = '';
-
             pagoBotones.forEach(btn => btn.classList.remove('activo'));
             pagoSeleccionado = null;
-
             updateTotal();
             mostrarToast('✅ Pedido enviado. ¡Todo listo para otro!');
         }
@@ -1982,7 +2175,7 @@
                 totalHamburguesas += cant;
                 if (cant > 0) {
                     const product = productos.find(p => p.id === input.dataset.productId);
-                    if (product && product.available !== false) {
+                    if (product) {
                         mensaje += `\n• *${product.name}* x${cant} — $${(cant * product.price).toLocaleString()}`;
                         tieneProductos = true;
                         if (product.hasExtras) {
@@ -2001,7 +2194,7 @@
             });
 
             if (!tieneProductos) {
-                alert('Agregá al menos un producto disponible con cantidad > 0.');
+                alert('Agregá al menos un producto con cantidad > 0.');
                 return;
             }
 
@@ -2043,13 +2236,12 @@
         document.getElementById('shareBtn').addEventListener('click', function() {
             const url = window.location.href;
             const title = document.title || 'Tech Classic Burgers';
-
             if (navigator.share) {
                 navigator.share({
                     title: title,
                     text: '🍔 Pedí tus burgers favoritas en Tech Classic Burgers',
                     url: url
-                }).catch(err => {});
+                }).catch(() => {});
             } else {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(url).then(() => {
@@ -2064,19 +2256,13 @@
         });
 
         // ============================================================
-        //  INICIALIZAR VISIBILIDAD DEL BOTÓN DE CANCELAR
-        // ============================================================
-        setTimeout(actualizarVisibilidadCancelar, 100);
-
-        // ============================================================
-        //  POPUP DE IMAGEN (CARRUSEL CON FLECHAS)
+        //  POPUP DE IMAGEN (CARRUSEL)
         // ============================================================
         const imagePopup = document.getElementById('imagePopup');
         const popupSlider = document.getElementById('popupSlider');
         const popupTrack = document.getElementById('popupTrack');
         const arrowLeft = document.getElementById('arrowLeft');
         const arrowRight = document.getElementById('arrowRight');
-
         let arrowInterval = null;
 
         function generarTrack() {
@@ -2111,16 +2297,12 @@
         }
 
         function abrirPopupImagen(index) {
-            if (popupTrack.children.length === 0) {
-                generarTrack();
-            }
+            if (popupTrack.children.length === 0) generarTrack();
             centrarImagen(index);
             imagePopup.classList.add('active');
             document.body.style.overflow = 'hidden';
-
             if (arrowInterval) clearInterval(arrowInterval);
             arrowInterval = setInterval(actualizarFlechas, 300);
-
             setTimeout(actualizarFlechas, 250);
         }
 
@@ -2133,45 +2315,30 @@
             }
         }
 
-        // Cerrar al hacer clic en el fondo
         imagePopup.addEventListener('click', function(e) {
-            if (e.target === imagePopup) {
-                cerrarPopup();
-            }
+            if (e.target === imagePopup) cerrarPopup();
         });
 
-        // Clic en imagen cierra el popup
         popupTrack.addEventListener('click', function(e) {
-            const img = e.target.closest('img');
-            if (!img) return;
-            cerrarPopup();
+            if (e.target.closest('img')) cerrarPopup();
         });
 
         popupSlider.addEventListener('scroll', actualizarFlechas);
         popupSlider.addEventListener('touchmove', actualizarFlechas);
-        popupSlider.addEventListener('touchend', function() {
-            setTimeout(actualizarFlechas, 150);
-        });
+        popupSlider.addEventListener('touchend', () => setTimeout(actualizarFlechas, 150));
 
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && imagePopup.classList.contains('active')) {
-                cerrarPopup();
-            }
+            if (e.key === 'Escape' && imagePopup.classList.contains('active')) cerrarPopup();
         });
 
         document.getElementById('productGrid').addEventListener('click', function(e) {
-            const target = e.target;
-            const imgDiv = target.closest('.product-img');
+            const imgDiv = e.target.closest('.product-img');
             if (imgDiv) {
                 const card = imgDiv.closest('.product-card');
                 if (card) {
                     const productId = card.dataset.id;
                     const index = productos.findIndex(p => p.id === productId);
-                    if (index !== -1) {
-                        // Generar track con todos los productos (solo disponibles o todos?)
-                        // Usamos todos los productos para el carrusel.
-                        abrirPopupImagen(index);
-                    }
+                    if (index !== -1) abrirPopupImagen(index);
                 }
             }
         });
@@ -2181,10 +2348,10 @@
             if (imagePopup.classList.contains('active')) {
                 clearTimeout(resizeTimeout);
                 resizeTimeout = setTimeout(() => {
-                    const currentScroll = popupSlider.scrollLeft;
-                    const sliderWidth = popupSlider.clientWidth;
-                    if (sliderWidth > 0) {
-                        const index = Math.round(currentScroll / sliderWidth);
+                    const scroll = popupSlider.scrollLeft;
+                    const w = popupSlider.clientWidth;
+                    if (w > 0) {
+                        const index = Math.round(scroll / w);
                         centrarImagen(index);
                     }
                     actualizarFlechas();
@@ -2193,12 +2360,12 @@
         });
 
         // ============================================================
-        //  INICIO: CARGAR PRODUCTOS
+        //  INICIALIZAR
         // ============================================================
         cargarProductos();
-
-        // Nota: el carrusel se genera en abrirPopupImagen, que se llama al hacer clic.
-        // Para precargar, podemos generarTrack al cargar productos, pero no es necesario.
+        cargarPromociones();
+        setTimeout(actualizarVisibilidadCancelar, 100);
+        generarTrack();
     </script>
 </body>
 </html>
