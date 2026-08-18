@@ -10,8 +10,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="manifest.json" />
 
-    <!-- ===== TÍTULO (solo para la pestaña) ===== -->
+    <!-- ===== TÍTULO ===== -->
     <title>Tech Classic Burgers · Pedido</title>
+
+    <!-- ===== FIREBASE SDK ===== -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
     <style>
         /* ===== RESET & BASE ===== */
@@ -65,6 +69,35 @@
 
         .brand .tagline span {
             color: #ffb703;
+        }
+
+        /* ===== BANNER DE PROMOCIONES ===== */
+        .promo-banner {
+            background: #2a4a2a;
+            border: 2px solid #ffb703;
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin: 10px 0 16px;
+            display: none;
+            /* se muestra con JS si hay promos activas */
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 183, 3, 0.2);
+        }
+        .promo-banner.active {
+            display: block;
+        }
+        .promo-banner .promo-title {
+            color: #ffb703;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .promo-banner .promo-desc {
+            color: #d0e0d0;
+            font-size: 0.9rem;
+        }
+        .promo-banner .promo-dates {
+            color: #8aaa8a;
+            font-size: 0.75rem;
         }
 
         /* ===== TARJETA DE ESTADO ABIERTO/CERRADO ===== */
@@ -338,6 +371,11 @@
 
         .product-card:hover {
             border-color: #e63946;
+        }
+        .product-card.disabled {
+            opacity: 0.5;
+            border-color: #555;
+            filter: grayscale(0.6);
         }
 
         .product-img {
@@ -826,7 +864,7 @@
             scrollbar-width: none;
         }
 
-        /* ===== FLECHAS INDICADORAS (MÁS GRANDES E INTENSAS) ===== */
+        /* ===== FLECHAS INDICADORAS ===== */
         .nav-arrow {
             position: absolute;
             top: 50%;
@@ -1054,7 +1092,7 @@
 
         <!-- BRAND -->
         <div class="brand">
-            <img src="images/logo_tech.webp" alt="Tech Classic Burgers" class="logo" />
+            <img src="images/icon-512.png" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
             <div class="status-card" id="statusCard">
                 <div id="statusText">⏳ Cargando...</div>
@@ -1062,8 +1100,19 @@
             </div>
         </div>
 
+        <!-- ===== BANNER DE PROMOCIONES ===== -->
+        <div id="promoBanner" class="promo-banner">
+            <div class="promo-title" id="promoTitulo">Promoción</div>
+            <div class="promo-desc" id="promoDesc">Descripción</div>
+            <div class="promo-dates" id="promoFechas"></div>
+        </div>
+
         <!-- PRODUCTOS -->
-        <div class="product-grid" id="productGrid"></div>
+        <div class="product-grid" id="productGrid">
+            <div style="text-align:center; color:#8aaa8a; padding:20px;">
+                ⏳ Cargando productos...
+            </div>
+        </div>
 
         <!-- FORMULARIO -->
         <div class="form-section" id="formSection">
@@ -1211,6 +1260,22 @@
 
     <script>
         // ============================================================
+        //  CONFIGURACIÓN DE FIREBASE
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbS9zdQcpj0HThGqQVKcfsNjMFQ9gjf9U",
+            authDomain: "tech-burgers.firebaseapp.com",
+            databaseURL: "https://tech-burgers-default-rtdb.firebaseio.com",
+            projectId: "tech-burgers",
+            storageBucket: "tech-burgers.firebasestorage.app",
+            messagingSenderId: "795678558305",
+            appId: "1:795678558305:web:5929a7d3789a939d6f4220"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // ============================================================
         //  REGISTRO DE SERVICE WORKER (PWA)
         // ============================================================
         if ('serviceWorker' in navigator) {
@@ -1280,63 +1345,74 @@
         }
 
         // ============================================================
-        //  DATOS DE PRODUCTOS
+        //  DATOS DESDE FIREBASE (REEMPLAZA EL ARRAY ESTÁTICO)
         // ============================================================
-        const PRODUCTS = [{
-            id: 'armatuburger',
-            name: 'Armá tu Burger',
-            price: 12000,
-            desc: '1 medallón 120gr · doble cheddar · salsa Tech. Agregá medallones y toppings.',
-            hasExtras: true,
-            badge: 'BASE',
-            imagen: 'images/arm.jpg',
-            popupImg: 'images/bn1.webp'
-        }, {
-            id: 'doblep',
-            name: 'Doble Provoleta',
-            price: 18000,
-            desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.',
-            hasExtras: false,
-            imagen: 'images/pro.jpg',
-            popupImg: 'images/bn2.webp'
-        }, {
-            id: 'intense',
-            name: 'Intense',
-            price: 18000,
-            desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.',
-            hasExtras: false,
-            imagen: 'images/int.jpg',
-            popupImg: 'images/bn3.webp'
-        }, {
-            id: 'techmex',
-            name: 'Tech Mex',
-            price: 18000,
-            desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.',
-            hasExtras: false,
-            imagen: 'images/mex.jpg',
-            popupImg: 'images/bn4.webp'
-        }, {
-            id: 'yankee',
-            name: 'Yankee',
-            price: 16000,
-            desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.',
-            hasExtras: false,
-            imagen: 'images/yan.jpg',
-            popupImg: 'images/bn5.webp'
-        }, {
-            id: 'clasica',
-            name: 'Clásica',
-            price: 16000,
-            desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.',
-            hasExtras: false,
-            imagen: 'images/cla.jpg',
-            popupImg: 'images/bn6.webp'
-        }];
-
+        let productos = [];
+        let productosOriginales = []; // para referencia
         const TOPPINGS = [
             'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
             'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
         ];
+
+        // ============================================================
+        //  CARGAR PRODUCTOS DESDE FIREBASE
+        // ============================================================
+        function cargarProductos() {
+            db.ref('products').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    // Si no hay datos, mostrar mensaje
+                    document.getElementById('productGrid').innerHTML =
+                        '<div style="text-align:center; color:#8aaa8a; padding:20px;">No hay productos disponibles</div>';
+                    return;
+                }
+                // Convertir objeto a array
+                const productosArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                // Filtrar solo los que están disponibles (si se quiere mostrar solo disponibles)
+                // Pero mostraremos todos, con estilo gris los no disponibles
+                productos = productosArray;
+                productosOriginales = productosArray.slice(); // copia
+                renderProducts();
+                updateTotal();
+                // También cargar promociones
+                cargarPromociones();
+            });
+        }
+
+        // ============================================================
+        //  CARGAR PROMOCIONES (ACTIVAS Y VIGENTES)
+        // ============================================================
+        function cargarPromociones() {
+            db.ref('promotions').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    document.getElementById('promoBanner').classList.remove('active');
+                    return;
+                }
+                const promos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                // Filtrar activas y vigentes
+                const now = new Date();
+                const activas = promos.filter(p => {
+                    if (!p.active) return false;
+                    if (p.startDate && new Date(p.startDate) > now) return false;
+                    if (p.endDate && new Date(p.endDate) < now) return false;
+                    return true;
+                });
+                if (activas.length === 0) {
+                    document.getElementById('promoBanner').classList.remove('active');
+                    return;
+                }
+                // Mostrar la primera promoción activa (o puedes mostrar un carrusel)
+                const promo = activas[0];
+                document.getElementById('promoTitulo').textContent = promo.title || 'Promoción';
+                document.getElementById('promoDesc').textContent = promo.description || '';
+                const fechas = [];
+                if (promo.startDate) fechas.push('Desde ' + new Date(promo.startDate).toLocaleDateString('es-AR'));
+                if (promo.endDate) fechas.push('Hasta ' + new Date(promo.endDate).toLocaleDateString('es-AR'));
+                document.getElementById('promoFechas').textContent = fechas.join(' · ');
+                document.getElementById('promoBanner').classList.add('active');
+            });
+        }
 
         // ============================================================
         //  RENDER PRODUCTOS
@@ -1345,9 +1421,18 @@
 
         function renderProducts() {
             grid.innerHTML = '';
-            PRODUCTS.forEach(p => {
+            if (!productos || productos.length === 0) {
+                grid.innerHTML = '<div style="text-align:center; color:#8aaa8a; padding:20px;">No hay productos disponibles</div>';
+                return;
+            }
+            // Ordenar por nombre (opcional)
+            productos.sort((a, b) => a.name.localeCompare(b.name));
+
+            productos.forEach(p => {
+                // Verificar si el producto está disponible
+                const available = p.available !== false; // por defecto true
                 const card = document.createElement('div');
-                card.className = 'product-card';
+                card.className = 'product-card' + (available ? '' : ' disabled');
                 card.dataset.id = p.id;
 
                 const cancelBtn = document.createElement('button');
@@ -1382,7 +1467,7 @@
 
                 const desc = document.createElement('div');
                 desc.className = 'product-desc';
-                desc.textContent = p.desc;
+                desc.textContent = p.desc || '';
 
                 const extras = document.createElement('div');
                 extras.className = 'product-extras';
@@ -1398,6 +1483,11 @@
                 qtyInput.dataset.productId = p.id;
                 qtyInput.className = 'qty-input';
                 qtyInput.readOnly = true;
+                // Si no disponible, deshabilitar el input
+                if (!available) {
+                    qtyInput.disabled = true;
+                    qtyInput.style.opacity = '0.5';
+                }
                 qtyWrap.appendChild(qtyLabel);
                 qtyWrap.appendChild(qtyInput);
                 extras.appendChild(qtyWrap);
@@ -1412,6 +1502,10 @@
                     medInput.className = 'med-extra-input';
                     medInput.dataset.productId = p.id;
                     medInput.readOnly = true;
+                    if (!available) {
+                        medInput.disabled = true;
+                        medInput.style.opacity = '0.5';
+                    }
                     extraMed.appendChild(medInput);
                     extras.appendChild(extraMed);
 
@@ -1424,11 +1518,22 @@
                         cb.className = 'topping-check';
                         cb.dataset.productId = p.id;
                         cb.value = t;
+                        if (!available) {
+                            cb.disabled = true;
+                        }
                         label.appendChild(cb);
                         label.appendChild(document.createTextNode(t));
                         toppingsDiv.appendChild(label);
                     });
                     extras.appendChild(toppingsDiv);
+                }
+
+                // Si no disponible, añadir mensaje "No disponible"
+                if (!available) {
+                    const noDisponible = document.createElement('div');
+                    noDisponible.style.cssText = 'font-size:0.8rem; color:#f44336; font-weight:700; margin-top:4px;';
+                    noDisponible.textContent = '⛔ Producto no disponible temporalmente';
+                    extras.appendChild(noDisponible);
                 }
 
                 info.appendChild(header);
@@ -1438,9 +1543,9 @@
                 card.appendChild(info);
                 grid.appendChild(card);
             });
+            // Re-inicializar visibilidad de botones cancelar (no disponible por ahora, pero se llama desde updateTotal)
+            actualizarVisibilidadCancelar();
         }
-
-        renderProducts();
 
         // ============================================================
         //  MANEJAR VISIBILIDAD DEL BOTÓN DE CANCELAR
@@ -1546,6 +1651,13 @@
             const target = e.target;
 
             if (target.classList.contains('qty-input')) {
+                // Verificar si el producto está disponible
+                const productId = target.dataset.productId;
+                const product = productos.find(p => p.id === productId);
+                if (product && product.available === false) {
+                    alert('Este producto no está disponible temporalmente');
+                    return;
+                }
                 openQtyModal(target);
                 return;
             }
@@ -1572,7 +1684,7 @@
                 if (!isNaN(val) && val >= 1 && val <= 9) {
                     if (currentInput) {
                         currentInput.value = val;
-                        const product = PRODUCTS.find(p => p.id === currentProductId);
+                        const product = productos.find(p => p.id === currentProductId);
                         if (product) {
                             mostrarToast(val + ' ' + product.name);
                         }
@@ -1694,8 +1806,8 @@
             let total = 0;
             document.querySelectorAll('.qty-input').forEach(input => {
                 const cant = parseInt(input.value) || 0;
-                const product = PRODUCTS.find(p => p.id === input.dataset.productId);
-                if (product) total += cant * product.price;
+                const product = productos.find(p => p.id === input.dataset.productId);
+                if (product && !isNaN(product.price)) total += cant * product.price;
             });
             document.querySelectorAll('.med-extra-input').forEach(input => {
                 const cant = parseInt(input.value) || 0;
@@ -1716,8 +1828,6 @@
             }
         });
 
-        updateTotal();
-
         // ============================================================
         //  MODAL DE RESUMEN DEL PEDIDO
         // ============================================================
@@ -1735,8 +1845,8 @@
             document.querySelectorAll('.qty-input').forEach(input => {
                 const cant = parseInt(input.value) || 0;
                 if (cant > 0) {
-                    const product = PRODUCTS.find(p => p.id === input.dataset.productId);
-                    if (product) {
+                    const product = productos.find(p => p.id === input.dataset.productId);
+                    if (product && product.available !== false) {
                         const subtotal = cant * product.price;
                         total += subtotal;
                         tieneProductos = true;
@@ -1766,7 +1876,7 @@
             });
 
             if (!tieneProductos) {
-                alert('Agregá al menos un producto con cantidad > 0.');
+                alert('Agregá al menos un producto disponible con cantidad > 0.');
                 return false;
             }
 
@@ -1871,8 +1981,8 @@
                 const cant = parseInt(input.value) || 0;
                 totalHamburguesas += cant;
                 if (cant > 0) {
-                    const product = PRODUCTS.find(p => p.id === input.dataset.productId);
-                    if (product) {
+                    const product = productos.find(p => p.id === input.dataset.productId);
+                    if (product && product.available !== false) {
                         mensaje += `\n• *${product.name}* x${cant} — $${(cant * product.price).toLocaleString()}`;
                         tieneProductos = true;
                         if (product.hasExtras) {
@@ -1891,7 +2001,7 @@
             });
 
             if (!tieneProductos) {
-                alert('Agregá al menos un producto con cantidad > 0.');
+                alert('Agregá al menos un producto disponible con cantidad > 0.');
                 return;
             }
 
@@ -1971,9 +2081,9 @@
 
         function generarTrack() {
             popupTrack.innerHTML = '';
-            PRODUCTS.forEach(p => {
+            productos.forEach(p => {
                 const img = document.createElement('img');
-                img.src = p.popupImg;
+                img.src = p.popupImg || p.imagen || 'images/placeholder.jpg';
                 img.alt = p.name;
                 img.loading = 'lazy';
                 popupTrack.appendChild(img);
@@ -2030,7 +2140,7 @@
             }
         });
 
-        // **Clic en imagen cierra el popup**
+        // Clic en imagen cierra el popup
         popupTrack.addEventListener('click', function(e) {
             const img = e.target.closest('img');
             if (!img) return;
@@ -2056,8 +2166,10 @@
                 const card = imgDiv.closest('.product-card');
                 if (card) {
                     const productId = card.dataset.id;
-                    const index = PRODUCTS.findIndex(p => p.id === productId);
+                    const index = productos.findIndex(p => p.id === productId);
                     if (index !== -1) {
+                        // Generar track con todos los productos (solo disponibles o todos?)
+                        // Usamos todos los productos para el carrusel.
                         abrirPopupImagen(index);
                     }
                 }
@@ -2080,8 +2192,13 @@
             }
         });
 
-        generarTrack();
-        actualizarFlechas();
+        // ============================================================
+        //  INICIO: CARGAR PRODUCTOS
+        // ============================================================
+        cargarProductos();
+
+        // Nota: el carrusel se genera en abrirPopupImagen, que se llama al hacer clic.
+        // Para precargar, podemos generarTrack al cargar productos, pero no es necesario.
     </script>
 </body>
 </html>
