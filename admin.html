@@ -89,6 +89,47 @@
         }
         .btn-logout:hover { background: #5a2a2a; }
 
+        /* ===== TOAST ===== */
+        #toastAdmin {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            max-width: 380px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        }
+        #toastAdmin.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .toast-admin-content {
+            background: #1f331f;
+            border-radius: 12px;
+            padding: 16px 20px;
+            border-left: 5px solid #ffb703;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .toast-admin-content .toast-icon {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+        .toast-admin-content .toast-message {
+            flex: 1;
+            font-size: 0.95rem;
+            color: #e8f0e8;
+        }
+        .toast-admin-content.success { border-color: #4caf50; }
+        .toast-admin-content.error { border-color: #f44336; }
+        .toast-admin-content.info { border-color: #2196F3; }
+
         /* ===== FORMULARIOS ===== */
         .form-producto {
             background: #1f331f;
@@ -276,37 +317,68 @@
             font-weight: 600;
         }
         .product-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #ffb703; cursor: pointer; }
+
+        /* CONTENEDOR DE ACCIONES - SEPARACIÓN DEL BOTÓN ELIMINAR */
         .product-item .actions {
             display: flex;
-            gap: 6px;
-            margin-left: auto;
             flex-wrap: wrap;
             align-items: center;
+            gap: 6px;
+            margin-left: auto;
         }
-        .product-item .actions button {
-            border: none;
-            padding: 6px 12px;
+        .product-item .actions .btn-eliminar {
+            margin-left: 8px;
+            order: 10; /* Para que vaya al final */
+            background: #f44336;
+            color: #fff;
+            padding: 6px 14px;
             border-radius: 30px;
+            border: none;
             font-weight: 700;
             font-size: 0.8rem;
             cursor: pointer;
             transition: background 0.2s;
         }
+        .product-item .actions .btn-eliminar:hover { background: #d32f2f; }
         .product-item .actions .btn-mover {
             background: #3a5a3a;
             color: #e8f0e8;
             font-size: 1.2rem;
             line-height: 1;
             padding: 4px 10px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
         }
         .product-item .actions .btn-mover:hover { background: #4a6a4a; }
         .product-item .actions .btn-mover:disabled { opacity: 0.3; cursor: not-allowed; }
-        .product-item .actions .btn-editar { background: #2196F3; color: #fff; }
+        .product-item .actions .btn-editar {
+            background: #2196F3;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
         .product-item .actions .btn-editar:hover { background: #1976D2; }
-        .product-item .actions .btn-guardar { background: #ffb703; color: #1a1a1a; }
+        .product-item .actions .btn-guardar {
+            background: #ffb703;
+            color: #1a1a1a;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
         .product-item .actions .btn-guardar:hover { background: #e6a500; }
-        .product-item .actions .btn-eliminar { background: #f44336; color: #fff; }
-        .product-item .actions .btn-eliminar:hover { background: #d32f2f; }
+
         .product-item .badge-preview {
             background: #e63946;
             color: #fff;
@@ -316,71 +388,147 @@
             font-weight: 600;
         }
 
+        /* PROMOCIONES */
         .promo-item .info { flex: 1; min-width: 150px; }
         .promo-item .dates { font-size: 0.8rem; color: #b8d0b8; }
         .promo-item label { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
         .promo-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #ffb703; cursor: pointer; }
         .promo-item .actions {
             display: flex;
-            gap: 6px;
             flex-wrap: wrap;
             align-items: center;
+            gap: 6px;
             margin-left: auto;
         }
-        .promo-item .actions button {
-            border: none;
+        .promo-item .actions .btn-editar-promo {
+            background: #2196F3;
+            color: #fff;
             padding: 6px 14px;
             border-radius: 30px;
+            border: none;
             font-weight: 700;
             font-size: 0.8rem;
             cursor: pointer;
             transition: background 0.2s;
         }
-        .promo-item .actions .btn-editar-promo { background: #2196F3; color: #fff; }
         .promo-item .actions .btn-editar-promo:hover { background: #1976D2; }
-        .promo-item .actions .btn-eliminar-promo { background: #f44336; color: #fff; }
+        .promo-item .actions .btn-eliminar-promo {
+            background: #f44336;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-left: 8px;
+            order: 10;
+        }
         .promo-item .actions .btn-eliminar-promo:hover { background: #d32f2f; }
 
+        /* EXCEPCIONES */
         .excepcion-item .info { flex: 2; min-width: 150px; }
         .excepcion-item .estado { font-weight: 600; }
         .excepcion-item .actions {
             display: flex;
+            flex-wrap: wrap;
+            align-items: center;
             gap: 6px;
             margin-left: auto;
         }
-        .excepcion-item .actions button {
-            border: none;
+        .excepcion-item .actions .btn-editar-excepcion {
+            background: #2196F3;
+            color: #fff;
             padding: 6px 14px;
             border-radius: 30px;
+            border: none;
             font-weight: 700;
             font-size: 0.8rem;
             cursor: pointer;
             transition: background 0.2s;
         }
-        .excepcion-item .actions .btn-editar-excepcion { background: #2196F3; color: #fff; }
         .excepcion-item .actions .btn-editar-excepcion:hover { background: #1976D2; }
-        .excepcion-item .actions .btn-eliminar-excepcion { background: #f44336; color: #fff; }
+        .excepcion-item .actions .btn-eliminar-excepcion {
+            background: #f44336;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-left: 8px;
+            order: 10;
+        }
         .excepcion-item .actions .btn-eliminar-excepcion:hover { background: #d32f2f; }
 
         .hidden { display: none !important; }
 
         @media (max-width: 600px) {
-            .product-item, .promo-item, .excepcion-item { flex-direction: column; align-items: stretch; }
+            .product-item, .promo-item, .excepcion-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
             .product-item label { justify-content: space-between; }
-            .product-item .actions { margin-left: 0; justify-content: flex-end; }
-            .promo-item .actions { margin-left: 0; justify-content: flex-end; }
-            .excepcion-item .actions { margin-left: 0; justify-content: flex-end; }
+            .product-item .actions {
+                margin-left: 0;
+                justify-content: flex-end;
+            }
+            .promo-item .actions {
+                margin-left: 0;
+                justify-content: flex-end;
+            }
+            .excepcion-item .actions {
+                margin-left: 0;
+                justify-content: flex-end;
+            }
             .form-row { flex-direction: column; }
             .form-row .form-group { min-width: auto; }
             .form-actions { flex-direction: column; }
             .filtro-container { flex-direction: column; align-items: stretch; }
             .estado-rapido { flex-direction: column; }
+            /* En móvil, los botones de eliminar se ponen en una línea aparte */
+            .product-item .actions .btn-eliminar,
+            .promo-item .actions .btn-eliminar-promo,
+            .excepcion-item .actions .btn-eliminar-excepcion {
+                margin-left: 0;
+                order: 0;
+                width: 100%;
+                text-align: center;
+                margin-top: 4px;
+            }
+            .product-item .actions .btn-mover,
+            .product-item .actions .btn-editar,
+            .product-item .actions .btn-guardar {
+                flex: 1;
+                text-align: center;
+            }
+            .promo-item .actions .btn-editar-promo,
+            .promo-item .actions .btn-eliminar-promo {
+                flex: 1;
+                text-align: center;
+            }
+            .excepcion-item .actions .btn-editar-excepcion,
+            .excepcion-item .actions .btn-eliminar-excepcion {
+                flex: 1;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🍔 Admin Tech Burgers</h1>
+
+        <!-- ===== TOAST ===== -->
+        <div id="toastAdmin">
+            <div class="toast-admin-content" id="toastAdminContent">
+                <span class="toast-icon" id="toastIcon">✅</span>
+                <span class="toast-message" id="toastMessage">Mensaje</span>
+            </div>
+        </div>
 
         <!-- ===== LOGIN ===== -->
         <div id="authSection" class="card">
@@ -447,14 +595,14 @@
 
             <hr style="border-color:#2f4a2f; margin:20px 0;">
 
-            <!-- ===== PROMOCIONES (CORREGIDO) ===== -->
+            <!-- ===== PROMOCIONES ===== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                 <h2>🎯 Promociones</h2>
                 <button class="btn-add" id="addPromoBtn">➕ Agregar promoción</button>
             </div>
             <div id="promoList"></div>
             <div id="formPromo" class="form-producto">
-                <h3 id="formPromoTitulo">✏️ Nueva promoción</h3>
+                <h3>✏️ Nueva promoción</h3>
                 <div class="form-group"><label for="promoTitulo">Título <span class="required">*</span></label><input type="text" id="promoTitulo" placeholder="Ej: 2x1 en Clásicas" /></div>
                 <div class="form-group"><label for="promoDesc">Descripción <span class="required">*</span></label><input type="text" id="promoDesc" placeholder="Ej: Llevá dos burgers por el precio de una" /></div>
                 <div class="form-group"><label for="promoImagen">URL imagen</label><input type="text" id="promoImagen" placeholder="Ej: images/promo1.jpg" /><span class="hint-text">Imagen del banner</span></div>
@@ -556,6 +704,39 @@
         const db = firebase.database();
 
         // ============================================================
+        //  TOAST NOTIFICATIONS
+        // ============================================================
+        let toastTimeout = null;
+
+        function mostrarToast(mensaje, tipo = 'success') {
+            const toast = document.getElementById('toastAdmin');
+            const content = document.getElementById('toastAdminContent');
+            const icon = document.getElementById('toastIcon');
+            const message = document.getElementById('toastMessage');
+
+            // Limpiar clases previas
+            content.classList.remove('success', 'error', 'info');
+            if (tipo === 'success') {
+                content.classList.add('success');
+                icon.textContent = '✅';
+            } else if (tipo === 'error') {
+                content.classList.add('error');
+                icon.textContent = '❌';
+            } else {
+                content.classList.add('info');
+                icon.textContent = 'ℹ️';
+            }
+
+            message.textContent = mensaje;
+            toast.classList.add('show');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ============================================================
         //  REFERENCIAS DOM
         // ============================================================
         const authSection = document.getElementById('authSection');
@@ -579,7 +760,6 @@
         const formPromo = document.getElementById('formPromo');
         const savePromoBtn = document.getElementById('savePromoBtn');
         const cancelPromoBtn = document.getElementById('cancelPromoBtn');
-        const formPromoTitulo = document.getElementById('formPromoTitulo');
 
         // Excepciones
         const addExcepcionBtn = document.getElementById('addExcepcionBtn');
@@ -653,7 +833,7 @@
             cargarExcepciones();
         }
 
-        // ---- PRODUCTOS (sin cambios) ----
+        // ---- PRODUCTOS ----
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -743,7 +923,7 @@
             try {
                 const snapshot = await db.ref('products/' + id).once('value');
                 const producto = snapshot.val();
-                if (!producto) { alert('❌ Producto no encontrado'); return; }
+                if (!producto) { mostrarToast('Producto no encontrado', 'error'); return; }
                 document.getElementById('prodNombre').value = producto.name || '';
                 document.getElementById('prodPrecio').value = producto.price || '';
                 document.getElementById('prodDesc').value = producto.desc || '';
@@ -761,7 +941,7 @@
                 formProducto.classList.add('active');
                 formProducto.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } catch (error) {
-                alert('❌ Error al cargar producto: ' + error.message);
+                mostrarToast('Error al cargar producto: ' + error.message, 'error');
             }
         };
 
@@ -769,9 +949,9 @@
             if (!confirm(`¿Eliminar el producto "${id}" permanentemente?`)) return;
             try {
                 await db.ref('products/' + id).remove();
-                alert('✅ Producto eliminado');
+                mostrarToast('Producto eliminado', 'success');
             } catch (error) {
-                alert('❌ Error al eliminar: ' + error.message);
+                mostrarToast('Error al eliminar: ' + error.message, 'error');
             }
         };
 
@@ -783,9 +963,9 @@
             const available = availInput.checked;
             try {
                 await db.ref('products/' + id).update({ price, available });
-                alert('✅ Producto actualizado');
+                mostrarToast('Producto actualizado', 'success');
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                mostrarToast('Error: ' + error.message, 'error');
             }
         };
 
@@ -853,14 +1033,14 @@
             let id = document.getElementById('prodId').value.trim().toLowerCase().replace(/\s+/g, '-');
             const hasExtras = document.getElementById('prodHasExtras').checked;
             const disponible = document.getElementById('prodDisponible').checked;
-            if (!nombre || !precio || !id) { alert('❌ Nombre, precio e ID son obligatorios.'); return; }
-            if (isNaN(precio) || precio <= 0) { alert('❌ Ingresá un precio válido.'); return; }
-            if (!/^[a-z0-9\-]+$/.test(id)) { alert('❌ El ID solo puede contener letras minúsculas, números y guiones. Sin espacios.'); return; }
+            if (!nombre || !precio || !id) { mostrarToast('Nombre, precio e ID son obligatorios.', 'error'); return; }
+            if (isNaN(precio) || precio <= 0) { mostrarToast('Ingresá un precio válido.', 'error'); return; }
+            if (!/^[a-z0-9\-]+$/.test(id)) { mostrarToast('El ID solo puede contener letras minúsculas, números y guiones. Sin espacios.', 'error'); return; }
             const nuevoProducto = { id, name: nombre, price: precio, desc: desc || '', imagen: imagen || 'images/placeholder.jpg', popupImg: popupImg || imagen || 'images/placeholder.jpg', categoria, tiempoPreparacion, badge, hasExtras, available: disponible };
             try {
                 if (window.editandoProductoId) {
                     await db.ref('products/' + window.editandoProductoId).update(nuevoProducto);
-                    alert('✅ Producto actualizado correctamente');
+                    mostrarToast('Producto actualizado', 'success');
                 } else {
                     const snapshot = await db.ref('products').orderByChild('orden').once('value');
                     const data = snapshot.val();
@@ -871,21 +1051,20 @@
                     }
                     nuevoProducto.orden = maxOrden + 1;
                     const exist = await db.ref('products/' + id).once('value');
-                    if (exist.exists()) { alert('❌ Ya existe un producto con ese ID. Usá otro.'); return; }
+                    if (exist.exists()) { mostrarToast('Ya existe un producto con ese ID. Usá otro.', 'error'); return; }
                     await db.ref('products/' + id).set(nuevoProducto);
-                    alert('✅ Producto creado correctamente');
+                    mostrarToast('Producto creado', 'success');
                 }
                 ocultarFormProducto();
             } catch (error) {
-                alert('❌ Error al guardar: ' + error.message);
+                mostrarToast('Error al guardar: ' + error.message, 'error');
             }
         });
 
         // ============================================================
-        //  PROMOCIONES (CORREGIDO - SIN DUPLICAR)
+        //  PROMOCIONES
         // ============================================================
         let actualizandoPromo = false;
-        let editandoPromoId = null; // Variable local para saber si estamos editando
 
         function cargarPromociones() {
             db.ref('promotions').on('value', (snapshot) => {
@@ -934,18 +1113,12 @@
                 .then(() => { actualizandoPromo = false; })
                 .catch((error) => {
                     actualizandoPromo = false;
-                    alert('❌ Error al actualizar: ' + error.message);
+                    mostrarToast('Error al actualizar: ' + error.message, 'error');
                     cb.checked = !activa;
                 });
         }
 
-        function ocultarFormPromo() {
-            formPromo.classList.remove('active');
-            editandoPromoId = null; // Limpiar estado de edición
-            // Restaurar título
-            formPromoTitulo.textContent = '✏️ Nueva promoción';
-        }
-
+        function ocultarFormPromo() { formPromo.classList.remove('active'); }
         addPromoBtn.addEventListener('click', () => {
             formPromo.classList.add('active');
             document.getElementById('promoTitulo').value = '';
@@ -954,20 +1127,14 @@
             document.getElementById('promoInicio').value = '';
             document.getElementById('promoFin').value = '';
             document.getElementById('promoActiva').checked = true;
-            formPromoTitulo.textContent = '✏️ Nueva promoción';
-            editandoPromoId = null; // Asegurar que no esté en modo edición
             document.getElementById('promoTitulo').focus();
         });
         cancelPromoBtn.addEventListener('click', ocultarFormPromo);
 
-        // Evento del botón guardar promoción (ahora verifica si estamos editando)
         savePromoBtn.addEventListener('click', async function() {
             const titulo = document.getElementById('promoTitulo').value.trim();
             const desc = document.getElementById('promoDesc').value.trim();
-            if (!titulo || !desc) {
-                alert('❌ Título y descripción son obligatorios');
-                return;
-            }
+            if (!titulo || !desc) { mostrarToast('Título y descripción son obligatorios', 'error'); return; }
             const data = {
                 title: titulo,
                 description: desc,
@@ -976,57 +1143,70 @@
                 endDate: document.getElementById('promoFin').value || '',
                 active: document.getElementById('promoActiva').checked
             };
-
             try {
-                if (editandoPromoId) {
-                    // MODO EDICIÓN: actualizar la promoción existente
-                    await db.ref('promotions/' + editandoPromoId).update(data);
-                    alert('✅ Promoción actualizada');
-                } else {
-                    // MODO CREACIÓN: agregar nueva promoción
-                    await db.ref('promotions').push(data);
-                    alert('✅ Promoción creada');
-                }
+                await db.ref('promotions').push(data);
+                mostrarToast('Promoción creada', 'success');
                 ocultarFormPromo();
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                mostrarToast('Error: ' + error.message, 'error');
             }
         });
 
         window.eliminarPromocion = async function(id) {
             if (!confirm('¿Eliminar esta promoción?')) return;
-            try { await db.ref('promotions/' + id).remove(); alert('✅ Eliminada'); } catch (error) { alert('❌ Error: ' + error.message); }
+            try { 
+                await db.ref('promotions/' + id).remove(); 
+                mostrarToast('Promoción eliminada', 'success');
+            } catch (error) { 
+                mostrarToast('Error: ' + error.message, 'error');
+            }
         };
 
         window.editarPromocion = async function(id) {
             try {
                 const snapshot = await db.ref('promotions/' + id).once('value');
                 const promo = snapshot.val();
-                if (!promo) {
-                    alert('❌ Promoción no encontrada');
-                    return;
-                }
-                // Cargar datos en el formulario
+                if (!promo) { mostrarToast('Promoción no encontrada', 'error'); return; }
                 document.getElementById('promoTitulo').value = promo.title || '';
                 document.getElementById('promoDesc').value = promo.description || '';
                 document.getElementById('promoImagen').value = promo.image || '';
                 document.getElementById('promoInicio').value = promo.startDate || '';
                 document.getElementById('promoFin').value = promo.endDate || '';
                 document.getElementById('promoActiva').checked = promo.active !== false;
-
-                // Guardar el ID de la promoción que estamos editando
-                editandoPromoId = id;
-                formPromoTitulo.textContent = '✏️ Editando: ' + promo.title;
                 formPromo.classList.add('active');
                 document.getElementById('promoTitulo').focus();
+                window.editandoPromoId = id;
+                formPromo.querySelector('h3').textContent = '✏️ Editando: ' + promo.title;
+                const originalClick = savePromoBtn.onclick;
+                savePromoBtn.onclick = async function() {
+                    const titulo = document.getElementById('promoTitulo').value.trim();
+                    const desc = document.getElementById('promoDesc').value.trim();
+                    if (!titulo || !desc) { mostrarToast('Título y descripción son obligatorios', 'error'); return; }
+                    const data = {
+                        title: titulo,
+                        description: desc,
+                        image: document.getElementById('promoImagen').value.trim() || '',
+                        startDate: document.getElementById('promoInicio').value || '',
+                        endDate: document.getElementById('promoFin').value || '',
+                        active: document.getElementById('promoActiva').checked
+                    };
+                    try {
+                        await db.ref('promotions/' + id).update(data);
+                        mostrarToast('Promoción actualizada', 'success');
+                        ocultarFormPromo();
+                        savePromoBtn.onclick = originalClick;
+                    } catch (error) {
+                        mostrarToast('Error: ' + error.message, 'error');
+                    }
+                };
                 formPromo.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } catch (error) {
-                alert('❌ Error al cargar promoción: ' + error.message);
+                mostrarToast('Error al cargar promoción: ' + error.message, 'error');
             }
         };
 
         // ============================================================
-        //  EXCEPCIONES DE HORARIO (CON BOTONES DE ESTADO RÁPIDO)
+        //  EXCEPCIONES DE HORARIO
         // ============================================================
         let editandoExcepcionId = null;
 
@@ -1105,7 +1285,8 @@
         }
 
         function getHoyStr() {
-            return new Date().toISOString().split('T')[0];
+            const d = new Date();
+            return d.toISOString().split('T')[0];
         }
 
         async function buscarExcepcionHoy() {
@@ -1147,14 +1328,14 @@
             try {
                 if (exHoy) {
                     await db.ref('excepciones/' + exHoy.id).update(data);
-                    alert('✅ Estado actualizado');
+                    mostrarToast('Estado actualizado', 'success');
                 } else {
                     await db.ref('excepciones').push(data);
-                    alert('✅ Estado establecido');
+                    mostrarToast('Estado establecido', 'success');
                 }
                 setTimeout(actualizarBotonesEstado, 500);
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                mostrarToast('Error: ' + error.message, 'error');
             }
         }
 
@@ -1164,25 +1345,26 @@
         btnVolverNormal.addEventListener('click', async function() {
             const exHoy = await buscarExcepcionHoy();
             if (!exHoy) {
-                alert('ℹ️ Ya estás en horario normal');
+                mostrarToast('Ya estás en horario normal', 'info');
                 return;
             }
             if (!confirm('¿Eliminar la excepción de hoy y volver al horario normal?')) return;
             try {
                 await db.ref('excepciones/' + exHoy.id).remove();
-                alert('✅ Horario normal restaurado');
+                mostrarToast('Horario normal restaurado', 'success');
                 setTimeout(actualizarBotonesEstado, 500);
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                mostrarToast('Error: ' + error.message, 'error');
             }
         });
 
+        // ---- Funciones de edición/eliminación de excepciones ----
         window.editarExcepcion = async function(id) {
             try {
                 const snapshot = await db.ref('excepciones/' + id).once('value');
                 const ex = snapshot.val();
                 if (!ex) {
-                    alert('❌ Excepción no encontrada');
+                    mostrarToast('Excepción no encontrada', 'error');
                     return;
                 }
                 document.getElementById('exFechaInicio').value = ex.fechaInicio || '';
@@ -1203,7 +1385,7 @@
                 formExcepcion.classList.add('active');
                 formExcepcion.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } catch (error) {
-                alert('❌ Error al cargar excepción: ' + error.message);
+                mostrarToast('Error al cargar excepción: ' + error.message, 'error');
             }
         };
 
@@ -1211,10 +1393,10 @@
             if (!confirm('¿Eliminar esta excepción?')) return;
             try {
                 await db.ref('excepciones/' + id).remove();
-                alert('✅ Excepción eliminada');
+                mostrarToast('Excepción eliminada', 'success');
                 actualizarBotonesEstado();
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                mostrarToast('Error: ' + error.message, 'error');
             }
         };
 
@@ -1253,7 +1435,7 @@
             const fechaFin = document.getElementById('exFechaFin').value || fechaInicio;
             const tipo = document.getElementById('exTipo').value;
             const mensaje = document.getElementById('exMensaje').value.trim();
-            if (!fechaInicio) { alert('❌ La fecha inicio es obligatoria.'); return; }
+            if (!fechaInicio) { mostrarToast('La fecha inicio es obligatoria.', 'error'); return; }
 
             const data = { fechaInicio, fechaFin, tipo };
             if (tipo === 'horario_especial') {
@@ -1265,14 +1447,14 @@
             try {
                 if (window.editandoExcepcionId) {
                     await db.ref('excepciones/' + window.editandoExcepcionId).update(data);
-                    alert('✅ Excepción actualizada');
+                    mostrarToast('Excepción actualizada', 'success');
                 } else {
                     await db.ref('excepciones').push(data);
-                    alert('✅ Excepción guardada');
+                    mostrarToast('Excepción guardada', 'success');
                 }
                 ocultarFormExcepcion();
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                mostrarToast('Error: ' + error.message, 'error');
             }
         });
     </script>
