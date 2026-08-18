@@ -426,7 +426,6 @@
             font-weight: 600;
         }
 
-        /* ===== PROMOCIONES (con checkbox) ===== */
         .promo-item .info {
             flex: 1;
             min-width: 150px;
@@ -1088,10 +1087,15 @@
         });
 
         // ============================================================
-        //  PROMOCIONES CON CHECKBOX "ACTIVA" EN LA LISTA
+        //  PROMOCIONES CON CHECKBOX "ACTIVA" (CORREGIDO - SIN DUPLICAR)
         // ============================================================
+        let actualizandoPromo = false; // Bandera para evitar ciclos
+
         function cargarPromociones() {
             db.ref('promotions').on('value', (snapshot) => {
+                // Si estamos actualizando, no renderizar para evitar ciclos
+                if (actualizandoPromo) return;
+
                 const data = snapshot.val();
                 if (!data) {
                     document.getElementById('promoList').innerHTML =
@@ -1110,7 +1114,6 @@
                 const div = document.createElement('div');
                 div.className = 'promo-item';
 
-                // Fechas formateadas
                 const fechaInicio = p.startDate ? new Date(p.startDate).toLocaleDateString('es-AR') : '';
                 const fechaFin = p.endDate ? new Date(p.endDate).toLocaleDateString('es-AR') : '';
 
@@ -1131,34 +1134,33 @@
                 list.appendChild(div);
             });
 
-            // Agregar eventos a los checkboxes de promociones
+            // Agregar eventos a los checkboxes (usando addEventListener para mejor control)
             document.querySelectorAll('.promo-active-check').forEach(cb => {
-                cb.addEventListener('change', function() {
-                    const id = this.dataset.id;
-                    const activa = this.checked;
-                    togglePromocion(id, activa);
-                });
+                cb.removeEventListener('change', handlePromoChange);
+                cb.addEventListener('change', handlePromoChange);
             });
         }
 
-        // Función para activar/desactivar promoción desde el checkbox
-        async function togglePromocion(id, activa) {
-            try {
-                await db.ref('promotions/' + id).update({ active: activa });
-                // Mostrar feedback visual (opcional)
-                const checkbox = document.querySelector(`.promo-active-check[data-id="${id}"]`);
-                if (checkbox) {
-                    checkbox.checked = activa;
-                }
-                // No mostramos alert para no interrumpir, solo actualizamos silenciosamente
-            } catch (error) {
-                alert('❌ Error al actualizar: ' + error.message);
-                // Revertir checkbox
-                const checkbox = document.querySelector(`.promo-active-check[data-id="${id}"]`);
-                if (checkbox) {
-                    checkbox.checked = !activa;
-                }
-            }
+        function handlePromoChange(event) {
+            const cb = event.target;
+            const id = cb.dataset.id;
+            const activa = cb.checked;
+
+            // Evitar que el listener de Firebase dispare un nuevo render mientras actualizamos
+            actualizandoPromo = true;
+
+            db.ref('promotions/' + id).update({ active: activa })
+                .then(() => {
+                    // Actualización exitosa, permitir que el listener renderice de nuevo
+                    actualizandoPromo = false;
+                    // No mostramos alert para no molestar
+                })
+                .catch((error) => {
+                    actualizandoPromo = false;
+                    alert('❌ Error al actualizar: ' + error.message);
+                    // Revertir checkbox
+                    cb.checked = !activa;
+                });
         }
 
         // ---- CRUD Promociones ----
