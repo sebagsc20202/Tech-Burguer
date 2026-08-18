@@ -368,7 +368,7 @@
         .estado-rapido .btn-estado.activo { box-shadow: 0 0 0 2px #fff, 0 0 20px rgba(255,255,255,0.2); }
 
         /* ===== LISTAS ===== */
-        .product-item, .promo-item, .excepcion-item, .pedido-item {
+        .product-item, .promo-item, .excepcion-item {
             background: #1f331f;
             border: 1px solid #3a5a3a;
             border-radius: 12px;
@@ -557,7 +557,38 @@
         }
         .excepcion-item .actions .btn-eliminar-excepcion:hover { background: #d32f2f; }
 
-        /* PEDIDOS */
+        /* ===== PEDIDOS con scroll y botón WhatsApp ===== */
+        .pedido-list-wrapper {
+            max-height: 480px; /* 3 pedidos aprox */
+            overflow-y: auto;
+            margin-top: 10px;
+            border-radius: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: #ffb703 #1f331f;
+        }
+        .pedido-list-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+        .pedido-list-wrapper::-webkit-scrollbar-track {
+            background: #1f331f;
+            border-radius: 8px;
+        }
+        .pedido-list-wrapper::-webkit-scrollbar-thumb {
+            background: #ffb703;
+            border-radius: 8px;
+        }
+
+        .pedido-item {
+            background: #1f331f;
+            border: 1px solid #3a5a3a;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
         .pedido-item .info { flex: 2; min-width: 200px; }
         .pedido-item .estado-label { font-weight: 600; min-width: 80px; }
         .pedido-item .actions {
@@ -566,6 +597,24 @@
             align-items: center;
             gap: 6px;
             margin-left: auto;
+        }
+        .pedido-item .actions .btn-whatsapp {
+            background: #25D366;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 6px 14px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+        }
+        .pedido-item .actions .btn-whatsapp:hover {
+            background: #1ebe5a;
         }
         .pedido-item .actions .btn-eliminar-pedido {
             background: #f44336;
@@ -641,9 +690,11 @@
                 flex: 1;
                 text-align: center;
             }
+            .pedido-item .actions .btn-whatsapp,
             .pedido-item .actions .btn-eliminar-pedido {
                 width: 100%;
                 text-align: center;
+                justify-content: center;
             }
         }
     </style>
@@ -835,7 +886,9 @@
                     </select>
                 </div>
             </div>
-            <div id="pedidoList"></div>
+            <div class="pedido-list-wrapper" id="pedidoListWrapper">
+                <div id="pedidoList"></div>
+            </div>
 
             <hr style="border-color:#2f4a2f; margin:20px 0;">
             <div style="font-size:0.8rem; color:#6a8a6a; text-align:center;">
@@ -1030,7 +1083,7 @@
             cargarPedidos();
         }
 
-        // ---- PRODUCTOS ----
+        // ---- PRODUCTOS (código abreviado pero completo) ----
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1662,8 +1715,10 @@
         });
 
         // ============================================================
-        //  PEDIDOS
+        //  PEDIDOS CON NOTIFICACIONES POR WHATSAPP PERSONALIZADAS
         // ============================================================
+        const MAPS_URL_LOCAL = 'https://bit.ly/4xOCf1o'; // Cambiar por la dirección real
+
         function cargarPedidos() {
             db.ref('pedidos').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1705,13 +1760,18 @@
                                     p.estado === 'preparando' ? '#4caf50' :
                                     p.estado === 'listo' ? '#2196F3' :
                                     p.estado === 'entregado' ? '#8aaa8a' : '#f44336';
+                const telefono = p.telefono || '';
+                const nombreCliente = p.nombre || 'Cliente';
+                const tipoEnvio = p.envio || 'Retiro en local';
+                const direccion = p.direccion || '';
+
                 div.innerHTML = `
                     <div class="info">
-                        <div><strong>${p.nombre}</strong> (${p.telefono})</div>
+                        <div><strong>${nombreCliente}</strong> (${telefono})</div>
                         <div style="font-size:0.8rem; color:#b8d0b8;">${fecha}</div>
                         <div style="font-size:0.8rem; color:#b8d0b8;">📦 ${productosResumen}</div>
-                        <div style="font-size:0.8rem; color:#b8d0b8;">💳 ${p.metodoPago || 'N/E'} · 🚚 ${p.envio || 'N/E'}</div>
-                        ${p.direccion ? `<div style="font-size:0.8rem; color:#b8d0b8;">📍 ${p.direccion}</div>` : ''}
+                        <div style="font-size:0.8rem; color:#b8d0b8;">💳 ${p.metodoPago || 'N/E'} · 🚚 ${tipoEnvio}</div>
+                        ${p.direccion ? `<div style="font-size:0.8rem; color:#b8d0b8;">📍 ${direccion}</div>` : ''}
                     </div>
                     <div class="estado-label" style="color:${estadoColor};">${p.estado || 'pendiente'}</div>
                     <label style="display:flex; align-items:center; gap:4px; font-size:0.8rem;">
@@ -1725,7 +1785,10 @@
                         </select>
                     </label>
                     <div class="actions">
-                        <button class="btn-eliminar-pedido" onclick="eliminarPedido('${p.id}')" title="Eliminar pedido permanentemente">🗑️</button>
+                        <button class="btn-whatsapp" onclick="abrirWhatsAppPedido('${p.id}')" title="Notificar al cliente por WhatsApp">
+                            💬
+                        </button>
+                        <button class="btn-eliminar-pedido" onclick="eliminarPedido('${p.id}')" title="Eliminar pedido">🗑️</button>
                     </div>
                 `;
                 list.appendChild(div);
@@ -1746,6 +1809,81 @@
                 .then(() => mostrarToast('Estado actualizado', 'success'))
                 .catch(err => mostrarToast('Error: ' + err.message, 'error'));
         }
+
+        // ===== FUNCIÓN PARA ABRIR WHATSAPP CON MENSAJE PERSONALIZADO =====
+        window.abrirWhatsAppPedido = function(id) {
+            const pedido = pedidosActuales.find(p => p.id === id);
+            if (!pedido) {
+                mostrarToast('Pedido no encontrado', 'error');
+                return;
+            }
+
+            const telefono = pedido.telefono || '';
+            if (!telefono) {
+                mostrarToast('El cliente no tiene número de teléfono', 'error');
+                return;
+            }
+
+            const nombre = pedido.nombre || 'Cliente';
+            const estado = pedido.estado || 'pendiente';
+            const tipoEnvio = pedido.envio || 'Retiro en local';
+            const direccion = pedido.direccion || '';
+
+            // Mensaje según estado y tipo de envío
+            let mensaje = `🍔 *Tech Classic Burgers* · Actualización de tu pedido\n\n`;
+            mensaje += `Hola *${nombre}*! 👋\n\n`;
+
+            // Estado con variante según envío
+            switch(estado) {
+                case 'pendiente':
+                    mensaje += `✅ Tu pedido ha sido recibido y está en cola de preparación.`;
+                    if (tipoEnvio.includes('domicilio') || tipoEnvio.includes('Entrega')) {
+                        mensaje += ` En breve te avisamos cuando salga el repartidor.`;
+                    } else {
+                        mensaje += ` Podés pasar a retirarlo cuando te avisemos.`;
+                    }
+                    break;
+                case 'preparando':
+                    mensaje += `👨‍🍳 Tu pedido ya está en preparación.`;
+                    if (tipoEnvio.includes('domicilio') || tipoEnvio.includes('Entrega')) {
+                        mensaje += ` En breve el repartidor saldrá con tu pedido.`;
+                    } else {
+                        mensaje += ` En unos minutos estará listo para que pases a buscarlo.`;
+                    }
+                    break;
+                case 'listo':
+                    mensaje += `🍔 Tu pedido está listo.`;
+                    if (tipoEnvio.includes('domicilio') || tipoEnvio.includes('Entrega')) {
+                        mensaje += ` El repartidor ya salió con tu pedido. ¡Llegará en breve!`;
+                    } else {
+                        mensaje += ` ¡Pasá a buscarlo cuando quieras! Te esperamos en *Av. Tech 123* (o la dirección que prefieras).`;
+                        mensaje += `\n📍 ${MAPS_URL_LOCAL}`;
+                    }
+                    break;
+                case 'entregado':
+                    mensaje += `🚚 Tu pedido ya fue entregado.`;
+                    if (tipoEnvio.includes('domicilio') || tipoEnvio.includes('Entrega')) {
+                        mensaje += ` ¡Disfrutá tu comida! 🍔`;
+                    } else {
+                        mensaje += ` ¡Gracias por elegir Tech Classic Burgers! 🍔`;
+                    }
+                    break;
+                case 'cancelado':
+                    mensaje += `❌ Tu pedido ha sido cancelado.`;
+                    mensaje += ` Si tenés dudas, contactanos al *351-8692251* o por este mismo chat.`;
+                    break;
+                default:
+                    mensaje += `Tu pedido está en estado: *${estado}*`;
+            }
+
+            mensaje += `\n\n¡Gracias por confiar en nosotros! 🙌`;
+            mensaje += `\n📲 *Tech Classic Burgers*`;
+
+            // Limpiar el número (solo dígitos)
+            const telefonoLimpio = telefono.replace(/\D/g, '');
+            // Abrir WhatsApp
+            window.open(`https://wa.me/${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        };
 
         window.eliminarPedido = async function(id) {
             const confirmado = await mostrarConfirm('Eliminar pedido', '¿Eliminar este pedido permanentemente?');
