@@ -110,7 +110,7 @@
             margin-top: 4px;
         }
 
-        /* ===== PROMO BANNER (NUEVO) ===== */
+        /* ===== PROMO BANNER ===== */
         #promoBanner {
             display: none;
             background: linear-gradient(135deg, #1f331f, #2a4a2a);
@@ -1307,7 +1307,7 @@
 
         <!-- ===== BRAND ===== -->
         <div class="brand">
-            <img src="images/logo_tech.webp" alt="Tech Classic Burgers" class="logo" />
+            <img src="images/icon-512.png" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
             <div class="status-card" id="statusCard">
                 <div id="statusText">⏳ Cargando...</div>
@@ -1561,7 +1561,7 @@
         }
 
         // ============================================================
-        //  CARGAR PRODUCTOS DESDE FIREBASE
+        //  CARGAR PRODUCTOS DESDE FIREBASE (CON ORDENAMIENTO)
         // ============================================================
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
@@ -1571,8 +1571,9 @@
                     return;
                 }
                 productos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                // 🔽 ORDENAR POR EL CAMPO 'orden' (si no tiene, se asigna 999 para que quede al final)
+                productos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
                 renderProducts();
-                // Actualizar el carrusel de imágenes
                 generarTrack();
             });
         }
@@ -1633,6 +1634,23 @@
                 const desc = document.createElement('div');
                 desc.className = 'product-desc';
                 desc.textContent = p.desc || '';
+
+                // Categoría y tiempo (si existen)
+                if (p.categoria || p.tiempoPreparacion) {
+                    const meta = document.createElement('div');
+                    meta.style.cssText = 'font-size:0.75rem; color:#8aaa8a; margin-top:4px; display:flex; gap:12px; flex-wrap:wrap;';
+                    if (p.categoria) {
+                        const catSpan = document.createElement('span');
+                        catSpan.textContent = '📂 ' + p.categoria;
+                        meta.appendChild(catSpan);
+                    }
+                    if (p.tiempoPreparacion) {
+                        const timeSpan = document.createElement('span');
+                        timeSpan.textContent = '⏱️ ' + p.tiempoPreparacion + ' min';
+                        meta.appendChild(timeSpan);
+                    }
+                    info.appendChild(meta);
+                }
 
                 const extras = document.createElement('div');
                 extras.className = 'product-extras';
@@ -1709,7 +1727,6 @@
                     return;
                 }
 
-                // Convertir a array y filtrar activas y vigentes
                 const promos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 const now = new Date();
                 const activas = promos.filter(p => {
@@ -1736,7 +1753,6 @@
                         div.style.marginTop = '8px';
                     }
 
-                    // Imagen
                     const imgContainer = document.createElement('div');
                     imgContainer.className = 'promo-img-container';
 
@@ -1761,7 +1777,6 @@
                     imgContainer.appendChild(img);
                     div.appendChild(imgContainer);
 
-                    // Info
                     const info = document.createElement('div');
                     info.className = 'promo-info';
                     info.innerHTML = `
@@ -1771,7 +1786,6 @@
                     `;
                     div.appendChild(info);
 
-                    // Tag
                     const tag = document.createElement('span');
                     tag.className = 'promo-tag';
                     tag.textContent = '🔥 Promo';
@@ -2267,6 +2281,7 @@
 
         function generarTrack() {
             popupTrack.innerHTML = '';
+            // Usamos el array 'productos' ya ordenado
             productos.forEach(p => {
                 const img = document.createElement('img');
                 img.src = p.popupImg || p.imagen || 'images/placeholder.jpg';
