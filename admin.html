@@ -301,16 +301,33 @@
             margin-left: auto;
         }
         .product-item .actions button {
-            background: #ffb703;
             border: none;
-            padding: 6px 16px;
+            padding: 6px 14px;
             border-radius: 30px;
             font-weight: 700;
             cursor: pointer;
             transition: background 0.2s;
         }
-        .product-item .actions button:hover {
+        .product-item .actions .btn-editar {
+            background: #2196F3;
+            color: #fff;
+        }
+        .product-item .actions .btn-editar:hover {
+            background: #1976D2;
+        }
+        .product-item .actions .btn-guardar {
+            background: #ffb703;
+            color: #1a1a1a;
+        }
+        .product-item .actions .btn-guardar:hover {
             background: #e6a500;
+        }
+        .product-item .actions .btn-eliminar {
+            background: #f44336;
+            color: #fff;
+        }
+        .product-item .actions .btn-eliminar:hover {
+            background: #d32f2f;
         }
         .product-item .badge-preview {
             background: #e63946;
@@ -344,11 +361,11 @@
         .btn-danger:hover {
             background: #d32f2f !important;
         }
-        .btn-edit {
+        .btn-edit-promo {
             background: #2196F3 !important;
             color: #fff !important;
         }
-        .btn-edit:hover {
+        .btn-edit-promo:hover {
             background: #1976D2 !important;
         }
 
@@ -399,9 +416,9 @@
                 <button class="btn-add" id="addProductBtn">➕ Nuevo producto</button>
             </div>
 
-            <!-- Formulario para crear producto -->
+            <!-- Formulario para crear/editar producto -->
             <div id="formProducto" class="form-producto">
-                <h3>✏️ Nuevo producto</h3>
+                <h3 id="formProductoTitulo">✏️ Nuevo producto</h3>
                 <input type="text" id="prodNombre" placeholder="Nombre (ej: Doble Cheddar)" />
                 <input type="text" id="prodPrecio" placeholder="Precio (ej: 15000)" />
                 <textarea id="prodDesc" placeholder="Descripción"></textarea>
@@ -409,7 +426,6 @@
                     <input type="text" id="prodImagen" placeholder="URL imagen (ej: images/cheddar.jpg)" />
                     <input type="text" id="prodPopupImg" placeholder="URL imagen popup (ej: images/cheddar-popup.jpg)" />
                 </div>
-                <!-- NUEVOS CAMPOS: Categoría y Tiempo de preparación -->
                 <div class="row">
                     <select id="prodCategoria">
                         <option value="Hamburguesas">🍔 Hamburguesas</option>
@@ -514,6 +530,7 @@
         const formProducto = document.getElementById('formProducto');
         const saveProductBtn = document.getElementById('saveProductBtn');
         const cancelProductBtn = document.getElementById('cancelProductBtn');
+        const formProductoTitulo = document.getElementById('formProductoTitulo');
 
         const addPromoBtn = document.getElementById('addPromoBtn');
         const formPromo = document.getElementById('formPromo');
@@ -603,7 +620,6 @@
                     `<span class="badge-preview">${p.badge}</span>` :
                     '';
 
-                // Mostrar categoría y tiempo si existen
                 const metaHtml = `
                     <div class="meta">
                         ${p.categoria ? `<span>📂 ${p.categoria}</span>` : ''}
@@ -619,15 +635,53 @@
                     <label>💰 Precio: <input type="number" value="${p.price}" data-id="${p.id}" class="price-input" /></label>
                     <label>📦 Disponible: <input type="checkbox" ${p.available !== false ? 'checked' : ''} data-id="${p.id}" class="avail-input" /></label>
                     <div class="actions">
-                        <button onclick="actualizarProducto('${p.id}')">Guardar</button>
-                        <button onclick="eliminarProducto('${p.id}')" style="background:#f44336; color:#fff;">🗑️</button>
+                        <button class="btn-editar" onclick="editarProducto('${p.id}')">✏️ Editar</button>
+                        <button class="btn-guardar" onclick="actualizarProducto('${p.id}')">💾 Guardar</button>
+                        <button class="btn-eliminar" onclick="eliminarProducto('${p.id}')">🗑️</button>
                     </div>
                 `;
                 list.appendChild(div);
             });
         }
 
-        // Función para eliminar producto
+        // ---- EDITAR PRODUCTO (carga datos en el formulario) ----
+        window.editarProducto = async function(id) {
+            try {
+                const snapshot = await db.ref('products/' + id).once('value');
+                const producto = snapshot.val();
+                if (!producto) {
+                    alert('❌ Producto no encontrado');
+                    return;
+                }
+
+                // Cargar datos en el formulario
+                document.getElementById('prodNombre').value = producto.name || '';
+                document.getElementById('prodPrecio').value = producto.price || '';
+                document.getElementById('prodDesc').value = producto.desc || '';
+                document.getElementById('prodImagen').value = producto.imagen || '';
+                document.getElementById('prodPopupImg').value = producto.popupImg || '';
+                document.getElementById('prodCategoria').value = producto.categoria || 'Hamburguesas';
+                document.getElementById('prodTiempo').value = producto.tiempoPreparacion || 15;
+                document.getElementById('prodBadge').value = producto.badge || '';
+                document.getElementById('prodId').value = producto.id || '';
+                document.getElementById('prodId').readOnly = true; // No se puede cambiar el ID
+                document.getElementById('prodHasExtras').checked = producto.hasExtras || false;
+                document.getElementById('prodDisponible').checked = producto.available !== false;
+
+                // Cambiar título del formulario
+                formProductoTitulo.textContent = '✏️ Editando: ' + producto.name;
+                formProducto.classList.add('active');
+                window.editandoProductoId = id;
+
+                // Scroll al formulario
+                formProducto.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            } catch (error) {
+                alert('❌ Error al cargar producto: ' + error.message);
+            }
+        };
+
+        // ---- ELIMINAR PRODUCTO ----
         window.eliminarProducto = async function(id) {
             if (!confirm(`¿Eliminar el producto "${id}" permanentemente?`)) return;
             try {
@@ -638,6 +692,7 @@
             }
         };
 
+        // ---- ACTUALIZAR PRECIO Y DISPONIBILIDAD (desde la lista) ----
         window.actualizarProducto = async function(id) {
             const priceInput = document.querySelector(`.price-input[data-id="${id}"]`);
             const availInput = document.querySelector(`.avail-input[data-id="${id}"]`);
@@ -652,6 +707,7 @@
             }
         };
 
+        // ---- CREAR PRODUCTOS POR DEFECTO ----
         function crearProductosDefault() {
             const defaultProducts = [
                 { id: 'armatuburger', name: 'Armá tu Burger', price: 12000, desc: '1 medallón 120gr · doble cheddar · salsa Tech.', hasExtras: true, badge: 'BASE', imagen: 'images/arm.jpg', popupImg: 'images/bn1.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15 },
@@ -675,24 +731,33 @@
             });
         }
 
-        // ---- CREAR NUEVO PRODUCTO ----
+        // ---- CREAR / EDITAR PRODUCTO (desde el formulario) ----
+        let editandoProductoId = null;
+
         function mostrarFormProducto() {
-            formProducto.classList.add('active');
+            // Limpiar formulario para nuevo producto
             document.getElementById('prodNombre').value = '';
             document.getElementById('prodPrecio').value = '';
             document.getElementById('prodDesc').value = '';
             document.getElementById('prodImagen').value = '';
             document.getElementById('prodPopupImg').value = '';
-            document.getElementById('prodBadge').value = '';
-            document.getElementById('prodId').value = '';
             document.getElementById('prodCategoria').value = 'Hamburguesas';
             document.getElementById('prodTiempo').value = 15;
+            document.getElementById('prodBadge').value = '';
+            document.getElementById('prodId').value = '';
+            document.getElementById('prodId').readOnly = false;
             document.getElementById('prodHasExtras').checked = false;
             document.getElementById('prodDisponible').checked = true;
+            formProductoTitulo.textContent = '✏️ Nuevo producto';
+            editandoProductoId = null;
+            formProducto.classList.add('active');
+            document.getElementById('prodNombre').focus();
         }
 
         function ocultarFormProducto() {
             formProducto.classList.remove('active');
+            editandoProductoId = null;
+            document.getElementById('prodId').readOnly = false;
         }
 
         addProductBtn.addEventListener('click', mostrarFormProducto);
@@ -704,13 +769,14 @@
             const desc = document.getElementById('prodDesc').value.trim();
             const imagen = document.getElementById('prodImagen').value.trim();
             const popupImg = document.getElementById('prodPopupImg').value.trim();
-            const badge = document.getElementById('prodBadge').value.trim() || null;
-            const id = document.getElementById('prodId').value.trim().toLowerCase().replace(/\s+/g, '-');
             const categoria = document.getElementById('prodCategoria').value;
             const tiempoPreparacion = parseInt(document.getElementById('prodTiempo').value) || 15;
+            const badge = document.getElementById('prodBadge').value.trim() || null;
+            let id = document.getElementById('prodId').value.trim().toLowerCase().replace(/\s+/g, '-');
             const hasExtras = document.getElementById('prodHasExtras').checked;
             const disponible = document.getElementById('prodDisponible').checked;
 
+            // Validaciones
             if (!nombre || !precio || !id) {
                 alert('❌ Nombre, precio e ID son obligatorios.');
                 return;
@@ -724,12 +790,6 @@
                 return;
             }
 
-            const snapshot = await db.ref('products/' + id).once('value');
-            if (snapshot.exists()) {
-                alert('❌ Ya existe un producto con ese ID. Usá otro.');
-                return;
-            }
-
             const nuevoProducto = {
                 id: id,
                 name: nombre,
@@ -737,19 +797,33 @@
                 desc: desc || '',
                 imagen: imagen || 'images/placeholder.jpg',
                 popupImg: popupImg || imagen || 'images/placeholder.jpg',
-                badge: badge,
                 categoria: categoria,
                 tiempoPreparacion: tiempoPreparacion,
+                badge: badge,
                 hasExtras: hasExtras,
                 available: disponible
             };
 
             try {
-                await db.ref('products/' + id).set(nuevoProducto);
-                alert('✅ Producto creado correctamente');
+                if (editandoProductoId) {
+                    // === MODO EDICIÓN ===
+                    // Mantener el ID original, actualizar el resto
+                    await db.ref('products/' + editandoProductoId).update(nuevoProducto);
+                    alert('✅ Producto actualizado correctamente');
+                } else {
+                    // === MODO CREACIÓN ===
+                    // Verificar que el ID no exista
+                    const snapshot = await db.ref('products/' + id).once('value');
+                    if (snapshot.exists()) {
+                        alert('❌ Ya existe un producto con ese ID. Usá otro.');
+                        return;
+                    }
+                    await db.ref('products/' + id).set(nuevoProducto);
+                    alert('✅ Producto creado correctamente');
+                }
                 ocultarFormProducto();
             } catch (error) {
-                alert('❌ Error al crear: ' + error.message);
+                alert('❌ Error al guardar: ' + error.message);
             }
         });
 
@@ -780,7 +854,7 @@
                     <div class="dates">${p.startDate || ''} → ${p.endDate || ''}</div>
                     <div class="status">${p.active ? '✅ Activa' : '❌ Inactiva'}</div>
                     <div class="actions">
-                        <button class="btn-edit" onclick="editarPromocion('${p.id}')">✏️ Editar</button>
+                        <button class="btn-edit-promo" onclick="editarPromocion('${p.id}')">✏️ Editar</button>
                         <button class="btn-danger" onclick="eliminarPromocion('${p.id}')">🗑️ Eliminar</button>
                     </div>
                 `;
@@ -840,19 +914,61 @@
         };
 
         window.editarPromocion = async function(id) {
-            const nuevoTitulo = prompt('Nuevo título:');
-            if (nuevoTitulo === null) return;
-            if (nuevoTitulo.trim() === '') {
-                alert('El título no puede estar vacío');
-                return;
-            }
             try {
-                await db.ref('promotions/' + id).update({ title: nuevoTitulo.trim() });
-                alert('✅ Título actualizado');
+                const snapshot = await db.ref('promotions/' + id).once('value');
+                const promo = snapshot.val();
+                if (!promo) {
+                    alert('❌ Promoción no encontrada');
+                    return;
+                }
+                // Cargar datos en el formulario de promoción
+                document.getElementById('promoTitulo').value = promo.title || '';
+                document.getElementById('promoDesc').value = promo.description || '';
+                document.getElementById('promoImagen').value = promo.image || '';
+                document.getElementById('promoInicio').value = promo.startDate || '';
+                document.getElementById('promoFin').value = promo.endDate || '';
+                document.getElementById('promoActiva').checked = promo.active !== false;
+                formPromo.classList.add('active');
+                // Cambiar el comportamiento del botón guardar para editar
+                const originalClick = savePromoBtn._listener;
+                savePromoBtn._editandoId = id;
+                // Reemplazar temporalmente el evento
+                savePromoBtn.onclick = async function() {
+                    const titulo = document.getElementById('promoTitulo').value.trim();
+                    const desc = document.getElementById('promoDesc').value.trim();
+                    if (!titulo || !desc) {
+                        alert('❌ Título y descripción son obligatorios');
+                        return;
+                    }
+                    const data = {
+                        title: titulo,
+                        description: desc,
+                        image: document.getElementById('promoImagen').value.trim() || '',
+                        startDate: document.getElementById('promoInicio').value || '',
+                        endDate: document.getElementById('promoFin').value || '',
+                        active: document.getElementById('promoActiva').checked
+                    };
+                    try {
+                        await db.ref('promotions/' + id).update(data);
+                        alert('✅ Promoción actualizada');
+                        ocultarFormPromo();
+                        // Restaurar el evento original
+                        savePromoBtn.onclick = savePromoBtn._originalClick || function() {};
+                    } catch (error) {
+                        alert('❌ Error: ' + error.message);
+                    }
+                };
+                // Guardar referencia al original para restaurar
+                if (!savePromoBtn._originalClick) {
+                    savePromoBtn._originalClick = savePromoBtn.onclick;
+                }
+                formPromo.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                alert('❌ Error al cargar promoción: ' + error.message);
             }
         };
+        // Restaurar el evento original del botón guardar promoción
+        savePromoBtn._originalClick = savePromoBtn.onclick;
     </script>
 </body>
 </html>
