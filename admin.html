@@ -590,7 +590,6 @@
             gap: 12px;
         }
         .pedido-item .info { flex: 2; min-width: 200px; }
-        .pedido-item .info strong { color: #ffb703; }
         .pedido-item .estado-label { font-weight: 600; min-width: 80px; }
         .pedido-item .actions {
             display: flex;
@@ -735,62 +734,35 @@
             <div class="hint">Usá el correo y contraseña configurados en Firebase.</div>
         </div>
 
-        <!-- ===== PANEL DE ADMIN ===== -->
+        <!-- ===== PANEL DE ADMIN (NUEVO ORDEN) ===== -->
         <div id="adminPanel">
             <div class="panel-header">
                 <span class="user-info">👤 <strong id="userEmail">admin@techburgers.com</strong></span>
                 <button class="btn-logout" id="logoutBtn">🚪 Cerrar sesión</button>
             </div>
 
-            <!-- ===== PRODUCTOS ===== -->
+            <!-- ===== 1️⃣ PEDIDOS ===== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                <h2>📋 Productos</h2>
-                <button class="btn-add" id="addProductBtn">➕ Nuevo producto</button>
-            </div>
-            <div class="filtro-container">
-                <label for="filtroCategoria">🔍 Filtrar por categoría:</label>
-                <select id="filtroCategoria"><option value="todas">Todas</option></select>
-            </div>
-            <div id="formProducto" class="form-producto">
-                <h3 id="formProductoTitulo">✏️ Nuevo producto</h3>
-                <div class="form-group"><label for="prodNombre">Nombre <span class="required">*</span></label><input type="text" id="prodNombre" placeholder="Ej: Doble Cheddar" /></div>
-                <div class="form-group"><label for="prodPrecio">Precio <span class="required">*</span></label><input type="text" id="prodPrecio" placeholder="Ej: 15000" /></div>
-                <div class="form-group"><label for="prodDesc">Descripción</label><textarea id="prodDesc" placeholder="Ej: Doble medallón 120gr · doble cheddar · salsa Tech."></textarea></div>
-                <div class="form-row">
-                    <div class="form-group"><label for="prodImagen">URL imagen</label><input type="text" id="prodImagen" placeholder="Ej: images/cheddar.jpg" /><span class="hint-text">Imagen que se muestra en la tarjeta</span></div>
-                    <div class="form-group"><label for="prodPopupImg">URL popup</label><input type="text" id="prodPopupImg" placeholder="Ej: images/cheddar-popup.jpg" /><span class="hint-text">Imagen ampliada</span></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label for="prodCategoria">Categoría</label>
-                        <select id="prodCategoria">
-                            <option value="Hamburguesas">🍔 Hamburguesas</option>
-                            <option value="Papas">🍟 Papas</option>
-                            <option value="Bebidas">🥤 Bebidas</option>
-                            <option value="Postres">🍰 Postres</option>
-                            <option value="Otros">📦 Otros</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label for="prodTiempo">Tiempo (min)</label><input type="number" id="prodTiempo" value="15" min="1" /><span class="hint-text">Tiempo estimado de preparación</span></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label for="prodBadge">Badge</label><input type="text" id="prodBadge" placeholder="Ej: NUEVO, BASE, PROMO" /><span class="hint-text">Etiqueta destacada</span></div>
-                    <div class="form-group"><label for="prodId">ID <span class="required">*</span></label><input type="text" id="prodId" placeholder="Ej: doble-cheddar" /><span class="hint-text">🔑 Único, sin espacios. Solo minúsculas y guiones. <strong>No se puede cambiar en edición.</strong></span></div>
-                </div>
-                <hr class="form-divider" />
-                <div class="form-checkbox-group">
-                    <label><input type="checkbox" id="prodHasExtras" /> Tiene medallones extra y toppings</label>
-                    <label><input type="checkbox" id="prodDisponible" checked /> Disponible</label>
-                </div>
-                <div class="form-actions">
-                    <button class="btn-save" id="saveProductBtn">💾 Guardar</button>
-                    <button class="btn-cancel" id="cancelProductBtn">Cancelar</button>
+                <h2>📦 Pedidos</h2>
+                <div class="filtro-container" style="margin:0;">
+                    <label for="filtroEstado">Filtrar por estado:</label>
+                    <select id="filtroEstado">
+                        <option value="todos">Todos</option>
+                        <option value="pendiente">⏳ Pendiente</option>
+                        <option value="preparando">👨‍🍳 Preparando</option>
+                        <option value="listo">✅ Listo</option>
+                        <option value="entregado">🚚 Entregado</option>
+                        <option value="cancelado">❌ Cancelado</option>
+                    </select>
                 </div>
             </div>
-            <div id="productList"></div>
+            <div class="pedido-list-wrapper" id="pedidoListWrapper">
+                <div id="pedidoList"></div>
+            </div>
 
             <hr style="border-color:#2f4a2f; margin:20px 0;">
 
-            <!-- ===== PROMOCIONES ===== -->
+            <!-- ===== 2️⃣ PROMOCIONES ===== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                 <h2>🎯 Promociones</h2>
                 <button class="btn-add" id="addPromoBtn">➕ Agregar promoción</button>
@@ -816,7 +788,7 @@
 
             <hr style="border-color:#2f4a2f; margin:20px 0;">
 
-            <!-- ===== HORARIO EXCEPCIONAL ===== -->
+            <!-- ===== 3️⃣ HORARIO EXCEPCIONAL ===== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                 <h2>⏰ Horario excepcional</h2>
                 <button class="btn-add" id="addExcepcionBtn">➕ Agregar excepción</button>
@@ -872,24 +844,51 @@
 
             <hr style="border-color:#2f4a2f; margin:20px 0;">
 
-            <!-- ===== PEDIDOS ===== -->
+            <!-- ===== 4️⃣ PRODUCTOS ===== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                <h2>📦 Pedidos</h2>
-                <div class="filtro-container" style="margin:0;">
-                    <label for="filtroEstado">Filtrar por estado:</label>
-                    <select id="filtroEstado">
-                        <option value="todos">Todos</option>
-                        <option value="pendiente">⏳ Pendiente</option>
-                        <option value="preparando">👨‍🍳 Preparando</option>
-                        <option value="listo">✅ Listo</option>
-                        <option value="entregado">🚚 Entregado</option>
-                        <option value="cancelado">❌ Cancelado</option>
-                    </select>
+                <h2>📋 Productos</h2>
+                <button class="btn-add" id="addProductBtn">➕ Nuevo producto</button>
+            </div>
+            <div class="filtro-container">
+                <label for="filtroCategoria">🔍 Filtrar por categoría:</label>
+                <select id="filtroCategoria"><option value="todas">Todas</option></select>
+            </div>
+            <div id="formProducto" class="form-producto">
+                <h3 id="formProductoTitulo">✏️ Nuevo producto</h3>
+                <div class="form-group"><label for="prodNombre">Nombre <span class="required">*</span></label><input type="text" id="prodNombre" placeholder="Ej: Doble Cheddar" /></div>
+                <div class="form-group"><label for="prodPrecio">Precio <span class="required">*</span></label><input type="text" id="prodPrecio" placeholder="Ej: 15000" /></div>
+                <div class="form-group"><label for="prodDesc">Descripción</label><textarea id="prodDesc" placeholder="Ej: Doble medallón 120gr · doble cheddar · salsa Tech."></textarea></div>
+                <div class="form-row">
+                    <div class="form-group"><label for="prodImagen">URL imagen</label><input type="text" id="prodImagen" placeholder="Ej: images/cheddar.jpg" /><span class="hint-text">Imagen que se muestra en la tarjeta</span></div>
+                    <div class="form-group"><label for="prodPopupImg">URL popup</label><input type="text" id="prodPopupImg" placeholder="Ej: images/cheddar-popup.jpg" /><span class="hint-text">Imagen ampliada</span></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="prodCategoria">Categoría</label>
+                        <select id="prodCategoria">
+                            <option value="Hamburguesas">🍔 Hamburguesas</option>
+                            <option value="Papas">🍟 Papas</option>
+                            <option value="Bebidas">🥤 Bebidas</option>
+                            <option value="Postres">🍰 Postres</option>
+                            <option value="Otros">📦 Otros</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="prodTiempo">Tiempo (min)</label><input type="number" id="prodTiempo" value="15" min="1" /><span class="hint-text">Tiempo estimado de preparación</span></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="prodBadge">Badge</label><input type="text" id="prodBadge" placeholder="Ej: NUEVO, BASE, PROMO" /><span class="hint-text">Etiqueta destacada</span></div>
+                    <div class="form-group"><label for="prodId">ID <span class="required">*</span></label><input type="text" id="prodId" placeholder="Ej: doble-cheddar" /><span class="hint-text">🔑 Único, sin espacios. Solo minúsculas y guiones. <strong>No se puede cambiar en edición.</strong></span></div>
+                </div>
+                <hr class="form-divider" />
+                <div class="form-checkbox-group">
+                    <label><input type="checkbox" id="prodHasExtras" /> Tiene medallones extra y toppings</label>
+                    <label><input type="checkbox" id="prodDisponible" checked /> Disponible</label>
+                </div>
+                <div class="form-actions">
+                    <button class="btn-save" id="saveProductBtn">💾 Guardar</button>
+                    <button class="btn-cancel" id="cancelProductBtn">Cancelar</button>
                 </div>
             </div>
-            <div class="pedido-list-wrapper" id="pedidoListWrapper">
-                <div id="pedidoList"></div>
-            </div>
+            <div id="productList"></div>
 
             <hr style="border-color:#2f4a2f; margin:20px 0;">
             <div style="font-size:0.8rem; color:#6a8a6a; text-align:center;">
@@ -1805,12 +1804,12 @@
                 const div = document.createElement('div');
                 div.className = 'pedido-item';
 
-                // Formatear fecha y hora
-                let fechaHora = 'Fecha desconocida';
+                // Formatear fecha y hora separadas
+                let fechaStr = 'Fecha desconocida';
                 let horaStr = '';
                 if (p.fecha) {
                     const fechaObj = new Date(p.fecha);
-                    fechaHora = fechaObj.toLocaleDateString('es-AR') + ' ' + fechaObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+                    fechaStr = fechaObj.toLocaleDateString('es-AR');
                     horaStr = fechaObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
                 }
 
@@ -1820,12 +1819,15 @@
                                     p.estado === 'listo' ? '#2196F3' :
                                     p.estado === 'entregado' ? '#8aaa8a' : '#f44336';
 
-                // Construir el HTML con total y hora en negrita
+                // Construir el HTML con fecha y total en amarillo, hora en blanco
                 div.innerHTML = `
                     <div class="info">
                         <div><strong>${p.nombre || 'Sin nombre'}</strong> (${p.telefono || 'Sin teléfono'})</div>
-                        <div style="font-size:0.8rem; color:#b8d0b8;">
-                            <strong>${fechaHora}</strong> · <strong>${total}</strong>
+                        <div style="font-size:0.8rem;">
+                            <strong style="color:#ffb703;">${fechaStr}</strong> 
+                            <span style="color:#e8f0e8; font-weight:700;">${horaStr}</span> 
+                            · 
+                            <strong style="color:#ffb703;">${total}</strong>
                         </div>
                         <div style="font-size:0.8rem; color:#b8d0b8;">
                             📦 ${p.productos ? p.productos.map(prod => `${prod.cantidad}x ${prod.nombre}`).join(', ') : 'Sin productos'}
