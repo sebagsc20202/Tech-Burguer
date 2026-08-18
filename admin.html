@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Tech Burgers</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #1a2e1a;
+            color: #e8f0e8;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #ffb703;
+            margin-bottom: 15px;
+        }
+        hr {
+            border: 1px solid #2f4a2f;
+            margin: 20px 0;
+        }
+        .login {
+            background: #1f331f;
+            padding: 30px 20px;
+            border-radius: 12px;
+            border: 2px solid #3a5a3a;
+            max-width: 400px;
+            margin: 40px auto;
+        }
+        .login h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .login input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 40px;
+            border: 1px solid #3a5a3a;
+            background: #1a2e1a;
+            color: #fff;
+            font-size: 1rem;
+        }
+        .login button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 40px;
+            background: #ffb703;
+            color: #1a1a1a;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .login button:hover {
+            background: #e6a500;
+        }
+        .login .hint {
+            color: #b8d0b8;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .login .hint span {
+            color: #ffb703;
+            font-weight: 700;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .panel-header button {
+            background: #f44336;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .panel-header button:hover {
+            background: #d32f2f;
+        }
+
+        .product-item, .promo-item {
+            background: #1f331f;
+            border: 1px solid #3a5a3a;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+        .product-item .name {
+            flex: 2;
+            font-weight: 600;
+            min-width: 120px;
+        }
+        .product-item label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+        .product-item input[type="number"] {
+            width: 70px;
+            padding: 6px 8px;
+            border-radius: 30px;
+            border: 1px solid #3a5a3a;
+            background: #1a2e1a;
+            color: #fff;
+            font-weight: 600;
+        }
+        .product-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #e63946;
+            cursor: pointer;
+        }
+        .product-item button {
+            background: #ffb703;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .product-item button:hover {
+            background: #e6a500;
+        }
+
+        .promo-item {
+            flex-wrap: wrap;
+        }
+        .promo-item .info {
+            flex: 1;
+            min-width: 150px;
+        }
+        .promo-item .dates {
+            font-size: 0.8rem;
+            color: #b8d0b8;
+        }
+        .promo-item .status {
+            font-weight: 600;
+        }
+        .promo-item .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn-danger {
+            background: #f44336 !important;
+            color: #fff !important;
+        }
+        .btn-danger:hover {
+            background: #d32f2f !important;
+        }
+        .btn-edit {
+            background: #2196F3 !important;
+            color: #fff !important;
+        }
+        .btn-edit:hover {
+            background: #1976D2 !important;
+        }
+        .btn-add {
+            background: #4caf50;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin: 10px 0;
+        }
+        .btn-add:hover {
+            background: #388e3c;
+        }
+
+        .form-promo {
+            background: #1f331f;
+            border: 2px solid #3a5a3a;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            display: none;
+        }
+        .form-promo.active {
+            display: block;
+        }
+        .form-promo input {
+            width: 100%;
+            padding: 10px 14px;
+            margin: 6px 0;
+            border-radius: 40px;
+            border: 1px solid #3a5a3a;
+            background: #1a2e1a;
+            color: #fff;
+        }
+        .form-promo input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+        .form-promo .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .form-promo .row input {
+            flex: 1;
+            min-width: 150px;
+        }
+        .form-promo .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .form-promo .actions button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-save {
+            background: #ffb703;
+            color: #1a1a1a;
+        }
+        .btn-save:hover {
+            background: #e6a500;
+        }
+        .btn-cancel {
+            background: #555;
+            color: #fff;
+        }
+        .btn-cancel:hover {
+            background: #444;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 600px) {
+            .product-item, .promo-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .product-item label {
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>🍔 Admin Tech Burgers</h1>
+
+    <!-- ===== LOGIN ===== -->
+    <div id="loginSection" class="login">
+        <h2>🔐 Ingresar</h2>
+        <input type="password" id="passInput" placeholder="Contraseña de administrador" autofocus>
+        <button onclick="login()">Acceder</button>
+        <div class="hint">Contraseña por defecto: <span>admin123</span> (cámbiala en el código)</div>
+    </div>
+
+    <!-- ===== PANEL ===== -->
+    <div id="adminPanel" class="hidden">
+        <div class="panel-header">
+            <h2>📦 Panel de control</h2>
+            <button onclick="logout()">🚪 Cerrar sesión</button>
+        </div>
+
+        <!-- Productos -->
+        <h2>📋 Productos</h2>
+        <div id="productList"></div>
+
+        <hr>
+
+        <!-- Promociones -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <h2>🎯 Promociones</h2>
+            <button class="btn-add" onclick="mostrarFormPromo()">➕ Agregar promoción</button>
+        </div>
+        <div id="promoList"></div>
+
+        <!-- Formulario de promoción -->
+        <div id="formPromo" class="form-promo">
+            <h3>✏️ Nueva promoción</h3>
+            <input type="text" id="promoTitulo" placeholder="Título (ej: 2x1)">
+            <input type="text" id="promoDesc" placeholder="Descripción (ej: Llevá dos burgers)">
+            <input type="text" id="promoImagen" placeholder="URL imagen (ej: images/promo1.jpg)">
+            <div class="row">
+                <input type="date" id="promoInicio">
+                <input type="date" id="promoFin">
+            </div>
+            <div style="margin: 10px 0;">
+                <label style="display:flex; align-items:center; gap:8px;">
+                    <input type="checkbox" id="promoActiva" checked> Activa
+                </label>
+            </div>
+            <div class="actions">
+                <button class="btn-save" onclick="guardarPromocion()">💾 Guardar</button>
+                <button class="btn-cancel" onclick="ocultarFormPromo()">Cancelar</button>
+            </div>
+        </div>
+
+        <hr>
+        <div style="font-size:0.8rem; color:#6a8a6a; margin-top:20px;">
+            Los cambios se guardan automáticamente en Firebase.
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== FIREBASE SDK ===== -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+<script>
+    // ============================================================
+    //  CONFIGURACIÓN DE FIREBASE (TUS DATOS)
+    // ============================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyCbS9zdQcpj0HThGqQVKcfsNjMFQ9gjf9U",
+        authDomain: "tech-burgers.firebaseapp.com",
+        databaseURL: "https://tech-burgers-default-rtdb.firebaseio.com",
+        projectId: "tech-burgers",
+        storageBucket: "tech-burgers.firebasestorage.app",
+        messagingSenderId: "795678558305",
+        appId: "1:795678558305:web:5929a7d3789a939d6f4220"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // ============================================================
+    //  AUTENTICACIÓN SIMPLE (CAMBIAR CONTRASEÑA AQUÍ)
+    // ============================================================
+    const ADMIN_PASSWORD = 'admin123'; // ← Cámbiala por la que quieras
+
+    function login() {
+        const pass = document.getElementById('passInput').value;
+        if (pass === ADMIN_PASSWORD) {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            cargarDatos();
+        } else {
+            alert('❌ Contraseña incorrecta');
+            document.getElementById('passInput').value = '';
+            document.getElementById('passInput').focus();
+        }
+    }
+
+    // Permitir login con Enter
+    document.getElementById('passInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') login();
+    });
+
+    function logout() {
+        document.getElementById('loginSection').classList.remove('hidden');
+        document.getElementById('adminPanel').classList.add('hidden');
+        document.getElementById('passInput').value = '';
+        // Desconectar listeners de Firebase (opcional)
+        db.ref('products').off();
+        db.ref('promotions').off();
+    }
+
+    // ============================================================
+    //  CARGA DE DATOS (REALTIME)
+    // ============================================================
+    function cargarDatos() {
+        cargarProductos();
+        cargarPromociones();
+    }
+
+    // ---- PRODUCTOS ----
+    function cargarProductos() {
+        db.ref('products').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (!data) {
+                // Si no hay productos, creamos los por defecto
+                crearProductosDefault();
+                return;
+            }
+            // Convertir objeto a array
+            const productos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+            renderProductos(productos);
+        });
+    }
+
+    function renderProductos(productos) {
+        const list = document.getElementById('productList');
+        list.innerHTML = '';
+        if (productos.length === 0) {
+            list.innerHTML = '<p style="color:#b8d0b8;">No hay productos cargados.</p>';
+            return;
+        }
+        productos.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'product-item';
+            div.innerHTML = `
+                <span class="name">${p.name} ${p.badge ? '<span style="background:#e63946;padding:2px 8px;border-radius:20px;font-size:0.7rem;color:#fff;">'+p.badge+'</span>' : ''}</span>
+                <label>💰 Precio: <input type="number" value="${p.price}" data-id="${p.id}" class="price-input"></label>
+                <label>📦 Disponible: <input type="checkbox" ${p.available !== false ? 'checked' : ''} data-id="${p.id}" class="avail-input"></label>
+                <button onclick="actualizarProducto('${p.id}')">Guardar</button>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    async function actualizarProducto(id) {
+        const priceInput = document.querySelector(`.price-input[data-id="${id}"]`);
+        const availInput = document.querySelector(`.avail-input[data-id="${id}"]`);
+        if (!priceInput || !availInput) return;
+        const price = parseInt(priceInput.value);
+        const available = availInput.checked;
+        try {
+            await db.ref('products/' + id).update({ price, available });
+            alert('✅ Producto actualizado correctamente');
+        } catch (error) {
+            alert('❌ Error al actualizar: ' + error.message);
+        }
+    }
+
+    function crearProductosDefault() {
+        const defaultProducts = [
+            { id: 'armatuburger', name: 'Armá tu Burger', price: 12000, desc: '1 medallón 120gr · doble cheddar · salsa Tech.', hasExtras: true, badge: 'BASE', imagen: 'images/arm.jpg', popupImg: 'images/bn1.webp', available: true },
+            { id: 'doblep', name: 'Doble Provoleta', price: 18000, desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.', hasExtras: false, badge: null, imagen: 'images/pro.jpg', popupImg: 'images/bn2.webp', available: true },
+            { id: 'intense', name: 'Intense', price: 18000, desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/int.jpg', popupImg: 'images/bn3.webp', available: true },
+            { id: 'techmex', name: 'Tech Mex', price: 18000, desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/mex.jpg', popupImg: 'images/bn4.webp', available: true },
+            { id: 'yankee', name: 'Yankee', price: 16000, desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.', hasExtras: false, badge: null, imagen: 'images/yan.jpg', popupImg: 'images/bn5.webp', available: true },
+            { id: 'clasica', name: 'Clásica', price: 16000, desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.', hasExtras: false, badge: null, imagen: 'images/cla.jpg', popupImg: 'images/bn6.webp', available: true }
+        ];
+        defaultProducts.forEach(p => {
+            db.ref('products/' + p.id).set(p);
+        });
+        // Crear una promoción de ejemplo
+        db.ref('promotions').push({
+            title: 'Promo 2x1',
+            description: 'Llevá dos burgers por el precio de una',
+            image: 'images/promo1.jpg',
+            startDate: '2026-08-18',
+            endDate: '2026-08-31',
+            active: true
+        });
+        // Después de crearlos, se recargará automáticamente por el listener
+    }
+
+    // ---- PROMOCIONES ----
+    function cargarPromociones() {
+        db.ref('promotions').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (!data) {
+                document.getElementById('promoList').innerHTML = '<p style="color:#b8d0b8;">No hay promociones aún.</p>';
+                return;
+            }
+            const promos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+            renderPromociones(promos);
+        });
+    }
+
+    function renderPromociones(promos) {
+        const list = document.getElementById('promoList');
+        list.innerHTML = '';
+        promos.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'promo-item';
+            const fechaInicio = p.startDate ? new Date(p.startDate).toLocaleDateString('es-AR') : 'sin fecha';
+            const fechaFin = p.endDate ? new Date(p.endDate).toLocaleDateString('es-AR') : 'sin fecha';
+            div.innerHTML = `
+                <div class="info">
+                    <strong>${p.title}</strong> — ${p.description}
+                </div>
+                <div class="dates">📅 ${fechaInicio} → ${fechaFin}</div>
+                <div class="status">${p.active ? '✅ Activa' : '❌ Inactiva'}</div>
+                <div class="actions">
+                    <button class="btn-edit" onclick="editarPromocion('${p.id}')">✏️ Editar</button>
+                    <button class="btn-danger" onclick="eliminarPromocion('${p.id}')">🗑️ Eliminar</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    // Mostrar/ocultar formulario de promoción
+    function mostrarFormPromo() {
+        document.getElementById('formPromo').classList.add('active');
+        // Limpiar campos (excepto la fecha)
+        document.getElementById('promoTitulo').value = '';
+        document.getElementById('promoDesc').value = '';
+        document.getElementById('promoImagen').value = '';
+        document.getElementById('promoActiva').checked = true;
+        // Fechas opcionales: dejar vacías
+        document.getElementById('promoInicio').value = '';
+        document.getElementById('promoFin').value = '';
+    }
+
+    function ocultarFormPromo() {
+        document.getElementById('formPromo').classList.remove('active');
+    }
+
+    async function guardarPromocion() {
+        const titulo = document.getElementById('promoTitulo').value.trim();
+        const desc = document.getElementById('promoDesc').value.trim();
+        if (!titulo || !desc) {
+            alert('❌ Título y descripción son obligatorios');
+            return;
+        }
+        const data = {
+            title: titulo,
+            description: desc,
+            image: document.getElementById('promoImagen').value.trim() || '',
+            startDate: document.getElementById('promoInicio').value || '',
+            endDate: document.getElementById('promoFin').value || '',
+            active: document.getElementById('promoActiva').checked
+        };
+        try {
+            await db.ref('promotions').push(data);
+            alert('✅ Promoción creada correctamente');
+            ocultarFormPromo();
+        } catch (error) {
+            alert('❌ Error al guardar: ' + error.message);
+        }
+    }
+
+    async function eliminarPromocion(id) {
+        if (!confirm('¿Eliminar esta promoción permanentemente?')) return;
+        try {
+            await db.ref('promotions/' + id).remove();
+            alert('✅ Promoción eliminada');
+        } catch (error) {
+            alert('❌ Error al eliminar: ' + error.message);
+        }
+    }
+
+    async function editarPromocion(id) {
+        const nuevoTitulo = prompt('Nuevo título:');
+        if (nuevoTitulo === null) return; // canceló
+        if (nuevoTitulo.trim() === '') {
+            alert('El título no puede estar vacío');
+            return;
+        }
+        try {
+            await db.ref('promotions/' + id).update({ title: nuevoTitulo.trim() });
+            alert('✅ Título actualizado');
+        } catch (error) {
+            alert('❌ Error al actualizar: ' + error.message);
+        }
+        // Para editar más campos, se puede extender fácilmente.
+    }
+
+    // ============================================================
+    //  INICIO: si ya hay sesión, no mostrar login
+    //  (por simplicidad siempre mostramos login al cargar)
+    // ============================================================
+    // Al cargar, si la sesión está activa (puedes usar localStorage)
+    // pero por seguridad preferimos pedir siempre la contraseña.
+    // Si quieres persistencia, puedes guardar un token en localStorage.
+</script>
+</body>
+</html>
