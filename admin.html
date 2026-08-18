@@ -137,7 +137,7 @@
             background: #5a2a2a;
         }
 
-        /* ===== FORMULARIO PRODUCTO (con etiquetas) ===== */
+        /* ===== FORMULARIO PRODUCTO ===== */
         .form-producto {
             background: #1f331f;
             border: 2px solid #ffb703;
@@ -149,18 +149,15 @@
         .form-producto.active {
             display: block;
         }
-
         .form-producto h3 {
             color: #ffb703;
             font-size: 1.3rem;
             margin-bottom: 16px;
             text-align: center;
         }
-
         .form-group {
             margin-bottom: 12px;
         }
-
         .form-group label {
             display: block;
             font-size: 0.85rem;
@@ -168,19 +165,16 @@
             margin-bottom: 4px;
             font-weight: 600;
         }
-
         .form-group label .required {
             color: #ff6b6b;
             margin-left: 2px;
         }
-
         .form-group .hint-text {
             display: block;
             font-size: 0.7rem;
             color: #6a8a6a;
             margin-top: 2px;
         }
-
         .form-group input,
         .form-group textarea,
         .form-group select {
@@ -195,24 +189,20 @@
             appearance: none;
             transition: border 0.2s;
         }
-
         .form-group textarea {
             border-radius: 16px;
             resize: vertical;
             min-height: 60px;
         }
-
         .form-group input:focus,
         .form-group textarea:focus,
         .form-group select:focus {
             border-color: #ffb703;
         }
-
         .form-group select option {
             background: #1a2e1a;
             color: #fff;
         }
-
         .form-row {
             display: flex;
             flex-wrap: wrap;
@@ -222,7 +212,6 @@
             flex: 1;
             min-width: 150px;
         }
-
         .form-checkbox-group {
             display: flex;
             flex-wrap: wrap;
@@ -243,7 +232,6 @@
             accent-color: #ffb703;
             cursor: pointer;
         }
-
         .form-actions {
             display: flex;
             gap: 12px;
@@ -261,7 +249,6 @@
         .form-actions button:active {
             transform: scale(0.97);
         }
-
         .btn-save {
             background: #ffb703;
             color: #1a1a1a;
@@ -269,7 +256,6 @@
         .btn-save:hover {
             background: #e6a500;
         }
-
         .btn-cancel {
             background: #555;
             color: #fff;
@@ -277,7 +263,6 @@
         .btn-cancel:hover {
             background: #444;
         }
-
         .btn-add {
             background: #4caf50;
             border: none;
@@ -292,7 +277,6 @@
         .btn-add:hover {
             background: #388e3c;
         }
-
         .form-divider {
             border: none;
             border-top: 1px solid #2f4a2f;
@@ -453,16 +437,6 @@
                 flex-direction: column;
             }
         }
-
-        .badge-preview-admin {
-            background: #e63946;
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-block;
-        }
     </style>
 </head>
 <body>
@@ -492,29 +466,25 @@
                 <button class="btn-add" id="addProductBtn">➕ Nuevo producto</button>
             </div>
 
-            <!-- ===== FORMULARIO DE PRODUCTO (CON ETIQUETAS) ===== -->
+            <!-- FORMULARIO DE PRODUCTO -->
             <div id="formProducto" class="form-producto">
                 <h3 id="formProductoTitulo">✏️ Nuevo producto</h3>
 
-                <!-- NOMBRE -->
                 <div class="form-group">
                     <label for="prodNombre">Nombre del producto <span class="required">*</span></label>
                     <input type="text" id="prodNombre" placeholder="Ej: Doble Cheddar" />
                 </div>
 
-                <!-- PRECIO -->
                 <div class="form-group">
                     <label for="prodPrecio">Precio en pesos <span class="required">*</span></label>
                     <input type="text" id="prodPrecio" placeholder="Ej: 15000" />
                 </div>
 
-                <!-- DESCRIPCIÓN -->
                 <div class="form-group">
                     <label for="prodDesc">Descripción</label>
                     <textarea id="prodDesc" placeholder="Ej: Doble medallón 120gr · doble cheddar · salsa Tech."></textarea>
                 </div>
 
-                <!-- IMÁGENES -->
                 <div class="form-row">
                     <div class="form-group">
                         <label for="prodImagen">URL imagen (miniatura)</label>
@@ -528,7 +498,6 @@
                     </div>
                 </div>
 
-                <!-- CATEGORÍA Y TIEMPO -->
                 <div class="form-row">
                     <div class="form-group">
                         <label for="prodCategoria">Categoría</label>
@@ -547,7 +516,6 @@
                     </div>
                 </div>
 
-                <!-- BADGE E ID -->
                 <div class="form-row">
                     <div class="form-group">
                         <label for="prodBadge">Badge / Etiqueta</label>
@@ -563,7 +531,6 @@
 
                 <hr class="form-divider" />
 
-                <!-- CHECKBOXES -->
                 <div class="form-checkbox-group">
                     <label>
                         <input type="checkbox" id="prodHasExtras" /> Tiene medallones extra y toppings
@@ -590,7 +557,7 @@
             </div>
             <div id="promoList"></div>
 
-            <!-- ===== FORMULARIO DE PROMOCIÓN ===== -->
+            <!-- FORMULARIO DE PROMOCIÓN -->
             <div id="formPromo" class="form-producto">
                 <h3>✏️ Nueva promoción</h3>
 
@@ -788,7 +755,7 @@
             });
         }
 
-        // ---- EDITAR PRODUCTO ----
+        // ---- EDITAR PRODUCTO (CORREGIDO) ----
         window.editarProducto = async function(id) {
             try {
                 const snapshot = await db.ref('products/' + id).once('value');
@@ -798,6 +765,7 @@
                     return;
                 }
 
+                // Cargar datos en el formulario
                 document.getElementById('prodNombre').value = producto.name || '';
                 document.getElementById('prodPrecio').value = producto.price || '';
                 document.getElementById('prodDesc').value = producto.desc || '';
@@ -807,14 +775,18 @@
                 document.getElementById('prodTiempo').value = producto.tiempoPreparacion || 15;
                 document.getElementById('prodBadge').value = producto.badge || '';
                 document.getElementById('prodId').value = producto.id || '';
-                document.getElementById('prodId').readOnly = true;
+                document.getElementById('prodId').readOnly = true; // Bloquear ID
                 document.getElementById('prodHasExtras').checked = producto.hasExtras || false;
                 document.getElementById('prodDisponible').checked = producto.available !== false;
 
+                // Asignar correctamente la variable global
+                window.editandoProductoId = id;  // <--- CORREGIDO: ahora es window.
+
+                // Cambiar título del formulario
                 formProductoTitulo.textContent = '✏️ Editando: ' + producto.name;
                 formProducto.classList.add('active');
-                window.editandoProductoId = id;
 
+                // Scroll al formulario
                 formProducto.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             } catch (error) {
@@ -861,6 +833,7 @@
             defaultProducts.forEach(p => {
                 db.ref('products/' + p.id).set(p);
             });
+            // Promoción de ejemplo
             db.ref('promotions').push({
                 title: 'Promo 2x1',
                 description: 'Llevá dos burgers por el precio de una',
@@ -871,10 +844,11 @@
             });
         }
 
-        // ---- CREAR / EDITAR PRODUCTO ----
-        let editandoProductoId = null;
+        // ---- CREAR / EDITAR PRODUCTO (evento del botón Guardar) ----
+        let editandoProductoId = null;  // Variable local
 
         function mostrarFormProducto() {
+            // Limpiar formulario para nuevo producto
             document.getElementById('prodNombre').value = '';
             document.getElementById('prodPrecio').value = '';
             document.getElementById('prodDesc').value = '';
@@ -888,7 +862,8 @@
             document.getElementById('prodHasExtras').checked = false;
             document.getElementById('prodDisponible').checked = true;
             formProductoTitulo.textContent = '✏️ Nuevo producto';
-            editandoProductoId = null;
+            editandoProductoId = null;   // Resetear
+            window.editandoProductoId = null; // También por si acaso
             formProducto.classList.add('active');
             document.getElementById('prodNombre').focus();
         }
@@ -896,12 +871,14 @@
         function ocultarFormProducto() {
             formProducto.classList.remove('active');
             editandoProductoId = null;
+            window.editandoProductoId = null;
             document.getElementById('prodId').readOnly = false;
         }
 
         addProductBtn.addEventListener('click', mostrarFormProducto);
         cancelProductBtn.addEventListener('click', ocultarFormProducto);
 
+        // Evento del botón Guardar (CORREGIDO)
         saveProductBtn.addEventListener('click', async function() {
             const nombre = document.getElementById('prodNombre').value.trim();
             const precio = parseInt(document.getElementById('prodPrecio').value.trim());
@@ -915,6 +892,7 @@
             const hasExtras = document.getElementById('prodHasExtras').checked;
             const disponible = document.getElementById('prodDisponible').checked;
 
+            // Validaciones
             if (!nombre || !precio || !id) {
                 alert('❌ Nombre, precio e ID son obligatorios.');
                 return;
@@ -943,10 +921,15 @@
             };
 
             try {
-                if (editandoProductoId) {
-                    await db.ref('products/' + editandoProductoId).update(nuevoProducto);
+                // DETERMINAR SI ESTAMOS EDITANDO (usando window.editandoProductoId)
+                const editando = window.editandoProductoId !== null && window.editandoProductoId !== undefined;
+
+                if (editando) {
+                    // MODO EDICIÓN: actualizar sin verificar existencia
+                    await db.ref('products/' + window.editandoProductoId).update(nuevoProducto);
                     alert('✅ Producto actualizado correctamente');
                 } else {
+                    // MODO CREACIÓN: verificar que el ID no exista
                     const snapshot = await db.ref('products/' + id).once('value');
                     if (snapshot.exists()) {
                         alert('❌ Ya existe un producto con ese ID. Usá otro.');
@@ -1070,7 +1053,7 @@
                 // Cambiar título
                 formPromo.querySelector('h3').textContent = '✏️ Editando: ' + promo.title;
 
-                // Modificar el botón guardar para que actualice en lugar de crear
+                // Sobrescribir evento guardar para actualizar
                 const originalClick = savePromoBtn.onclick;
                 savePromoBtn.onclick = async function() {
                     const titulo = document.getElementById('promoTitulo').value.trim();
