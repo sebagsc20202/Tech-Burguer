@@ -339,15 +339,30 @@
             gap: 6px;
             margin-left: auto;
             flex-wrap: wrap;
+            align-items: center;
         }
         .product-item .actions button {
             border: none;
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 30px;
             font-weight: 700;
             font-size: 0.8rem;
             cursor: pointer;
             transition: background 0.2s;
+        }
+        .product-item .actions .btn-mover {
+            background: #3a5a3a;
+            color: #e8f0e8;
+            font-size: 1.2rem;
+            line-height: 1;
+            padding: 4px 10px;
+        }
+        .product-item .actions .btn-mover:hover {
+            background: #4a6a4a;
+        }
+        .product-item .actions .btn-mover:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
         }
         .product-item .actions .btn-editar {
             background: #2196F3;
@@ -712,6 +727,8 @@
                     return;
                 }
                 const productos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                // Ordenar por 'orden', si no tiene, usar 999 para ponerlo al final
+                productos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
                 renderProductos(productos);
             });
         }
@@ -723,7 +740,7 @@
                 list.innerHTML = '<p style="color:#b8d0b8;">No hay productos cargados.</p>';
                 return;
             }
-            productos.forEach(p => {
+            productos.forEach((p, index) => {
                 const div = document.createElement('div');
                 div.className = 'product-item';
 
@@ -746,8 +763,10 @@
                     <label>💰 Precio: <input type="number" value="${p.price}" data-id="${p.id}" class="price-input" /></label>
                     <label>📦 Disponible: <input type="checkbox" ${p.available !== false ? 'checked' : ''} data-id="${p.id}" class="avail-input" /></label>
                     <div class="actions">
-                        <button class="btn-editar" onclick="editarProducto('${p.id}')">✏️ Editar</button>
-                        <button class="btn-guardar" onclick="actualizarProducto('${p.id}')">💾 Guardar</button>
+                        <button class="btn-mover" onclick="moverProducto('${p.id}', -1)" ${index === 0 ? 'disabled' : ''}>⬆</button>
+                        <button class="btn-mover" onclick="moverProducto('${p.id}', 1)" ${index === productos.length - 1 ? 'disabled' : ''}>⬇</button>
+                        <button class="btn-editar" onclick="editarProducto('${p.id}')">✏️</button>
+                        <button class="btn-guardar" onclick="actualizarProducto('${p.id}')">💾</button>
                         <button class="btn-eliminar" onclick="eliminarProducto('${p.id}')">🗑️</button>
                     </div>
                 `;
@@ -755,7 +774,34 @@
             });
         }
 
-        // ---- EDITAR PRODUCTO (CORREGIDO) ----
+        // ---- MOVER PRODUCTO (orden) ----
+        window.moverProducto = async function(id, direccion) {
+            // Obtener todos los productos y ordenarlos
+            const snapshot = await db.ref('products').once('value');
+            const data = snapshot.val();
+            if (!data) return;
+            const productos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+            // Ordenar por orden (si no tiene, usar 999)
+            productos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
+            const idx = productos.findIndex(p => p.id === id);
+            if (idx === -1) return;
+            const nuevoIdx = idx + direccion;
+            if (nuevoIdx < 0 || nuevoIdx >= productos.length) return;
+
+            const productoActual = productos[idx];
+            const productoVecino = productos[nuevoIdx];
+            const ordenActual = productoActual.orden !== undefined ? productoActual.orden : idx;
+            const ordenVecino = productoVecino.orden !== undefined ? productoVecino.orden : nuevoIdx;
+
+            // Intercambiar órdenes
+            const updates = {};
+            updates['products/' + productoActual.id + '/orden'] = ordenVecino;
+            updates['products/' + productoVecino.id + '/orden'] = ordenActual;
+            await db.ref().update(updates);
+            // No hace falta recargar, el listener se actualizará solo
+        };
+
+        // ---- EDITAR PRODUCTO ----
         window.editarProducto = async function(id) {
             try {
                 const snapshot = await db.ref('products/' + id).once('value');
@@ -765,7 +811,6 @@
                     return;
                 }
 
-                // Cargar datos en el formulario
                 document.getElementById('prodNombre').value = producto.name || '';
                 document.getElementById('prodPrecio').value = producto.price || '';
                 document.getElementById('prodDesc').value = producto.desc || '';
@@ -775,18 +820,13 @@
                 document.getElementById('prodTiempo').value = producto.tiempoPreparacion || 15;
                 document.getElementById('prodBadge').value = producto.badge || '';
                 document.getElementById('prodId').value = producto.id || '';
-                document.getElementById('prodId').readOnly = true; // Bloquear ID
+                document.getElementById('prodId').readOnly = true;
                 document.getElementById('prodHasExtras').checked = producto.hasExtras || false;
                 document.getElementById('prodDisponible').checked = producto.available !== false;
 
-                // Asignar correctamente la variable global
-                window.editandoProductoId = id;  // <--- CORREGIDO: ahora es window.
-
-                // Cambiar título del formulario
+                window.editandoProductoId = id;
                 formProductoTitulo.textContent = '✏️ Editando: ' + producto.name;
                 formProducto.classList.add('active');
-
-                // Scroll al formulario
                 formProducto.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             } catch (error) {
@@ -823,17 +863,16 @@
         // ---- CREAR PRODUCTOS POR DEFECTO ----
         function crearProductosDefault() {
             const defaultProducts = [
-                { id: 'armatuburger', name: 'Armá tu Burger', price: 12000, desc: '1 medallón 120gr · doble cheddar · salsa Tech.', hasExtras: true, badge: 'BASE', imagen: 'images/arm.jpg', popupImg: 'images/bn1.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15 },
-                { id: 'doblep', name: 'Doble Provoleta', price: 18000, desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.', hasExtras: false, badge: null, imagen: 'images/pro.jpg', popupImg: 'images/bn2.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20 },
-                { id: 'intense', name: 'Intense', price: 18000, desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/int.jpg', popupImg: 'images/bn3.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20 },
-                { id: 'techmex', name: 'Tech Mex', price: 18000, desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/mex.jpg', popupImg: 'images/bn4.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20 },
-                { id: 'yankee', name: 'Yankee', price: 16000, desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.', hasExtras: false, badge: null, imagen: 'images/yan.jpg', popupImg: 'images/bn5.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 18 },
-                { id: 'clasica', name: 'Clásica', price: 16000, desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.', hasExtras: false, badge: null, imagen: 'images/cla.jpg', popupImg: 'images/bn6.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15 }
+                { id: 'armatuburger', name: 'Armá tu Burger', price: 12000, desc: '1 medallón 120gr · doble cheddar · salsa Tech.', hasExtras: true, badge: 'BASE', imagen: 'images/arm.jpg', popupImg: 'images/bn1.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15, orden: 0 },
+                { id: 'doblep', name: 'Doble Provoleta', price: 18000, desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.', hasExtras: false, badge: null, imagen: 'images/pro.jpg', popupImg: 'images/bn2.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20, orden: 1 },
+                { id: 'intense', name: 'Intense', price: 18000, desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/int.jpg', popupImg: 'images/bn3.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20, orden: 2 },
+                { id: 'techmex', name: 'Tech Mex', price: 18000, desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/mex.jpg', popupImg: 'images/bn4.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20, orden: 3 },
+                { id: 'yankee', name: 'Yankee', price: 16000, desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.', hasExtras: false, badge: null, imagen: 'images/yan.jpg', popupImg: 'images/bn5.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 18, orden: 4 },
+                { id: 'clasica', name: 'Clásica', price: 16000, desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.', hasExtras: false, badge: null, imagen: 'images/cla.jpg', popupImg: 'images/bn6.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15, orden: 5 }
             ];
             defaultProducts.forEach(p => {
                 db.ref('products/' + p.id).set(p);
             });
-            // Promoción de ejemplo
             db.ref('promotions').push({
                 title: 'Promo 2x1',
                 description: 'Llevá dos burgers por el precio de una',
@@ -844,11 +883,10 @@
             });
         }
 
-        // ---- CREAR / EDITAR PRODUCTO (evento del botón Guardar) ----
-        let editandoProductoId = null;  // Variable local
+        // ---- CREAR / EDITAR PRODUCTO ----
+        let editandoProductoId = null;
 
         function mostrarFormProducto() {
-            // Limpiar formulario para nuevo producto
             document.getElementById('prodNombre').value = '';
             document.getElementById('prodPrecio').value = '';
             document.getElementById('prodDesc').value = '';
@@ -862,8 +900,8 @@
             document.getElementById('prodHasExtras').checked = false;
             document.getElementById('prodDisponible').checked = true;
             formProductoTitulo.textContent = '✏️ Nuevo producto';
-            editandoProductoId = null;   // Resetear
-            window.editandoProductoId = null; // También por si acaso
+            editandoProductoId = null;
+            window.editandoProductoId = null;
             formProducto.classList.add('active');
             document.getElementById('prodNombre').focus();
         }
@@ -878,7 +916,6 @@
         addProductBtn.addEventListener('click', mostrarFormProducto);
         cancelProductBtn.addEventListener('click', ocultarFormProducto);
 
-        // Evento del botón Guardar (CORREGIDO)
         saveProductBtn.addEventListener('click', async function() {
             const nombre = document.getElementById('prodNombre').value.trim();
             const precio = parseInt(document.getElementById('prodPrecio').value.trim());
@@ -892,7 +929,6 @@
             const hasExtras = document.getElementById('prodHasExtras').checked;
             const disponible = document.getElementById('prodDisponible').checked;
 
-            // Validaciones
             if (!nombre || !precio || !id) {
                 alert('❌ Nombre, precio e ID son obligatorios.');
                 return;
@@ -921,17 +957,25 @@
             };
 
             try {
-                // DETERMINAR SI ESTAMOS EDITANDO (usando window.editandoProductoId)
-                const editando = window.editandoProductoId !== null && window.editandoProductoId !== undefined;
-
-                if (editando) {
-                    // MODO EDICIÓN: actualizar sin verificar existencia
+                if (window.editandoProductoId) {
+                    // Edición: no tocar el orden, solo actualizar
                     await db.ref('products/' + window.editandoProductoId).update(nuevoProducto);
                     alert('✅ Producto actualizado correctamente');
                 } else {
-                    // MODO CREACIÓN: verificar que el ID no exista
-                    const snapshot = await db.ref('products/' + id).once('value');
-                    if (snapshot.exists()) {
+                    // Creación: obtener el máximo orden actual y sumar 1
+                    const snapshot = await db.ref('products').orderByChild('orden').once('value');
+                    const data = snapshot.val();
+                    let maxOrden = 0;
+                    if (data) {
+                        const productos = Object.keys(data).map(key => ({ ...data[key] }));
+                        productos.forEach(p => {
+                            if (p.orden !== undefined && p.orden > maxOrden) maxOrden = p.orden;
+                        });
+                    }
+                    nuevoProducto.orden = maxOrden + 1;
+
+                    const exist = await db.ref('products/' + id).once('value');
+                    if (exist.exists()) {
                         alert('❌ Ya existe un producto con ese ID. Usá otro.');
                         return;
                     }
@@ -1048,12 +1092,9 @@
                 formPromo.classList.add('active');
                 document.getElementById('promoTitulo').focus();
 
-                // Guardar referencia para edición
                 window.editandoPromoId = id;
-                // Cambiar título
                 formPromo.querySelector('h3').textContent = '✏️ Editando: ' + promo.title;
 
-                // Sobrescribir evento guardar para actualizar
                 const originalClick = savePromoBtn.onclick;
                 savePromoBtn.onclick = async function() {
                     const titulo = document.getElementById('promoTitulo').value.trim();
@@ -1074,13 +1115,11 @@
                         await db.ref('promotions/' + id).update(data);
                         alert('✅ Promoción actualizada');
                         ocultarFormPromo();
-                        // Restaurar función original
                         savePromoBtn.onclick = originalClick;
                     } catch (error) {
                         alert('❌ Error: ' + error.message);
                     }
                 };
-
                 formPromo.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             } catch (error) {
