@@ -1502,7 +1502,7 @@
         }
 
         // ============================================================
-        //  INDICADOR ABIERTO/CERRADO (CON EXCEPCIONES)
+        //  INDICADOR ABIERTO/CERRADO (CON MÚLTIPLES EXCEPCIONES)
         // ============================================================
         function actualizarEstado() {
             const now = new Date();
@@ -1512,46 +1512,54 @@
             const horaMin = hora + minutos / 60;
 
             // ---- Verificar excepciones ----
-            let excepcion = null;
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            const hoyStr = hoy.toISOString().split('T')[0];
+
+            // Filtrar TODAS las excepciones que coinciden con la fecha actual
+            let excepcionesActivas = [];
             if (window.excepciones && window.excepciones.length > 0) {
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-                const hoyStr = hoy.toISOString().split('T')[0];
-                // Buscar excepción que coincida con la fecha actual
-                for (let ex of window.excepciones) {
+                excepcionesActivas = window.excepciones.filter(ex => {
                     if (ex.fechaInicio && ex.fechaFin) {
                         const inicio = new Date(ex.fechaInicio);
                         const fin = new Date(ex.fechaFin);
                         inicio.setHours(0, 0, 0, 0);
                         fin.setHours(0, 0, 0, 0);
-                        if (hoy >= inicio && hoy <= fin) {
-                            excepcion = ex;
-                            break;
-                        }
+                        return hoy >= inicio && hoy <= fin;
                     } else if (ex.fechaInicio) {
                         const inicio = new Date(ex.fechaInicio);
                         inicio.setHours(0, 0, 0, 0);
-                        if (hoy.getTime() === inicio.getTime()) {
-                            excepcion = ex;
-                            break;
-                        }
+                        return hoy.getTime() === inicio.getTime();
                     }
-                }
+                    return false;
+                });
             }
 
             let estado = 'cerrado';
-            let mensajeExtra = '';
+            let mensajesExtra = [];
 
-            if (excepcion) {
-                // Usar la excepción
-                if (excepcion.tipo === 'abierto') {
-                    estado = 'abierto';
-                    mensajeExtra = excepcion.mensaje || '';
-                } else if (excepcion.tipo === 'horario_especial') {
-                    // Verificar si está dentro del horario especial
-                    if (excepcion.horaApertura && excepcion.horaCierre) {
-                        const [hA, mA] = excepcion.horaApertura.split(':').map(Number);
-                        const [hC, mC] = excepcion.horaCierre.split(':').map(Number);
+            if (excepcionesActivas.length > 0) {
+                // Verificar si alguna es de tipo 'cerrado'
+                const hayCerrado = excepcionesActivas.some(ex => ex.tipo === 'cerrado');
+                const hayHorarioEspecial = excepcionesActivas.some(ex => ex.tipo === 'horario_especial');
+                const hayAbierto = excepcionesActivas.some(ex => ex.tipo === 'abierto');
+
+                // Recopilar mensajes de todas las excepciones activas
+                excepcionesActivas.forEach(ex => {
+                    if (ex.mensaje) mensajesExtra.push(ex.mensaje);
+                    else if (ex.tipo === 'cerrado') mensajesExtra.push('Cerrado');
+                    else if (ex.tipo === 'abierto') mensajesExtra.push('Abierto');
+                    else if (ex.tipo === 'horario_especial') mensajesExtra.push(`Horario especial: ${ex.horaApertura} - ${ex.horaCierre}`);
+                });
+
+                if (hayCerrado) {
+                    estado = 'cerrado';
+                } else if (hayHorarioEspecial) {
+                    // Tomar el primer horario especial (podría mejorarse para elegir el más restrictivo)
+                    const ex = excepcionesActivas.find(e => e.tipo === 'horario_especial');
+                    if (ex && ex.horaApertura && ex.horaCierre) {
+                        const [hA, mA] = ex.horaApertura.split(':').map(Number);
+                        const [hC, mC] = ex.horaCierre.split(':').map(Number);
                         const apertura = hA + mA / 60;
                         const cierre = hC + mC / 60;
                         if (horaMin >= apertura && horaMin < cierre) {
@@ -1559,15 +1567,13 @@
                         } else {
                             estado = 'cerrado';
                         }
-                        mensajeExtra = excepcion.mensaje || `Horario especial: ${excepcion.horaApertura} - ${excepcion.horaCierre}`;
                     } else {
                         estado = 'cerrado';
-                        mensajeExtra = excepcion.mensaje || 'Horario especial sin definir';
                     }
+                } else if (hayAbierto) {
+                    estado = 'abierto';
                 } else {
-                    // cerrado
                     estado = 'cerrado';
-                    mensajeExtra = excepcion.mensaje || 'Cerrado por excepción';
                 }
             } else {
                 // Comportamiento normal (sin excepción)
@@ -1589,15 +1595,17 @@
 
             card.classList.remove('abierto', 'cerrado', 'casi');
 
+            let mensajeFinal = mensajesExtra.length > 0 ? ' · ' + mensajesExtra.join(' | ') : '';
+
             if (estado === 'abierto') {
                 card.classList.add('abierto');
-                text.textContent = '🟢 ABIERTO' + (mensajeExtra ? ' · ' + mensajeExtra : ' · hasta las 00:00');
+                text.textContent = '🟢 ABIERTO' + (mensajeFinal || ' · hasta las 00:00');
             } else if (estado === 'casi') {
                 card.classList.add('casi');
-                text.textContent = '🟡 Estamos casi cerrando pero podemos hacer tu pedido !!!' + (mensajeExtra ? ' · ' + mensajeExtra : '');
+                text.textContent = '🟡 Estamos casi cerrando pero podemos hacer tu pedido !!!' + mensajeFinal;
             } else {
                 card.classList.add('cerrado');
-                text.textContent = '🔴 CERRADO' + (mensajeExtra ? ' · ' + mensajeExtra : '');
+                text.textContent = '🔴 CERRADO' + mensajeFinal;
             }
         }
 
@@ -2455,7 +2463,7 @@
         // ============================================================
         cargarProductos();
         cargarPromociones();
-        cargarExcepciones(); // <-- NUEVO: cargar excepciones
+        cargarExcepciones(); // Cargar excepciones de horario
         setTimeout(actualizarVisibilidadCancelar, 100);
         generarTrack();
     </script>
