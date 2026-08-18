@@ -222,6 +222,34 @@
         }
         .filtro-container select:focus { border-color: #ffb703; }
 
+        /* ===== BOTONES DE ESTADO RÁPIDO ===== */
+        .estado-rapido {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 12px 0 18px;
+        }
+        .estado-rapido .btn-estado {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+        .estado-rapido .btn-estado:active { transform: scale(0.97); }
+        .estado-rapido .btn-abrir { background: #4caf50; color: #fff; }
+        .estado-rapido .btn-abrir:hover { background: #388e3c; }
+        .estado-rapido .btn-cerrar { background: #f44336; color: #fff; }
+        .estado-rapido .btn-cerrar:hover { background: #d32f2f; }
+        .estado-rapido .btn-normal { background: #3a5a3a; color: #e8f0e8; }
+        .estado-rapido .btn-normal:hover { background: #4a6a4a; }
+        .estado-rapido .btn-estado.activo { box-shadow: 0 0 0 2px #fff, 0 0 20px rgba(255,255,255,0.2); }
+
         /* ===== LISTAS ===== */
         .product-item, .promo-item, .excepcion-item {
             background: #1f331f;
@@ -346,6 +374,7 @@
             .form-row .form-group { min-width: auto; }
             .form-actions { flex-direction: column; }
             .filtro-container { flex-direction: column; align-items: stretch; }
+            .estado-rapido { flex-direction: column; }
         }
     </style>
 </head>
@@ -444,11 +473,19 @@
 
             <hr style="border-color:#2f4a2f; margin:20px 0;">
 
-            <!-- ===== HORARIO EXCEPCIONAL (CON EDICIÓN) ===== -->
+            <!-- ===== HORARIO EXCEPCIONAL (CON BOTONES DE ESTADO RÁPIDO) ===== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                 <h2>⏰ Horario excepcional</h2>
                 <button class="btn-add" id="addExcepcionBtn">➕ Agregar excepción</button>
             </div>
+
+            <!-- Botones de acción rápida -->
+            <div class="estado-rapido">
+                <button class="btn-estado btn-abrir" id="btnAbrirAhora">🔓 Abrir ahora</button>
+                <button class="btn-estado btn-cerrar" id="btnCerrarAhora">🔒 Cerrar ahora</button>
+                <button class="btn-estado btn-normal" id="btnVolverNormal">⏰ Horario normal</button>
+            </div>
+
             <div id="excepcionList"></div>
             <div id="formExcepcion" class="form-producto">
                 <h3 id="formExcepcionTitulo">✏️ Nueva excepción</h3>
@@ -552,6 +589,11 @@
         const exTipo = document.getElementById('exTipo');
         const exHorarioEspecial = document.getElementById('exHorarioEspecial');
 
+        // Botones de estado rápido
+        const btnAbrirAhora = document.getElementById('btnAbrirAhora');
+        const btnCerrarAhora = document.getElementById('btnCerrarAhora');
+        const btnVolverNormal = document.getElementById('btnVolverNormal');
+
         // Filtro
         const filtroCategoria = document.getElementById('filtroCategoria');
 
@@ -582,6 +624,8 @@
                 ocultarFormProducto();
                 ocultarFormPromo();
                 ocultarFormExcepcion();
+                // Actualizar estado visual de los botones
+                actualizarBotonesEstado();
             } else {
                 authSection.style.display = 'block';
                 adminPanel.classList.remove('active');
@@ -601,6 +645,7 @@
         // ============================================================
         let productosCompletos = [];
         let categoriasUnicas = [];
+        let excepcionesActuales = [];
 
         function cargarDatos() {
             cargarProductos();
@@ -976,7 +1021,7 @@
         };
 
         // ============================================================
-        //  EXCEPCIONES DE HORARIO (CON EDICIÓN)
+        //  EXCEPCIONES DE HORARIO (CON BOTONES DE ESTADO RÁPIDO)
         // ============================================================
         let editandoExcepcionId = null;
 
@@ -984,11 +1029,14 @@
             db.ref('excepciones').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) {
+                    excepcionesActuales = [];
                     document.getElementById('excepcionList').innerHTML = '<p style="color:#b8d0b8;">No hay excepciones.</p>';
+                    actualizarBotonesEstado();
                     return;
                 }
-                const excepciones = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                renderExcepciones(excepciones);
+                excepcionesActuales = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                renderExcepciones(excepcionesActuales);
+                actualizarBotonesEstado();
             });
         }
 
@@ -1019,7 +1067,122 @@
             });
         }
 
-        // Función para editar excepción (carga datos en el formulario)
+        // ===== BOTONES DE ESTADO RÁPIDO =====
+        function actualizarBotonesEstado() {
+            // Verificar si existe una excepción para hoy
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            const hoyStr = hoy.toISOString().split('T')[0];
+
+            const exHoy = excepcionesActuales.find(ex => {
+                if (ex.fechaInicio && ex.fechaFin) {
+                    const inicio = new Date(ex.fechaInicio);
+                    const fin = new Date(ex.fechaFin);
+                    inicio.setHours(0, 0, 0, 0);
+                    fin.setHours(0, 0, 0, 0);
+                    return hoy >= inicio && hoy <= fin;
+                } else if (ex.fechaInicio) {
+                    const inicio = new Date(ex.fechaInicio);
+                    inicio.setHours(0, 0, 0, 0);
+                    return hoy.getTime() === inicio.getTime();
+                }
+                return false;
+            });
+
+            // Quitar clase activo de todos
+            document.querySelectorAll('.btn-estado').forEach(b => b.classList.remove('activo'));
+
+            if (exHoy) {
+                if (exHoy.tipo === 'abierto') {
+                    btnAbrirAhora.classList.add('activo');
+                } else if (exHoy.tipo === 'cerrado') {
+                    btnCerrarAhora.classList.add('activo');
+                }
+                // Si es horario_especial, no destacamos ningún botón de los rápidos
+            }
+        }
+
+        // Función auxiliar para obtener la fecha de hoy en formato YYYY-MM-DD
+        function getHoyStr() {
+            const d = new Date();
+            return d.toISOString().split('T')[0];
+        }
+
+        // Buscar si ya existe una excepción para hoy
+        async function buscarExcepcionHoy() {
+            const hoyStr = getHoyStr();
+            const snapshot = await db.ref('excepciones').once('value');
+            const data = snapshot.val();
+            if (!data) return null;
+            const keys = Object.keys(data);
+            for (let key of keys) {
+                const ex = data[key];
+                if (ex.fechaInicio && ex.fechaFin) {
+                    const inicio = new Date(ex.fechaInicio);
+                    const fin = new Date(ex.fechaFin);
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    inicio.setHours(0, 0, 0, 0);
+                    fin.setHours(0, 0, 0, 0);
+                    if (hoy >= inicio && hoy <= fin) {
+                        return { id: key, ...ex };
+                    }
+                } else if (ex.fechaInicio === hoyStr) {
+                    return { id: key, ...ex };
+                }
+            }
+            return null;
+        }
+
+        // Establecer estado rápido
+        async function setEstadoRapido(tipo, mensaje) {
+            const hoyStr = getHoyStr();
+            const exHoy = await buscarExcepcionHoy();
+
+            const data = {
+                fechaInicio: hoyStr,
+                fechaFin: hoyStr,
+                tipo: tipo,
+                mensaje: mensaje || (tipo === 'abierto' ? 'Abierto por excepción' : 'Cerrado por excepción')
+            };
+
+            try {
+                if (exHoy) {
+                    // Actualizar excepción existente
+                    await db.ref('excepciones/' + exHoy.id).update(data);
+                    alert('✅ Estado actualizado');
+                } else {
+                    // Crear nueva excepción
+                    await db.ref('excepciones').push(data);
+                    alert('✅ Estado establecido');
+                }
+                // Actualizar botones
+                setTimeout(actualizarBotonesEstado, 500);
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        btnAbrirAhora.addEventListener('click', () => setEstadoRapido('abierto', 'Abierto por excepción'));
+        btnCerrarAhora.addEventListener('click', () => setEstadoRapido('cerrado', 'Cerrado por excepción'));
+
+        btnVolverNormal.addEventListener('click', async function() {
+            const exHoy = await buscarExcepcionHoy();
+            if (!exHoy) {
+                alert('ℹ️ Ya estás en horario normal');
+                return;
+            }
+            if (!confirm('¿Eliminar la excepción de hoy y volver al horario normal?')) return;
+            try {
+                await db.ref('excepciones/' + exHoy.id).remove();
+                alert('✅ Horario normal restaurado');
+                setTimeout(actualizarBotonesEstado, 500);
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        });
+
+        // ---- Funciones de edición/eliminación de excepciones (ya existentes) ----
         window.editarExcepcion = async function(id) {
             try {
                 const snapshot = await db.ref('excepciones/' + id).once('value');
@@ -1035,14 +1198,12 @@
                 document.getElementById('exHoraCierre').value = ex.horaCierre || '00:00';
                 document.getElementById('exMensaje').value = ex.mensaje || '';
 
-                // Mostrar/ocultar campos de horario especial según tipo
                 if (ex.tipo === 'horario_especial') {
                     exHorarioEspecial.style.display = 'flex';
                 } else {
                     exHorarioEspecial.style.display = 'none';
                 }
 
-                // Cambiar título del formulario
                 formExcepcionTitulo.textContent = '✏️ Editando excepción';
                 window.editandoExcepcionId = id;
                 formExcepcion.classList.add('active');
@@ -1057,6 +1218,7 @@
             try {
                 await db.ref('excepciones/' + id).remove();
                 alert('✅ Excepción eliminada');
+                actualizarBotonesEstado();
             } catch (error) {
                 alert('❌ Error: ' + error.message);
             }
@@ -1072,7 +1234,6 @@
         });
 
         function mostrarFormExcepcion() {
-            // Limpiar formulario para nueva excepción
             document.getElementById('exFechaInicio').value = '';
             document.getElementById('exFechaFin').value = '';
             document.getElementById('exTipo').value = 'cerrado';
@@ -1110,11 +1271,9 @@
 
             try {
                 if (window.editandoExcepcionId) {
-                    // Edición: actualizar excepción existente
                     await db.ref('excepciones/' + window.editandoExcepcionId).update(data);
                     alert('✅ Excepción actualizada');
                 } else {
-                    // Creación: agregar nueva excepción
                     await db.ref('excepciones').push(data);
                     alert('✅ Excepción guardada');
                 }
