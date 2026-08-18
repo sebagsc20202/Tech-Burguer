@@ -12,11 +12,7 @@
 
     <style>
         /* ===== RESET ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
             background: #1a2e1a;
@@ -27,25 +23,10 @@
             justify-content: center;
             align-items: flex-start;
         }
-        .container {
-            max-width: 1000px;
-            width: 100%;
-            padding-top: 20px;
-        }
-        h1 {
-            color: #ffb703;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2rem;
-        }
-        h2 {
-            color: #ffb703;
-            margin: 20px 0 10px;
-            border-bottom: 1px solid #2f4a2f;
-            padding-bottom: 6px;
-        }
+        .container { max-width: 1000px; width: 100%; padding-top: 20px; }
+        h1 { color: #ffb703; text-align: center; margin-bottom: 30px; font-size: 2rem; }
+        h2 { color: #ffb703; margin: 20px 0 10px; border-bottom: 1px solid #2f4a2f; padding-bottom: 6px; }
 
-        /* ===== CARD (LOGIN) ===== */
         .card {
             background: #1f331f;
             border: 2px solid #3a5a3a;
@@ -54,11 +35,7 @@
             max-width: 400px;
             margin: 0 auto 30px;
         }
-        .card h2 {
-            border-bottom: none;
-            text-align: center;
-            margin-top: 0;
-        }
+        .card h2 { border-bottom: none; text-align: center; margin-top: 0; }
         .card input {
             width: 100%;
             padding: 12px 16px;
@@ -70,9 +47,7 @@
             font-size: 1rem;
             outline: none;
         }
-        .card input:focus {
-            border-color: #ffb703;
-        }
+        .card input:focus { border-color: #ffb703; }
         .card button {
             width: 100%;
             padding: 12px;
@@ -85,29 +60,12 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .card button:hover {
-            background: #e6a500;
-        }
-        .card .error {
-            color: #ef9a9a;
-            font-size: 0.9rem;
-            margin-top: 8px;
-            text-align: center;
-        }
-        .card .hint {
-            color: #8aaa8a;
-            font-size: 0.8rem;
-            text-align: center;
-            margin-top: 8px;
-        }
+        .card button:hover { background: #e6a500; }
+        .card .error { color: #ef9a9a; font-size: 0.9rem; margin-top: 8px; text-align: center; }
+        .card .hint { color: #8aaa8a; font-size: 0.8rem; text-align: center; margin-top: 8px; }
 
-        /* ===== PANEL ===== */
-        #adminPanel {
-            display: none;
-        }
-        #adminPanel.active {
-            display: block;
-        }
+        #adminPanel { display: none; }
+        #adminPanel.active { display: block; }
 
         .panel-header {
             display: flex;
@@ -117,12 +75,8 @@
             gap: 12px;
             margin-bottom: 20px;
         }
-        .panel-header .user-info {
-            color: #b8d0b8;
-        }
-        .panel-header .user-info strong {
-            color: #ffb703;
-        }
+        .panel-header .user-info { color: #b8d0b8; }
+        .panel-header .user-info strong { color: #ffb703; }
         .btn-logout {
             background: #3a1a1a;
             color: #ef9a9a;
@@ -133,11 +87,9 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .btn-logout:hover {
-            background: #5a2a2a;
-        }
+        .btn-logout:hover { background: #5a2a2a; }
 
-        /* ===== FORMULARIO PRODUCTO ===== */
+        /* ===== FORMULARIOS ===== */
         .form-producto {
             background: #1f331f;
             border: 2px solid #ffb703;
@@ -146,18 +98,9 @@
             margin: 15px 0;
             display: none;
         }
-        .form-producto.active {
-            display: block;
-        }
-        .form-producto h3 {
-            color: #ffb703;
-            font-size: 1.3rem;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 12px;
-        }
+        .form-producto.active { display: block; }
+        .form-producto h3 { color: #ffb703; font-size: 1.3rem; margin-bottom: 16px; text-align: center; }
+        .form-group { margin-bottom: 12px; }
         .form-group label {
             display: block;
             font-size: 0.85rem;
@@ -165,10 +108,7 @@
             margin-bottom: 4px;
             font-weight: 600;
         }
-        .form-group label .required {
-            color: #ff6b6b;
-            margin-left: 2px;
-        }
+        .form-group label .required { color: #ff6b6b; margin-left: 2px; }
         .form-group .hint-text {
             display: block;
             font-size: 0.7rem;
@@ -196,22 +136,12 @@
         }
         .form-group input:focus,
         .form-group textarea:focus,
-        .form-group select:focus {
-            border-color: #ffb703;
-        }
-        .form-group select option {
-            background: #1a2e1a;
-            color: #fff;
-        }
-        .form-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .form-row .form-group {
-            flex: 1;
-            min-width: 150px;
-        }
+        .form-group select:focus { border-color: #ffb703; }
+        .form-group select option { background: #1a2e1a; color: #fff; }
+
+        .form-row { display: flex; flex-wrap: wrap; gap: 12px; }
+        .form-row .form-group { flex: 1; min-width: 150px; }
+
         .form-checkbox-group {
             display: flex;
             flex-wrap: wrap;
@@ -232,6 +162,7 @@
             accent-color: #ffb703;
             cursor: pointer;
         }
+
         .form-actions {
             display: flex;
             gap: 12px;
@@ -246,23 +177,11 @@
             cursor: pointer;
             transition: background 0.2s, transform 0.1s;
         }
-        .form-actions button:active {
-            transform: scale(0.97);
-        }
-        .btn-save {
-            background: #ffb703;
-            color: #1a1a1a;
-        }
-        .btn-save:hover {
-            background: #e6a500;
-        }
-        .btn-cancel {
-            background: #555;
-            color: #fff;
-        }
-        .btn-cancel:hover {
-            background: #444;
-        }
+        .form-actions button:active { transform: scale(0.97); }
+        .btn-save { background: #ffb703; color: #1a1a1a; }
+        .btn-save:hover { background: #e6a500; }
+        .btn-cancel { background: #555; color: #fff; }
+        .btn-cancel:hover { background: #444; }
         .btn-add {
             background: #4caf50;
             border: none;
@@ -274,14 +193,8 @@
             transition: background 0.2s;
             margin: 10px 0;
         }
-        .btn-add:hover {
-            background: #388e3c;
-        }
-        .form-divider {
-            border: none;
-            border-top: 1px solid #2f4a2f;
-            margin: 8px 0 12px;
-        }
+        .btn-add:hover { background: #388e3c; }
+        .form-divider { border: none; border-top: 1px solid #2f4a2f; margin: 8px 0 12px; }
 
         /* ===== FILTRO ===== */
         .filtro-container {
@@ -291,11 +204,7 @@
             margin: 10px 0 16px;
             flex-wrap: wrap;
         }
-        .filtro-container label {
-            font-size: 0.9rem;
-            color: #b8d0b8;
-            font-weight: 600;
-        }
+        .filtro-container label { font-size: 0.9rem; color: #b8d0b8; font-weight: 600; }
         .filtro-container select {
             padding: 8px 16px;
             border-radius: 40px;
@@ -311,13 +220,10 @@
             background-repeat: no-repeat;
             background-position: right 12px center;
         }
-        .filtro-container select:focus {
-            border-color: #ffb703;
-        }
+        .filtro-container select:focus { border-color: #ffb703; }
 
         /* ===== LISTAS ===== */
-        .product-item,
-        .promo-item {
+        .product-item, .promo-item, .excepcion-item {
             background: #1f331f;
             border: 1px solid #3a5a3a;
             border-radius: 12px;
@@ -328,29 +234,10 @@
             align-items: center;
             gap: 12px;
         }
-        .product-item .name {
-            flex: 2;
-            font-weight: 600;
-            min-width: 120px;
-        }
-        .product-item .meta {
-            font-size: 0.8rem;
-            color: #b8d0b8;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .product-item .meta span {
-            background: #2a4a2a;
-            padding: 2px 10px;
-            border-radius: 30px;
-        }
-        .product-item label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.9rem;
-        }
+        .product-item .name { flex: 2; font-weight: 600; min-width: 120px; }
+        .product-item .meta { font-size: 0.8rem; color: #b8d0b8; display: flex; flex-wrap: wrap; gap: 8px; }
+        .product-item .meta span { background: #2a4a2a; padding: 2px 10px; border-radius: 30px; }
+        .product-item label { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
         .product-item input[type="number"] {
             width: 70px;
             padding: 6px 8px;
@@ -360,12 +247,7 @@
             color: #fff;
             font-weight: 600;
         }
-        .product-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #ffb703;
-            cursor: pointer;
-        }
+        .product-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #ffb703; cursor: pointer; }
         .product-item .actions {
             display: flex;
             gap: 6px;
@@ -389,34 +271,14 @@
             line-height: 1;
             padding: 4px 10px;
         }
-        .product-item .actions .btn-mover:hover {
-            background: #4a6a4a;
-        }
-        .product-item .actions .btn-mover:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-        .product-item .actions .btn-editar {
-            background: #2196F3;
-            color: #fff;
-        }
-        .product-item .actions .btn-editar:hover {
-            background: #1976D2;
-        }
-        .product-item .actions .btn-guardar {
-            background: #ffb703;
-            color: #1a1a1a;
-        }
-        .product-item .actions .btn-guardar:hover {
-            background: #e6a500;
-        }
-        .product-item .actions .btn-eliminar {
-            background: #f44336;
-            color: #fff;
-        }
-        .product-item .actions .btn-eliminar:hover {
-            background: #d32f2f;
-        }
+        .product-item .actions .btn-mover:hover { background: #4a6a4a; }
+        .product-item .actions .btn-mover:disabled { opacity: 0.3; cursor: not-allowed; }
+        .product-item .actions .btn-editar { background: #2196F3; color: #fff; }
+        .product-item .actions .btn-editar:hover { background: #1976D2; }
+        .product-item .actions .btn-guardar { background: #ffb703; color: #1a1a1a; }
+        .product-item .actions .btn-guardar:hover { background: #e6a500; }
+        .product-item .actions .btn-eliminar { background: #f44336; color: #fff; }
+        .product-item .actions .btn-eliminar:hover { background: #d32f2f; }
         .product-item .badge-preview {
             background: #e63946;
             color: #fff;
@@ -426,26 +288,10 @@
             font-weight: 600;
         }
 
-        .promo-item .info {
-            flex: 1;
-            min-width: 150px;
-        }
-        .promo-item .dates {
-            font-size: 0.8rem;
-            color: #b8d0b8;
-        }
-        .promo-item label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.9rem;
-        }
-        .promo-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #ffb703;
-            cursor: pointer;
-        }
+        .promo-item .info { flex: 1; min-width: 150px; }
+        .promo-item .dates { font-size: 0.8rem; color: #b8d0b8; }
+        .promo-item label { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
+        .promo-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #ffb703; cursor: pointer; }
         .promo-item .actions {
             display: flex;
             gap: 6px;
@@ -462,55 +308,42 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .promo-item .actions .btn-editar-promo {
-            background: #2196F3;
-            color: #fff;
-        }
-        .promo-item .actions .btn-editar-promo:hover {
-            background: #1976D2;
-        }
-        .promo-item .actions .btn-eliminar-promo {
-            background: #f44336;
-            color: #fff;
-        }
-        .promo-item .actions .btn-eliminar-promo:hover {
-            background: #d32f2f;
-        }
+        .promo-item .actions .btn-editar-promo { background: #2196F3; color: #fff; }
+        .promo-item .actions .btn-editar-promo:hover { background: #1976D2; }
+        .promo-item .actions .btn-eliminar-promo { background: #f44336; color: #fff; }
+        .promo-item .actions .btn-eliminar-promo:hover { background: #d32f2f; }
 
-        .hidden {
-            display: none !important;
+        .excepcion-item .info { flex: 2; min-width: 150px; }
+        .excepcion-item .estado { font-weight: 600; }
+        .excepcion-item .actions {
+            display: flex;
+            gap: 6px;
+            margin-left: auto;
         }
+        .excepcion-item .actions button {
+            border: none;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .excepcion-item .actions .btn-eliminar-excepcion { background: #f44336; color: #fff; }
+        .excepcion-item .actions .btn-eliminar-excepcion:hover { background: #d32f2f; }
+
+        .hidden { display: none !important; }
 
         @media (max-width: 600px) {
-            .product-item,
-            .promo-item {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .product-item label {
-                justify-content: space-between;
-            }
-            .product-item .actions {
-                margin-left: 0;
-                justify-content: flex-end;
-            }
-            .promo-item .actions {
-                margin-left: 0;
-                justify-content: flex-end;
-            }
-            .form-row {
-                flex-direction: column;
-            }
-            .form-row .form-group {
-                min-width: auto;
-            }
-            .form-actions {
-                flex-direction: column;
-            }
-            .filtro-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
+            .product-item, .promo-item, .excepcion-item { flex-direction: column; align-items: stretch; }
+            .product-item label { justify-content: space-between; }
+            .product-item .actions { margin-left: 0; justify-content: flex-end; }
+            .promo-item .actions { margin-left: 0; justify-content: flex-end; }
+            .excepcion-item .actions { margin-left: 0; justify-content: flex-end; }
+            .form-row { flex-direction: column; }
+            .form-row .form-group { min-width: auto; }
+            .form-actions { flex-direction: column; }
+            .filtro-container { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
@@ -540,50 +373,22 @@
                 <h2>📋 Productos</h2>
                 <button class="btn-add" id="addProductBtn">➕ Nuevo producto</button>
             </div>
-
-            <!-- FILTRO POR CATEGORÍA -->
             <div class="filtro-container">
                 <label for="filtroCategoria">🔍 Filtrar por categoría:</label>
-                <select id="filtroCategoria">
-                    <option value="todas">Todas</option>
-                </select>
+                <select id="filtroCategoria"><option value="todas">Todas</option></select>
             </div>
-
-            <!-- FORMULARIO DE PRODUCTO -->
             <div id="formProducto" class="form-producto">
                 <h3 id="formProductoTitulo">✏️ Nuevo producto</h3>
-
-                <div class="form-group">
-                    <label for="prodNombre">Nombre del producto <span class="required">*</span></label>
-                    <input type="text" id="prodNombre" placeholder="Ej: Doble Cheddar" />
-                </div>
-
-                <div class="form-group">
-                    <label for="prodPrecio">Precio en pesos <span class="required">*</span></label>
-                    <input type="text" id="prodPrecio" placeholder="Ej: 15000" />
-                </div>
-
-                <div class="form-group">
-                    <label for="prodDesc">Descripción</label>
-                    <textarea id="prodDesc" placeholder="Ej: Doble medallón 120gr · doble cheddar · salsa Tech."></textarea>
-                </div>
-
+                <!-- Campos del producto (ya los tenías) -->
+                <div class="form-group"><label for="prodNombre">Nombre <span class="required">*</span></label><input type="text" id="prodNombre" placeholder="Ej: Doble Cheddar" /></div>
+                <div class="form-group"><label for="prodPrecio">Precio <span class="required">*</span></label><input type="text" id="prodPrecio" placeholder="Ej: 15000" /></div>
+                <div class="form-group"><label for="prodDesc">Descripción</label><textarea id="prodDesc" placeholder="Ej: Doble medallón 120gr · doble cheddar · salsa Tech."></textarea></div>
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="prodImagen">URL imagen (miniatura)</label>
-                        <input type="text" id="prodImagen" placeholder="Ej: images/cheddar.jpg" />
-                        <span class="hint-text">Imagen que se muestra en la tarjeta del producto</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="prodPopupImg">URL imagen (popup ampliado)</label>
-                        <input type="text" id="prodPopupImg" placeholder="Ej: images/cheddar-popup.jpg" />
-                        <span class="hint-text">Imagen que se ve al hacer clic en la miniatura</span>
-                    </div>
+                    <div class="form-group"><label for="prodImagen">URL imagen</label><input type="text" id="prodImagen" placeholder="Ej: images/cheddar.jpg" /><span class="hint-text">Imagen que se muestra en la tarjeta</span></div>
+                    <div class="form-group"><label for="prodPopupImg">URL popup</label><input type="text" id="prodPopupImg" placeholder="Ej: images/cheddar-popup.jpg" /><span class="hint-text">Imagen ampliada</span></div>
                 </div>
-
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="prodCategoria">Categoría</label>
+                    <div class="form-group"><label for="prodCategoria">Categoría</label>
                         <select id="prodCategoria">
                             <option value="Hamburguesas">🍔 Hamburguesas</option>
                             <option value="Papas">🍟 Papas</option>
@@ -592,43 +397,22 @@
                             <option value="Otros">📦 Otros</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="prodTiempo">Tiempo de preparación (minutos)</label>
-                        <input type="number" id="prodTiempo" placeholder="Ej: 15" value="15" min="1" />
-                        <span class="hint-text">Tiempo estimado de preparación</span>
-                    </div>
+                    <div class="form-group"><label for="prodTiempo">Tiempo (min)</label><input type="number" id="prodTiempo" value="15" min="1" /><span class="hint-text">Tiempo estimado de preparación</span></div>
                 </div>
-
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="prodBadge">Badge / Etiqueta</label>
-                        <input type="text" id="prodBadge" placeholder="Ej: NUEVO, BASE, PROMO" />
-                        <span class="hint-text">Etiqueta destacada que aparece en la tarjeta</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="prodId">ID del producto <span class="required">*</span></label>
-                        <input type="text" id="prodId" placeholder="Ej: doble-cheddar" />
-                        <span class="hint-text">🔑 Único, sin espacios. Solo minúsculas y guiones. <strong>No se puede cambiar en edición.</strong></span>
-                    </div>
+                    <div class="form-group"><label for="prodBadge">Badge</label><input type="text" id="prodBadge" placeholder="Ej: NUEVO, BASE, PROMO" /><span class="hint-text">Etiqueta destacada</span></div>
+                    <div class="form-group"><label for="prodId">ID <span class="required">*</span></label><input type="text" id="prodId" placeholder="Ej: doble-cheddar" /><span class="hint-text">🔑 Único, sin espacios. Solo minúsculas y guiones. <strong>No se puede cambiar en edición.</strong></span></div>
                 </div>
-
                 <hr class="form-divider" />
-
                 <div class="form-checkbox-group">
-                    <label>
-                        <input type="checkbox" id="prodHasExtras" /> Tiene medallones extra y toppings
-                    </label>
-                    <label>
-                        <input type="checkbox" id="prodDisponible" checked /> Disponible
-                    </label>
+                    <label><input type="checkbox" id="prodHasExtras" /> Tiene medallones extra y toppings</label>
+                    <label><input type="checkbox" id="prodDisponible" checked /> Disponible</label>
                 </div>
-
                 <div class="form-actions">
-                    <button class="btn-save" id="saveProductBtn">💾 Guardar producto</button>
+                    <button class="btn-save" id="saveProductBtn">💾 Guardar</button>
                     <button class="btn-cancel" id="cancelProductBtn">Cancelar</button>
                 </div>
             </div>
-
             <div id="productList"></div>
 
             <hr style="border-color:#2f4a2f; margin:20px 0;">
@@ -639,47 +423,72 @@
                 <button class="btn-add" id="addPromoBtn">➕ Agregar promoción</button>
             </div>
             <div id="promoList"></div>
-
-            <!-- FORMULARIO DE PROMOCIÓN -->
             <div id="formPromo" class="form-producto">
                 <h3>✏️ Nueva promoción</h3>
-
-                <div class="form-group">
-                    <label for="promoTitulo">Título <span class="required">*</span></label>
-                    <input type="text" id="promoTitulo" placeholder="Ej: 2x1 en Clásicas" />
-                </div>
-
-                <div class="form-group">
-                    <label for="promoDesc">Descripción <span class="required">*</span></label>
-                    <input type="text" id="promoDesc" placeholder="Ej: Llevá dos burgers por el precio de una" />
-                </div>
-
-                <div class="form-group">
-                    <label for="promoImagen">URL imagen</label>
-                    <input type="text" id="promoImagen" placeholder="Ej: images/promo1.jpg" />
-                    <span class="hint-text">Imagen que se muestra en el banner de promociones</span>
-                </div>
-
+                <div class="form-group"><label for="promoTitulo">Título <span class="required">*</span></label><input type="text" id="promoTitulo" placeholder="Ej: 2x1 en Clásicas" /></div>
+                <div class="form-group"><label for="promoDesc">Descripción <span class="required">*</span></label><input type="text" id="promoDesc" placeholder="Ej: Llevá dos burgers por el precio de una" /></div>
+                <div class="form-group"><label for="promoImagen">URL imagen</label><input type="text" id="promoImagen" placeholder="Ej: images/promo1.jpg" /><span class="hint-text">Imagen del banner</span></div>
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="promoInicio">Fecha de inicio</label>
-                        <input type="date" id="promoInicio" />
-                    </div>
-                    <div class="form-group">
-                        <label for="promoFin">Fecha de fin</label>
-                        <input type="date" id="promoFin" />
-                    </div>
+                    <div class="form-group"><label for="promoInicio">Fecha inicio</label><input type="date" id="promoInicio" /></div>
+                    <div class="form-group"><label for="promoFin">Fecha fin</label><input type="date" id="promoFin" /></div>
                 </div>
-
                 <div class="form-checkbox-group">
-                    <label>
-                        <input type="checkbox" id="promoActiva" checked /> Activa
-                    </label>
+                    <label><input type="checkbox" id="promoActiva" checked /> Activa</label>
                 </div>
-
                 <div class="form-actions">
                     <button class="btn-save" id="savePromoBtn">💾 Guardar</button>
                     <button class="btn-cancel" id="cancelPromoBtn">Cancelar</button>
+                </div>
+            </div>
+
+            <hr style="border-color:#2f4a2f; margin:20px 0;">
+
+            <!-- ===== HORARIO EXCEPCIONAL ===== -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <h2>⏰ Horario excepcional</h2>
+                <button class="btn-add" id="addExcepcionBtn">➕ Agregar excepción</button>
+            </div>
+            <div id="excepcionList"></div>
+            <div id="formExcepcion" class="form-producto">
+                <h3>✏️ Nueva excepción</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="exFechaInicio">Fecha inicio <span class="required">*</span></label>
+                        <input type="date" id="exFechaInicio" />
+                    </div>
+                    <div class="form-group">
+                        <label for="exFechaFin">Fecha fin</label>
+                        <input type="date" id="exFechaFin" />
+                        <span class="hint-text">Si es un solo día, dejalo igual que la fecha inicio.</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="exTipo">Tipo</label>
+                    <select id="exTipo">
+                        <option value="cerrado">🔴 Cerrado</option>
+                        <option value="abierto">🟢 Abierto</option>
+                        <option value="horario_especial">🟡 Horario especial</option>
+                    </select>
+                </div>
+                <div id="exHorarioEspecial" style="display:none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="exHoraApertura">Hora apertura</label>
+                            <input type="time" id="exHoraApertura" value="20:00" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exHoraCierre">Hora cierre</label>
+                            <input type="time" id="exHoraCierre" value="00:00" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="exMensaje">Mensaje (opcional)</label>
+                    <input type="text" id="exMensaje" placeholder="Ej: Cerrado por feriado" />
+                </div>
+                <div class="form-actions">
+                    <button class="btn-save" id="saveExcepcionBtn">💾 Guardar</button>
+                    <button class="btn-cancel" id="cancelExcepcionBtn">Cancelar</button>
                 </div>
             </div>
 
@@ -720,17 +529,28 @@
         const userEmail = document.getElementById('userEmail');
         const logoutBtn = document.getElementById('logoutBtn');
 
+        // Productos
         const addProductBtn = document.getElementById('addProductBtn');
         const formProducto = document.getElementById('formProducto');
         const saveProductBtn = document.getElementById('saveProductBtn');
         const cancelProductBtn = document.getElementById('cancelProductBtn');
         const formProductoTitulo = document.getElementById('formProductoTitulo');
 
+        // Promociones
         const addPromoBtn = document.getElementById('addPromoBtn');
         const formPromo = document.getElementById('formPromo');
         const savePromoBtn = document.getElementById('savePromoBtn');
         const cancelPromoBtn = document.getElementById('cancelPromoBtn');
 
+        // Excepciones
+        const addExcepcionBtn = document.getElementById('addExcepcionBtn');
+        const formExcepcion = document.getElementById('formExcepcion');
+        const saveExcepcionBtn = document.getElementById('saveExcepcionBtn');
+        const cancelExcepcionBtn = document.getElementById('cancelExcepcionBtn');
+        const exTipo = document.getElementById('exTipo');
+        const exHorarioEspecial = document.getElementById('exHorarioEspecial');
+
+        // Filtro
         const filtroCategoria = document.getElementById('filtroCategoria');
 
         // ============================================================
@@ -745,17 +565,11 @@
             }
             authError.textContent = '';
             auth.signInWithEmailAndPassword(email, pass)
-                .catch(error => {
-                    authError.textContent = error.message;
-                });
+                .catch(error => { authError.textContent = error.message; });
         });
 
-        passInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') authButton.click();
-        });
-        emailInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') authButton.click();
-        });
+        passInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') authButton.click(); });
+        emailInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') authButton.click(); });
 
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -765,6 +579,7 @@
                 cargarDatos();
                 ocultarFormProducto();
                 ocultarFormPromo();
+                ocultarFormExcepcion();
             } else {
                 authSection.style.display = 'block';
                 adminPanel.classList.remove('active');
@@ -773,12 +588,11 @@
                 passInput.value = '';
                 db.ref('products').off();
                 db.ref('promotions').off();
+                db.ref('excepciones').off();
             }
         });
 
-        logoutBtn.addEventListener('click', () => {
-            auth.signOut();
-        });
+        logoutBtn.addEventListener('click', () => { auth.signOut(); });
 
         // ============================================================
         //  CARGA DE DATOS
@@ -789,23 +603,18 @@
         function cargarDatos() {
             cargarProductos();
             cargarPromociones();
+            cargarExcepciones();
         }
 
-        // ---- PRODUCTOS ----
+        // ---- PRODUCTOS (igual que antes) ----
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
-                if (!data) {
-                    crearProductosDefault();
-                    return;
-                }
+                if (!data) { crearProductosDefault(); return; }
                 productosCompletos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 productosCompletos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
-
                 const categorias = new Set();
-                productosCompletos.forEach(p => {
-                    if (p.categoria) categorias.add(p.categoria);
-                });
+                productosCompletos.forEach(p => { if (p.categoria) categorias.add(p.categoria); });
                 categoriasUnicas = Array.from(categorias).sort();
                 actualizarOpcionesFiltro();
                 aplicarFiltro();
@@ -821,11 +630,8 @@
                 opt.textContent = cat;
                 filtroCategoria.appendChild(opt);
             });
-            if (categoriasUnicas.includes(valorActual) || valorActual === 'todas') {
-                filtroCategoria.value = valorActual;
-            } else {
-                filtroCategoria.value = 'todas';
-            }
+            if (categoriasUnicas.includes(valorActual) || valorActual === 'todas') filtroCategoria.value = valorActual;
+            else filtroCategoria.value = 'todas';
         }
 
         function aplicarFiltro() {
@@ -842,33 +648,16 @@
         function renderProductos(productos) {
             const list = document.getElementById('productList');
             list.innerHTML = '';
-            if (productos.length === 0) {
-                list.innerHTML = '<p style="color:#b8d0b8;">No hay productos en esta categoría.</p>';
-                return;
-            }
+            if (productos.length === 0) { list.innerHTML = '<p style="color:#b8d0b8;">No hay productos en esta categoría.</p>'; return; }
             productos.forEach((p, index) => {
                 const div = document.createElement('div');
                 div.className = 'product-item';
-
-                const badgeHtml = p.badge ?
-                    `<span class="badge-preview">${p.badge}</span>` :
-                    '';
-
-                const metaHtml = `
-                    <div class="meta">
-                        ${p.categoria ? `<span>📂 ${p.categoria}</span>` : ''}
-                        ${p.tiempoPreparacion ? `<span>⏱️ ${p.tiempoPreparacion} min</span>` : ''}
-                    </div>
-                `;
-
+                const badgeHtml = p.badge ? `<span class="badge-preview">${p.badge}</span>` : '';
+                const metaHtml = `<div class="meta">${p.categoria ? `<span>📂 ${p.categoria}</span>` : ''}${p.tiempoPreparacion ? `<span>⏱️ ${p.tiempoPreparacion} min</span>` : ''}</div>`;
                 const isFirst = index === 0;
                 const isLast = index === productos.length - 1;
-
                 div.innerHTML = `
-                    <div style="flex:1; min-width:150px;">
-                        <div class="name">${p.name} ${badgeHtml}</div>
-                        ${metaHtml}
-                    </div>
+                    <div style="flex:1; min-width:150px;"><div class="name">${p.name} ${badgeHtml}</div>${metaHtml}</div>
                     <label>💰 Precio: <input type="number" value="${p.price}" data-id="${p.id}" class="price-input" /></label>
                     <label>📦 Disponible: <input type="checkbox" ${p.available !== false ? 'checked' : ''} data-id="${p.id}" class="avail-input" /></label>
                     <div class="actions">
@@ -893,12 +682,10 @@
             if (idx === -1) return;
             const nuevoIdx = idx + direccion;
             if (nuevoIdx < 0 || nuevoIdx >= productos.length) return;
-
             const productoActual = productos[idx];
             const productoVecino = productos[nuevoIdx];
             const ordenActual = productoActual.orden !== undefined ? productoActual.orden : idx;
             const ordenVecino = productoVecino.orden !== undefined ? productoVecino.orden : nuevoIdx;
-
             const updates = {};
             updates['products/' + productoActual.id + '/orden'] = ordenVecino;
             updates['products/' + productoVecino.id + '/orden'] = ordenActual;
@@ -909,11 +696,7 @@
             try {
                 const snapshot = await db.ref('products/' + id).once('value');
                 const producto = snapshot.val();
-                if (!producto) {
-                    alert('❌ Producto no encontrado');
-                    return;
-                }
-
+                if (!producto) { alert('❌ Producto no encontrado'); return; }
                 document.getElementById('prodNombre').value = producto.name || '';
                 document.getElementById('prodPrecio').value = producto.price || '';
                 document.getElementById('prodDesc').value = producto.desc || '';
@@ -926,12 +709,10 @@
                 document.getElementById('prodId').readOnly = true;
                 document.getElementById('prodHasExtras').checked = producto.hasExtras || false;
                 document.getElementById('prodDisponible').checked = producto.available !== false;
-
                 window.editandoProductoId = id;
                 formProductoTitulo.textContent = '✏️ Editando: ' + producto.name;
                 formProducto.classList.add('active');
                 formProducto.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
             } catch (error) {
                 alert('❌ Error al cargar producto: ' + error.message);
             }
@@ -970,9 +751,7 @@
                 { id: 'yankee', name: 'Yankee', price: 16000, desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.', hasExtras: false, badge: null, imagen: 'images/yan.jpg', popupImg: 'images/bn5.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 18, orden: 4 },
                 { id: 'clasica', name: 'Clásica', price: 16000, desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.', hasExtras: false, badge: null, imagen: 'images/cla.jpg', popupImg: 'images/bn6.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15, orden: 5 }
             ];
-            defaultProducts.forEach(p => {
-                db.ref('products/' + p.id).set(p);
-            });
+            defaultProducts.forEach(p => { db.ref('products/' + p.id).set(p); });
             db.ref('promotions').push({
                 title: 'Promo 2x1',
                 description: 'Llevá dos burgers por el precio de una',
@@ -983,7 +762,6 @@
             });
         }
 
-        // ---- CREAR / EDITAR PRODUCTO ----
         let editandoProductoId = null;
 
         function mostrarFormProducto() {
@@ -1028,34 +806,10 @@
             let id = document.getElementById('prodId').value.trim().toLowerCase().replace(/\s+/g, '-');
             const hasExtras = document.getElementById('prodHasExtras').checked;
             const disponible = document.getElementById('prodDisponible').checked;
-
-            if (!nombre || !precio || !id) {
-                alert('❌ Nombre, precio e ID son obligatorios.');
-                return;
-            }
-            if (isNaN(precio) || precio <= 0) {
-                alert('❌ Ingresá un precio válido.');
-                return;
-            }
-            if (!/^[a-z0-9\-]+$/.test(id)) {
-                alert('❌ El ID solo puede contener letras minúsculas, números y guiones. Sin espacios.');
-                return;
-            }
-
-            const nuevoProducto = {
-                id: id,
-                name: nombre,
-                price: precio,
-                desc: desc || '',
-                imagen: imagen || 'images/placeholder.jpg',
-                popupImg: popupImg || imagen || 'images/placeholder.jpg',
-                categoria: categoria,
-                tiempoPreparacion: tiempoPreparacion,
-                badge: badge,
-                hasExtras: hasExtras,
-                available: disponible
-            };
-
+            if (!nombre || !precio || !id) { alert('❌ Nombre, precio e ID son obligatorios.'); return; }
+            if (isNaN(precio) || precio <= 0) { alert('❌ Ingresá un precio válido.'); return; }
+            if (!/^[a-z0-9\-]+$/.test(id)) { alert('❌ El ID solo puede contener letras minúsculas, números y guiones. Sin espacios.'); return; }
+            const nuevoProducto = { id, name: nombre, price: precio, desc: desc || '', imagen: imagen || 'images/placeholder.jpg', popupImg: popupImg || imagen || 'images/placeholder.jpg', categoria, tiempoPreparacion, badge, hasExtras, available: disponible };
             try {
                 if (window.editandoProductoId) {
                     await db.ref('products/' + window.editandoProductoId).update(nuevoProducto);
@@ -1066,17 +820,11 @@
                     let maxOrden = 0;
                     if (data) {
                         const productos = Object.keys(data).map(key => ({ ...data[key] }));
-                        productos.forEach(p => {
-                            if (p.orden !== undefined && p.orden > maxOrden) maxOrden = p.orden;
-                        });
+                        productos.forEach(p => { if (p.orden !== undefined && p.orden > maxOrden) maxOrden = p.orden; });
                     }
                     nuevoProducto.orden = maxOrden + 1;
-
                     const exist = await db.ref('products/' + id).once('value');
-                    if (exist.exists()) {
-                        alert('❌ Ya existe un producto con ese ID. Usá otro.');
-                        return;
-                    }
+                    if (exist.exists()) { alert('❌ Ya existe un producto con ese ID. Usá otro.'); return; }
                     await db.ref('products/' + id).set(nuevoProducto);
                     alert('✅ Producto creado correctamente');
                 }
@@ -1087,19 +835,16 @@
         });
 
         // ============================================================
-        //  PROMOCIONES CON CHECKBOX "ACTIVA" (CORREGIDO - SIN DUPLICAR)
+        //  PROMOCIONES (con checkbox activa, sin duplicar)
         // ============================================================
-        let actualizandoPromo = false; // Bandera para evitar ciclos
+        let actualizandoPromo = false;
 
         function cargarPromociones() {
             db.ref('promotions').on('value', (snapshot) => {
-                // Si estamos actualizando, no renderizar para evitar ciclos
                 if (actualizandoPromo) return;
-
                 const data = snapshot.val();
                 if (!data) {
-                    document.getElementById('promoList').innerHTML =
-                    '<p style="color:#b8d0b8;">No hay promociones aún.</p>';
+                    document.getElementById('promoList').innerHTML = '<p style="color:#b8d0b8;">No hay promociones aún.</p>';
                     return;
                 }
                 const promos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
@@ -1113,28 +858,19 @@
             promos.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'promo-item';
-
                 const fechaInicio = p.startDate ? new Date(p.startDate).toLocaleDateString('es-AR') : '';
                 const fechaFin = p.endDate ? new Date(p.endDate).toLocaleDateString('es-AR') : '';
-
                 div.innerHTML = `
-                    <div class="info">
-                        <strong>${p.title}</strong> — ${p.description}
-                    </div>
+                    <div class="info"><strong>${p.title}</strong> — ${p.description}</div>
                     <div class="dates">${fechaInicio} ${fechaInicio && fechaFin ? '→' : ''} ${fechaFin}</div>
-                    <label>
-                        <input type="checkbox" ${p.active !== false ? 'checked' : ''} data-id="${p.id}" class="promo-active-check" />
-                        Activa
-                    </label>
+                    <label><input type="checkbox" ${p.active !== false ? 'checked' : ''} data-id="${p.id}" class="promo-active-check" /> Activa</label>
                     <div class="actions">
-                        <button class="btn-editar-promo" onclick="editarPromocion('${p.id}')">✏️ Editar</button>
+                        <button class="btn-editar-promo" onclick="editarPromocion('${p.id}')">✏️</button>
                         <button class="btn-eliminar-promo" onclick="eliminarPromocion('${p.id}')">🗑️</button>
                     </div>
                 `;
                 list.appendChild(div);
             });
-
-            // Agregar eventos a los checkboxes (usando addEventListener para mejor control)
             document.querySelectorAll('.promo-active-check').forEach(cb => {
                 cb.removeEventListener('change', handlePromoChange);
                 cb.addEventListener('change', handlePromoChange);
@@ -1145,26 +881,18 @@
             const cb = event.target;
             const id = cb.dataset.id;
             const activa = cb.checked;
-
-            // Evitar que el listener de Firebase dispare un nuevo render mientras actualizamos
             actualizandoPromo = true;
-
             db.ref('promotions/' + id).update({ active: activa })
-                .then(() => {
-                    // Actualización exitosa, permitir que el listener renderice de nuevo
-                    actualizandoPromo = false;
-                    // No mostramos alert para no molestar
-                })
+                .then(() => { actualizandoPromo = false; })
                 .catch((error) => {
                     actualizandoPromo = false;
                     alert('❌ Error al actualizar: ' + error.message);
-                    // Revertir checkbox
                     cb.checked = !activa;
                 });
         }
 
-        // ---- CRUD Promociones ----
-        function mostrarFormPromo() {
+        function ocultarFormPromo() { formPromo.classList.remove('active'); }
+        addPromoBtn.addEventListener('click', () => {
             formPromo.classList.add('active');
             document.getElementById('promoTitulo').value = '';
             document.getElementById('promoDesc').value = '';
@@ -1173,22 +901,13 @@
             document.getElementById('promoFin').value = '';
             document.getElementById('promoActiva').checked = true;
             document.getElementById('promoTitulo').focus();
-        }
-
-        function ocultarFormPromo() {
-            formPromo.classList.remove('active');
-        }
-
-        addPromoBtn.addEventListener('click', mostrarFormPromo);
+        });
         cancelPromoBtn.addEventListener('click', ocultarFormPromo);
 
         savePromoBtn.addEventListener('click', async function() {
             const titulo = document.getElementById('promoTitulo').value.trim();
             const desc = document.getElementById('promoDesc').value.trim();
-            if (!titulo || !desc) {
-                alert('❌ Título y descripción son obligatorios');
-                return;
-            }
+            if (!titulo || !desc) { alert('❌ Título y descripción son obligatorios'); return; }
             const data = {
                 title: titulo,
                 description: desc,
@@ -1208,22 +927,14 @@
 
         window.eliminarPromocion = async function(id) {
             if (!confirm('¿Eliminar esta promoción?')) return;
-            try {
-                await db.ref('promotions/' + id).remove();
-                alert('✅ Eliminada');
-            } catch (error) {
-                alert('❌ Error: ' + error.message);
-            }
+            try { await db.ref('promotions/' + id).remove(); alert('✅ Eliminada'); } catch (error) { alert('❌ Error: ' + error.message); }
         };
 
         window.editarPromocion = async function(id) {
             try {
                 const snapshot = await db.ref('promotions/' + id).once('value');
                 const promo = snapshot.val();
-                if (!promo) {
-                    alert('❌ Promoción no encontrada');
-                    return;
-                }
+                if (!promo) { alert('❌ Promoción no encontrada'); return; }
                 document.getElementById('promoTitulo').value = promo.title || '';
                 document.getElementById('promoDesc').value = promo.description || '';
                 document.getElementById('promoImagen').value = promo.image || '';
@@ -1232,18 +943,13 @@
                 document.getElementById('promoActiva').checked = promo.active !== false;
                 formPromo.classList.add('active');
                 document.getElementById('promoTitulo').focus();
-
                 window.editandoPromoId = id;
                 formPromo.querySelector('h3').textContent = '✏️ Editando: ' + promo.title;
-
                 const originalClick = savePromoBtn.onclick;
                 savePromoBtn.onclick = async function() {
                     const titulo = document.getElementById('promoTitulo').value.trim();
                     const desc = document.getElementById('promoDesc').value.trim();
-                    if (!titulo || !desc) {
-                        alert('❌ Título y descripción son obligatorios');
-                        return;
-                    }
+                    if (!titulo || !desc) { alert('❌ Título y descripción son obligatorios'); return; }
                     const data = {
                         title: titulo,
                         description: desc,
@@ -1262,11 +968,117 @@
                     }
                 };
                 formPromo.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
             } catch (error) {
                 alert('❌ Error al cargar promoción: ' + error.message);
             }
         };
+
+        // ============================================================
+        //  EXCEPCIONES DE HORARIO
+        // ============================================================
+        function cargarExcepciones() {
+            db.ref('excepciones').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    document.getElementById('excepcionList').innerHTML = '<p style="color:#b8d0b8;">No hay excepciones.</p>';
+                    return;
+                }
+                const excepciones = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                renderExcepciones(excepciones);
+            });
+        }
+
+        function renderExcepciones(excepciones) {
+            const list = document.getElementById('excepcionList');
+            list.innerHTML = '';
+            if (excepciones.length === 0) {
+                list.innerHTML = '<p style="color:#b8d0b8;">No hay excepciones cargadas.</p>';
+                return;
+            }
+            excepciones.forEach(ex => {
+                const div = document.createElement('div');
+                div.className = 'excepcion-item';
+                const tipoTexto = ex.tipo === 'cerrado' ? '🔴 Cerrado' : ex.tipo === 'abierto' ? '🟢 Abierto' : '🟡 Horario especial';
+                const rango = ex.fechaInicio && ex.fechaFin ? `${ex.fechaInicio} → ${ex.fechaFin}` : ex.fechaInicio || '';
+                const horario = ex.tipo === 'horario_especial' ? ` ${ex.horaApertura} - ${ex.horaCierre}` : '';
+                const mensaje = ex.mensaje ? ` (${ex.mensaje})` : '';
+                div.innerHTML = `
+                    <div class="info">
+                        <strong>${rango}</strong> — ${tipoTexto} ${horario} ${mensaje}
+                    </div>
+                    <div class="actions">
+                        <button class="btn-eliminar-excepcion" onclick="eliminarExcepcion('${ex.id}')">🗑️</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        window.eliminarExcepcion = async function(id) {
+            if (!confirm('¿Eliminar esta excepción?')) return;
+            try {
+                await db.ref('excepciones/' + id).remove();
+                alert('✅ Excepción eliminada');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        };
+
+        // Mostrar/ocultar campos de horario especial según tipo seleccionado
+        exTipo.addEventListener('change', function() {
+            if (this.value === 'horario_especial') {
+                exHorarioEspecial.style.display = 'flex';
+            } else {
+                exHorarioEspecial.style.display = 'none';
+            }
+        });
+
+        function mostrarFormExcepcion() {
+            formExcepcion.classList.add('active');
+            document.getElementById('exFechaInicio').value = '';
+            document.getElementById('exFechaFin').value = '';
+            document.getElementById('exTipo').value = 'cerrado';
+            document.getElementById('exHoraApertura').value = '20:00';
+            document.getElementById('exHoraCierre').value = '00:00';
+            document.getElementById('exMensaje').value = '';
+            exHorarioEspecial.style.display = 'none';
+            document.getElementById('exFechaInicio').focus();
+        }
+
+        function ocultarFormExcepcion() {
+            formExcepcion.classList.remove('active');
+        }
+
+        addExcepcionBtn.addEventListener('click', mostrarFormExcepcion);
+        cancelExcepcionBtn.addEventListener('click', ocultarFormExcepcion);
+
+        saveExcepcionBtn.addEventListener('click', async function() {
+            const fechaInicio = document.getElementById('exFechaInicio').value;
+            const fechaFin = document.getElementById('exFechaFin').value || fechaInicio;
+            const tipo = document.getElementById('exTipo').value;
+            const mensaje = document.getElementById('exMensaje').value.trim();
+            if (!fechaInicio) { alert('❌ La fecha inicio es obligatoria.'); return; }
+
+            const data = { fechaInicio, fechaFin, tipo };
+            if (tipo === 'horario_especial') {
+                data.horaApertura = document.getElementById('exHoraApertura').value || '20:00';
+                data.horaCierre = document.getElementById('exHoraCierre').value || '00:00';
+            }
+            if (mensaje) data.mensaje = mensaje;
+
+            try {
+                await db.ref('excepciones').push(data);
+                alert('✅ Excepción guardada');
+                ocultarFormExcepcion();
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        });
+
+        // ============================================================
+        //  INICIO
+        // ============================================================
+        // Ya se llama a cargarDatos() en onAuthStateChanged
     </script>
 </body>
 </html>
