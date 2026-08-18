@@ -283,6 +283,38 @@
             margin: 8px 0 12px;
         }
 
+        /* ===== FILTRO ===== */
+        .filtro-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 10px 0 16px;
+            flex-wrap: wrap;
+        }
+        .filtro-container label {
+            font-size: 0.9rem;
+            color: #b8d0b8;
+            font-weight: 600;
+        }
+        .filtro-container select {
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: 1px solid #3a5a3a;
+            background: #1a2e1a;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            padding-right: 30px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8d0b8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+        .filtro-container select:focus {
+            border-color: #ffb703;
+        }
+
         /* ===== LISTAS ===== */
         .product-item,
         .promo-item {
@@ -451,6 +483,10 @@
             .form-actions {
                 flex-direction: column;
             }
+            .filtro-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
     </style>
 </head>
@@ -479,6 +515,15 @@
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                 <h2>📋 Productos</h2>
                 <button class="btn-add" id="addProductBtn">➕ Nuevo producto</button>
+            </div>
+
+            <!-- FILTRO POR CATEGORÍA -->
+            <div class="filtro-container">
+                <label for="filtroCategoria">🔍 Filtrar por categoría:</label>
+                <select id="filtroCategoria">
+                    <option value="todas">Todas</option>
+                    <!-- Las opciones se llenarán dinámicamente -->
+                </select>
             </div>
 
             <!-- FORMULARIO DE PRODUCTO -->
@@ -663,6 +708,9 @@
         const savePromoBtn = document.getElementById('savePromoBtn');
         const cancelPromoBtn = document.getElementById('cancelPromoBtn');
 
+        // Filtro
+        const filtroCategoria = document.getElementById('filtroCategoria');
+
         // ============================================================
         //  AUTENTICACIÓN
         // ============================================================
@@ -713,6 +761,9 @@
         // ============================================================
         //  CARGA DE DATOS
         // ============================================================
+        let productosCompletos = []; // Guardamos todos los productos sin filtrar
+        let categoriasUnicas = [];
+
         function cargarDatos() {
             cargarProductos();
             cargarPromociones();
@@ -726,18 +777,60 @@
                     crearProductosDefault();
                     return;
                 }
-                const productos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                // Ordenar por 'orden', si no tiene, usar 999 para ponerlo al final
-                productos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
-                renderProductos(productos);
+                productosCompletos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                // Ordenar por 'orden'
+                productosCompletos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
+
+                // Extraer categorías únicas para el filtro
+                const categorias = new Set();
+                productosCompletos.forEach(p => {
+                    if (p.categoria) categorias.add(p.categoria);
+                });
+                categoriasUnicas = Array.from(categorias).sort();
+
+                // Actualizar opciones del filtro
+                actualizarOpcionesFiltro();
+
+                // Aplicar filtro
+                aplicarFiltro();
             });
         }
+
+        function actualizarOpcionesFiltro() {
+            // Mantener la selección actual si es posible
+            const valorActual = filtroCategoria.value;
+            filtroCategoria.innerHTML = '<option value="todas">Todas</option>';
+            categoriasUnicas.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                filtroCategoria.appendChild(opt);
+            });
+            // Restaurar selección
+            if (categoriasUnicas.includes(valorActual) || valorActual === 'todas') {
+                filtroCategoria.value = valorActual;
+            } else {
+                filtroCategoria.value = 'todas';
+            }
+        }
+
+        function aplicarFiltro() {
+            const categoriaSeleccionada = filtroCategoria.value;
+            let productosFiltrados = [...productosCompletos];
+            if (categoriaSeleccionada !== 'todas') {
+                productosFiltrados = productosFiltrados.filter(p => p.categoria === categoriaSeleccionada);
+            }
+            renderProductos(productosFiltrados);
+        }
+
+        // Escuchar cambios en el filtro
+        filtroCategoria.addEventListener('change', aplicarFiltro);
 
         function renderProductos(productos) {
             const list = document.getElementById('productList');
             list.innerHTML = '';
             if (productos.length === 0) {
-                list.innerHTML = '<p style="color:#b8d0b8;">No hay productos cargados.</p>';
+                list.innerHTML = '<p style="color:#b8d0b8;">No hay productos en esta categoría.</p>';
                 return;
             }
             productos.forEach((p, index) => {
@@ -755,6 +848,10 @@
                     </div>
                 `;
 
+                // Deshabilitar botones de movimiento si es el primero o último (dentro del filtro)
+                const isFirst = index === 0;
+                const isLast = index === productos.length - 1;
+
                 div.innerHTML = `
                     <div style="flex:1; min-width:150px;">
                         <div class="name">${p.name} ${badgeHtml}</div>
@@ -763,8 +860,8 @@
                     <label>💰 Precio: <input type="number" value="${p.price}" data-id="${p.id}" class="price-input" /></label>
                     <label>📦 Disponible: <input type="checkbox" ${p.available !== false ? 'checked' : ''} data-id="${p.id}" class="avail-input" /></label>
                     <div class="actions">
-                        <button class="btn-mover" onclick="moverProducto('${p.id}', -1)" ${index === 0 ? 'disabled' : ''}>⬆</button>
-                        <button class="btn-mover" onclick="moverProducto('${p.id}', 1)" ${index === productos.length - 1 ? 'disabled' : ''}>⬇</button>
+                        <button class="btn-mover" onclick="moverProducto('${p.id}', -1)" ${isFirst ? 'disabled' : ''}>⬆</button>
+                        <button class="btn-mover" onclick="moverProducto('${p.id}', 1)" ${isLast ? 'disabled' : ''}>⬇</button>
                         <button class="btn-editar" onclick="editarProducto('${p.id}')">✏️</button>
                         <button class="btn-guardar" onclick="actualizarProducto('${p.id}')">💾</button>
                         <button class="btn-eliminar" onclick="eliminarProducto('${p.id}')">🗑️</button>
@@ -776,12 +873,10 @@
 
         // ---- MOVER PRODUCTO (orden) ----
         window.moverProducto = async function(id, direccion) {
-            // Obtener todos los productos y ordenarlos
             const snapshot = await db.ref('products').once('value');
             const data = snapshot.val();
             if (!data) return;
             const productos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-            // Ordenar por orden (si no tiene, usar 999)
             productos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
             const idx = productos.findIndex(p => p.id === id);
             if (idx === -1) return;
@@ -793,12 +888,10 @@
             const ordenActual = productoActual.orden !== undefined ? productoActual.orden : idx;
             const ordenVecino = productoVecino.orden !== undefined ? productoVecino.orden : nuevoIdx;
 
-            // Intercambiar órdenes
             const updates = {};
             updates['products/' + productoActual.id + '/orden'] = ordenVecino;
             updates['products/' + productoVecino.id + '/orden'] = ordenActual;
             await db.ref().update(updates);
-            // No hace falta recargar, el listener se actualizará solo
         };
 
         // ---- EDITAR PRODUCTO ----
@@ -958,11 +1051,9 @@
 
             try {
                 if (window.editandoProductoId) {
-                    // Edición: no tocar el orden, solo actualizar
                     await db.ref('products/' + window.editandoProductoId).update(nuevoProducto);
                     alert('✅ Producto actualizado correctamente');
                 } else {
-                    // Creación: obtener el máximo orden actual y sumar 1
                     const snapshot = await db.ref('products').orderByChild('orden').once('value');
                     const data = snapshot.val();
                     let maxOrden = 0;
