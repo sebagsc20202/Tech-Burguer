@@ -110,6 +110,24 @@
             margin-top: 4px;
         }
 
+        /* ===== BOTÓN DE RECARGA MANUAL (para depuración) ===== */
+        .btn-reload {
+            background: #3a5a3a;
+            color: #e8f0e8;
+            border: 2px solid #ffb703;
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 6px;
+            display: inline-block;
+        }
+        .btn-reload:hover {
+            background: #4a6a4a;
+        }
+
         /* ===== PROMO BANNER ===== */
         #promoBanner {
             display: none;
@@ -1313,6 +1331,8 @@
                 <div id="statusText">⏳ Cargando...</div>
                 <div class="horario">Mar–Dom · 20:00 a 00:00</div>
             </div>
+            <!-- Botón de recarga manual (para depuración) -->
+            <button class="btn-reload" id="btnReloadEstado">🔄 Recargar estado</button>
         </div>
 
         <!-- ===== BANNER DE PROMOCIONES ===== -->
@@ -1486,11 +1506,18 @@
         //  VARIABLES GLOBALES
         // ============================================================
         let productos = [];
-        window.excepciones = []; // Para almacenar las excepciones de horario
+        window.excepciones = [];
         const TOPPINGS = [
             'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
             'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
         ];
+
+        // ============================================================
+        //  FUNCIÓN PARA OBTENER FECHA LOCAL EN FORMATO YYYY-MM-DD
+        // ============================================================
+        function getHoyLocal() {
+            return new Date().toLocaleDateString('en-CA');
+        }
 
         // ============================================================
         //  REGISTRO DE SERVICE WORKER (PWA)
@@ -1502,7 +1529,7 @@
         }
 
         // ============================================================
-        //  INDICADOR ABIERTO/CERRADO (CON MÚLTIPLES EXCEPCIONES)
+        //  INDICADOR ABIERTO/CERRADO (CON LOGS Y CORRECCIÓN DE ZONA)
         // ============================================================
         function actualizarEstado() {
             const now = new Date();
@@ -1510,26 +1537,16 @@
             const hora = now.getHours();
             const minutos = now.getMinutes();
             const horaMin = hora + minutos / 60;
+            const hoyStr = getHoyLocal();
 
             // ---- Verificar excepciones ----
-            const hoy = new Date();
-            hoy.setHours(0, 0, 0, 0);
-            const hoyStr = hoy.toISOString().split('T')[0];
-
-            // Filtrar TODAS las excepciones que coinciden con la fecha actual
             let excepcionesActivas = [];
             if (window.excepciones && window.excepciones.length > 0) {
                 excepcionesActivas = window.excepciones.filter(ex => {
                     if (ex.fechaInicio && ex.fechaFin) {
-                        const inicio = new Date(ex.fechaInicio);
-                        const fin = new Date(ex.fechaFin);
-                        inicio.setHours(0, 0, 0, 0);
-                        fin.setHours(0, 0, 0, 0);
-                        return hoy >= inicio && hoy <= fin;
+                        return hoyStr >= ex.fechaInicio && hoyStr <= ex.fechaFin;
                     } else if (ex.fechaInicio) {
-                        const inicio = new Date(ex.fechaInicio);
-                        inicio.setHours(0, 0, 0, 0);
-                        return hoy.getTime() === inicio.getTime();
+                        return hoyStr === ex.fechaInicio;
                     }
                     return false;
                 });
@@ -1539,12 +1556,10 @@
             let mensajesExtra = [];
 
             if (excepcionesActivas.length > 0) {
-                // Verificar si alguna es de tipo 'cerrado'
                 const hayCerrado = excepcionesActivas.some(ex => ex.tipo === 'cerrado');
                 const hayHorarioEspecial = excepcionesActivas.some(ex => ex.tipo === 'horario_especial');
                 const hayAbierto = excepcionesActivas.some(ex => ex.tipo === 'abierto');
 
-                // Recopilar mensajes de todas las excepciones activas
                 excepcionesActivas.forEach(ex => {
                     if (ex.mensaje) mensajesExtra.push(ex.mensaje);
                     else if (ex.tipo === 'cerrado') mensajesExtra.push('Cerrado');
@@ -1555,18 +1570,13 @@
                 if (hayCerrado) {
                     estado = 'cerrado';
                 } else if (hayHorarioEspecial) {
-                    // Tomar el primer horario especial (podría mejorarse para elegir el más restrictivo)
                     const ex = excepcionesActivas.find(e => e.tipo === 'horario_especial');
                     if (ex && ex.horaApertura && ex.horaCierre) {
                         const [hA, mA] = ex.horaApertura.split(':').map(Number);
                         const [hC, mC] = ex.horaCierre.split(':').map(Number);
                         const apertura = hA + mA / 60;
                         const cierre = hC + mC / 60;
-                        if (horaMin >= apertura && horaMin < cierre) {
-                            estado = 'abierto';
-                        } else {
-                            estado = 'cerrado';
-                        }
+                        estado = (horaMin >= apertura && horaMin < cierre) ? 'abierto' : 'cerrado';
                     } else {
                         estado = 'cerrado';
                     }
@@ -1576,7 +1586,7 @@
                     estado = 'cerrado';
                 }
             } else {
-                // Comportamiento normal (sin excepción)
+                // Comportamiento normal
                 if (dia === 1) {
                     estado = 'cerrado';
                 } else {
@@ -1609,27 +1619,8 @@
             }
         }
 
-        actualizarEstado();
-        setInterval(actualizarEstado, 60000);
-
         // ============================================================
-        //  TOAST
-        // ============================================================
-        var toastTimer = null;
-
-        function mostrarToast(mensaje) {
-            var toast = document.getElementById('toastConfirm');
-            var content = document.getElementById('toastContent');
-            content.innerHTML = mensaje + ' <span class="emoji">👍</span>';
-            toast.classList.add('show');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(function() {
-                toast.classList.remove('show');
-            }, 750);
-        }
-
-        // ============================================================
-        //  CARGAR EXCEPCIONES DESDE FIREBASE
+        //  CARGAR EXCEPCIONES (EN TIEMPO REAL)
         // ============================================================
         function cargarExcepciones() {
             db.ref('excepciones').on('value', (snapshot) => {
@@ -1641,21 +1632,37 @@
                 }
                 window.excepciones = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 actualizarEstado();
+            }, (error) => {
+                console.error('❌ Error en listener de excepciones:', error);
             });
         }
 
         // ============================================================
-        //  CARGAR PRODUCTOS DESDE FIREBASE (CON ORDENAMIENTO)
+        //  BOTÓN DE RECARGA MANUAL
+        // ============================================================
+        document.getElementById('btnReloadEstado').addEventListener('click', function() {
+            db.ref('excepciones').once('value').then((snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    window.excepciones = [];
+                } else {
+                    window.excepciones = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                }
+                actualizarEstado();
+                alert('✅ Estado recargado');
+            }).catch(err => {
+                alert('❌ Error al recargar');
+            });
+        });
+
+        // ============================================================
+        //  CARGAR PRODUCTOS (DESDE FIREBASE)
         // ============================================================
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
-                if (!data) {
-                    console.warn('⚠️ No hay productos en Firebase');
-                    return;
-                }
+                if (!data) return;
                 productos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                // 🔽 ORDENAR POR EL CAMPO 'orden' (si no tiene, se asigna 999 para que quede al final)
                 productos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
                 renderProducts();
                 generarTrack();
@@ -1669,7 +1676,6 @@
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
 
-            // Filtrar solo disponibles
             const disponibles = productos.filter(p => p.available !== false);
 
             if (disponibles.length === 0) {
@@ -1793,12 +1799,11 @@
                 grid.appendChild(card);
             });
 
-            // Actualizar visibilidad del botón cancelar
             actualizarVisibilidadCancelar();
         }
 
         // ============================================================
-        //  CARGAR PROMOCIONES DESDE FIREBASE
+        //  CARGAR PROMOCIONES
         // ============================================================
         function cargarPromociones() {
             db.ref('promotions').on('value', (snapshot) => {
@@ -1895,7 +1900,7 @@
         }
 
         // ============================================================
-        //  FUNCIÓN PARA RESETEAR UN PRODUCTO COMPLETO
+        //  RESETEAR PRODUCTO
         // ============================================================
         function resetearProducto(productId) {
             const qtyInput = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
@@ -2253,6 +2258,22 @@
         }
 
         // ============================================================
+        //  TOAST
+        // ============================================================
+        var toastTimer = null;
+
+        function mostrarToast(mensaje) {
+            var toast = document.getElementById('toastConfirm');
+            var content = document.getElementById('toastContent');
+            content.innerHTML = mensaje + ' <span class="emoji">👍</span>';
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function() {
+                toast.classList.remove('show');
+            }, 750);
+        }
+
+        // ============================================================
         //  ENVÍO POR WHATSAPP
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
@@ -2365,7 +2386,6 @@
 
         function generarTrack() {
             popupTrack.innerHTML = '';
-            // Usamos el array 'productos' ya ordenado
             productos.forEach(p => {
                 const img = document.createElement('img');
                 img.src = p.popupImg || p.imagen || 'images/placeholder.jpg';
@@ -2463,7 +2483,7 @@
         // ============================================================
         cargarProductos();
         cargarPromociones();
-        cargarExcepciones(); // Cargar excepciones de horario
+        cargarExcepciones();
         setTimeout(actualizarVisibilidadCancelar, 100);
         generarTrack();
     </script>
