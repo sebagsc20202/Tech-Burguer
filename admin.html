@@ -329,6 +329,8 @@
             cursor: pointer;
             transition: background 0.2s;
         }
+        .excepcion-item .actions .btn-editar-excepcion { background: #2196F3; color: #fff; }
+        .excepcion-item .actions .btn-editar-excepcion:hover { background: #1976D2; }
         .excepcion-item .actions .btn-eliminar-excepcion { background: #f44336; color: #fff; }
         .excepcion-item .actions .btn-eliminar-excepcion:hover { background: #d32f2f; }
 
@@ -379,7 +381,6 @@
             </div>
             <div id="formProducto" class="form-producto">
                 <h3 id="formProductoTitulo">✏️ Nuevo producto</h3>
-                <!-- Campos del producto (ya los tenías) -->
                 <div class="form-group"><label for="prodNombre">Nombre <span class="required">*</span></label><input type="text" id="prodNombre" placeholder="Ej: Doble Cheddar" /></div>
                 <div class="form-group"><label for="prodPrecio">Precio <span class="required">*</span></label><input type="text" id="prodPrecio" placeholder="Ej: 15000" /></div>
                 <div class="form-group"><label for="prodDesc">Descripción</label><textarea id="prodDesc" placeholder="Ej: Doble medallón 120gr · doble cheddar · salsa Tech."></textarea></div>
@@ -443,14 +444,14 @@
 
             <hr style="border-color:#2f4a2f; margin:20px 0;">
 
-            <!-- ===== HORARIO EXCEPCIONAL ===== -->
+            <!-- ===== HORARIO EXCEPCIONAL (CON EDICIÓN) ===== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                 <h2>⏰ Horario excepcional</h2>
                 <button class="btn-add" id="addExcepcionBtn">➕ Agregar excepción</button>
             </div>
             <div id="excepcionList"></div>
             <div id="formExcepcion" class="form-producto">
-                <h3>✏️ Nueva excepción</h3>
+                <h3 id="formExcepcionTitulo">✏️ Nueva excepción</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="exFechaInicio">Fecha inicio <span class="required">*</span></label>
@@ -547,6 +548,7 @@
         const formExcepcion = document.getElementById('formExcepcion');
         const saveExcepcionBtn = document.getElementById('saveExcepcionBtn');
         const cancelExcepcionBtn = document.getElementById('cancelExcepcionBtn');
+        const formExcepcionTitulo = document.getElementById('formExcepcionTitulo');
         const exTipo = document.getElementById('exTipo');
         const exHorarioEspecial = document.getElementById('exHorarioEspecial');
 
@@ -606,7 +608,7 @@
             cargarExcepciones();
         }
 
-        // ---- PRODUCTOS (igual que antes) ----
+        // ---- PRODUCTOS ----
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -835,7 +837,7 @@
         });
 
         // ============================================================
-        //  PROMOCIONES (con checkbox activa, sin duplicar)
+        //  PROMOCIONES
         // ============================================================
         let actualizandoPromo = false;
 
@@ -974,8 +976,10 @@
         };
 
         // ============================================================
-        //  EXCEPCIONES DE HORARIO
+        //  EXCEPCIONES DE HORARIO (CON EDICIÓN)
         // ============================================================
+        let editandoExcepcionId = null;
+
         function cargarExcepciones() {
             db.ref('excepciones').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1007,12 +1011,46 @@
                         <strong>${rango}</strong> — ${tipoTexto} ${horario} ${mensaje}
                     </div>
                     <div class="actions">
+                        <button class="btn-editar-excepcion" onclick="editarExcepcion('${ex.id}')">✏️ Editar</button>
                         <button class="btn-eliminar-excepcion" onclick="eliminarExcepcion('${ex.id}')">🗑️</button>
                     </div>
                 `;
                 list.appendChild(div);
             });
         }
+
+        // Función para editar excepción (carga datos en el formulario)
+        window.editarExcepcion = async function(id) {
+            try {
+                const snapshot = await db.ref('excepciones/' + id).once('value');
+                const ex = snapshot.val();
+                if (!ex) {
+                    alert('❌ Excepción no encontrada');
+                    return;
+                }
+                document.getElementById('exFechaInicio').value = ex.fechaInicio || '';
+                document.getElementById('exFechaFin').value = ex.fechaFin || '';
+                document.getElementById('exTipo').value = ex.tipo || 'cerrado';
+                document.getElementById('exHoraApertura').value = ex.horaApertura || '20:00';
+                document.getElementById('exHoraCierre').value = ex.horaCierre || '00:00';
+                document.getElementById('exMensaje').value = ex.mensaje || '';
+
+                // Mostrar/ocultar campos de horario especial según tipo
+                if (ex.tipo === 'horario_especial') {
+                    exHorarioEspecial.style.display = 'flex';
+                } else {
+                    exHorarioEspecial.style.display = 'none';
+                }
+
+                // Cambiar título del formulario
+                formExcepcionTitulo.textContent = '✏️ Editando excepción';
+                window.editandoExcepcionId = id;
+                formExcepcion.classList.add('active');
+                formExcepcion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (error) {
+                alert('❌ Error al cargar excepción: ' + error.message);
+            }
+        };
 
         window.eliminarExcepcion = async function(id) {
             if (!confirm('¿Eliminar esta excepción?')) return;
@@ -1034,7 +1072,7 @@
         });
 
         function mostrarFormExcepcion() {
-            formExcepcion.classList.add('active');
+            // Limpiar formulario para nueva excepción
             document.getElementById('exFechaInicio').value = '';
             document.getElementById('exFechaFin').value = '';
             document.getElementById('exTipo').value = 'cerrado';
@@ -1042,11 +1080,15 @@
             document.getElementById('exHoraCierre').value = '00:00';
             document.getElementById('exMensaje').value = '';
             exHorarioEspecial.style.display = 'none';
+            formExcepcionTitulo.textContent = '✏️ Nueva excepción';
+            window.editandoExcepcionId = null;
+            formExcepcion.classList.add('active');
             document.getElementById('exFechaInicio').focus();
         }
 
         function ocultarFormExcepcion() {
             formExcepcion.classList.remove('active');
+            window.editandoExcepcionId = null;
         }
 
         addExcepcionBtn.addEventListener('click', mostrarFormExcepcion);
@@ -1067,18 +1109,20 @@
             if (mensaje) data.mensaje = mensaje;
 
             try {
-                await db.ref('excepciones').push(data);
-                alert('✅ Excepción guardada');
+                if (window.editandoExcepcionId) {
+                    // Edición: actualizar excepción existente
+                    await db.ref('excepciones/' + window.editandoExcepcionId).update(data);
+                    alert('✅ Excepción actualizada');
+                } else {
+                    // Creación: agregar nueva excepción
+                    await db.ref('excepciones').push(data);
+                    alert('✅ Excepción guardada');
+                }
                 ocultarFormExcepcion();
             } catch (error) {
                 alert('❌ Error: ' + error.message);
             }
         });
-
-        // ============================================================
-        //  INICIO
-        // ============================================================
-        // Ya se llama a cargarDatos() en onAuthStateChanged
     </script>
 </body>
 </html>
