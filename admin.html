@@ -12,7 +12,11 @@
 
     <style>
         /* ===== RESET ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
             background: #1a2e1a;
@@ -23,9 +27,22 @@
             justify-content: center;
             align-items: center;
         }
-        .container { max-width: 900px; width: 100%; }
-        h1 { color: #ffb703; text-align: center; margin-bottom: 30px; font-size: 2rem; }
-        h2 { color: #ffb703; margin: 20px 0 10px; border-bottom: 1px solid #2f4a2f; padding-bottom: 6px; }
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+        h1 {
+            color: #ffb703;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+        h2 {
+            color: #ffb703;
+            margin: 20px 0 10px;
+            border-bottom: 1px solid #2f4a2f;
+            padding-bottom: 6px;
+        }
 
         /* ===== CARD ===== */
         .card {
@@ -36,7 +53,11 @@
             max-width: 400px;
             margin: 0 auto 30px;
         }
-        .card h2 { border-bottom: none; text-align: center; margin-top: 0; }
+        .card h2 {
+            border-bottom: none;
+            text-align: center;
+            margin-top: 0;
+        }
         .card input {
             width: 100%;
             padding: 12px 16px;
@@ -48,7 +69,9 @@
             font-size: 1rem;
             outline: none;
         }
-        .card input:focus { border-color: #ffb703; }
+        .card input:focus {
+            border-color: #ffb703;
+        }
         .card button {
             width: 100%;
             padding: 12px;
@@ -61,15 +84,29 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .card button:hover { background: #e6a500; }
-        .card .error { color: #ef9a9a; font-size: 0.9rem; margin-top: 8px; text-align: center; }
-        .card .link { color: #b8d0b8; font-size: 0.9rem; text-align: center; margin-top: 12px; cursor: pointer; text-decoration: underline; }
-        .card .link:hover { color: #ffb703; }
-        .card .hint { color: #8aaa8a; font-size: 0.8rem; text-align: center; margin-top: 8px; }
+        .card button:hover {
+            background: #e6a500;
+        }
+        .card .error {
+            color: #ef9a9a;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            text-align: center;
+        }
+        .card .hint {
+            color: #8aaa8a;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 8px;
+        }
 
         /* ===== PANEL ===== */
-        #adminPanel { display: none; }
-        #adminPanel.active { display: block; }
+        #adminPanel {
+            display: none;
+        }
+        #adminPanel.active {
+            display: block;
+        }
 
         .panel-header {
             display: flex;
@@ -79,8 +116,12 @@
             gap: 12px;
             margin-bottom: 20px;
         }
-        .panel-header .user-info { color: #b8d0b8; }
-        .panel-header .user-info strong { color: #ffb703; }
+        .panel-header .user-info {
+            color: #b8d0b8;
+        }
+        .panel-header .user-info strong {
+            color: #ffb703;
+        }
         .btn-logout {
             background: #3a1a1a;
             color: #ef9a9a;
@@ -91,10 +132,13 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .btn-logout:hover { background: #5a2a2a; }
+        .btn-logout:hover {
+            background: #5a2a2a;
+        }
 
         /* ===== LISTAS ===== */
-        .product-item, .promo-item {
+        .product-item,
+        .promo-item {
             background: #1f331f;
             border: 1px solid #3a5a3a;
             border-radius: 12px;
@@ -105,8 +149,17 @@
             align-items: center;
             gap: 12px;
         }
-        .product-item .name { flex: 2; font-weight: 600; min-width: 120px; }
-        .product-item label { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
+        .product-item .name {
+            flex: 2;
+            font-weight: 600;
+            min-width: 120px;
+        }
+        .product-item label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
         .product-item input[type="number"] {
             width: 70px;
             padding: 6px 8px;
@@ -116,7 +169,12 @@
             color: #fff;
             font-weight: 600;
         }
-        .product-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #ffb703; cursor: pointer; }
+        .product-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #ffb703;
+            cursor: pointer;
+        }
         .product-item button {
             background: #ffb703;
             border: none;
@@ -126,16 +184,40 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .product-item button:hover { background: #e6a500; }
+        .product-item button:hover {
+            background: #e6a500;
+        }
 
-        .promo-item .info { flex: 1; min-width: 150px; }
-        .promo-item .dates { font-size: 0.8rem; color: #b8d0b8; }
-        .promo-item .status { font-weight: 600; }
-        .promo-item .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-        .btn-danger { background: #f44336 !important; color: #fff !important; }
-        .btn-danger:hover { background: #d32f2f !important; }
-        .btn-edit { background: #2196F3 !important; color: #fff !important; }
-        .btn-edit:hover { background: #1976D2 !important; }
+        .promo-item .info {
+            flex: 1;
+            min-width: 150px;
+        }
+        .promo-item .dates {
+            font-size: 0.8rem;
+            color: #b8d0b8;
+        }
+        .promo-item .status {
+            font-weight: 600;
+        }
+        .promo-item .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn-danger {
+            background: #f44336 !important;
+            color: #fff !important;
+        }
+        .btn-danger:hover {
+            background: #d32f2f !important;
+        }
+        .btn-edit {
+            background: #2196F3 !important;
+            color: #fff !important;
+        }
+        .btn-edit:hover {
+            background: #1976D2 !important;
+        }
         .btn-add {
             background: #4caf50;
             border: none;
@@ -147,7 +229,9 @@
             transition: background 0.2s;
             margin: 10px 0;
         }
-        .btn-add:hover { background: #388e3c; }
+        .btn-add:hover {
+            background: #388e3c;
+        }
 
         /* ===== FORMULARIO PROMO ===== */
         .form-promo {
@@ -158,7 +242,9 @@
             margin: 15px 0;
             display: none;
         }
-        .form-promo.active { display: block; }
+        .form-promo.active {
+            display: block;
+        }
         .form-promo input {
             width: 100%;
             padding: 10px 14px;
@@ -168,21 +254,59 @@
             background: #1a2e1a;
             color: #fff;
         }
-        .form-promo input[type="checkbox"] { width: auto; margin-right: 8px; }
-        .form-promo .row { display: flex; flex-wrap: wrap; gap: 12px; }
-        .form-promo .row input { flex: 1; min-width: 150px; }
-        .form-promo .actions { display: flex; gap: 12px; margin-top: 12px; }
-        .form-promo .actions button { padding: 10px 24px; border: none; border-radius: 40px; font-weight: 700; cursor: pointer; }
-        .btn-save { background: #ffb703; color: #1a1a1a; }
-        .btn-save:hover { background: #e6a500; }
-        .btn-cancel { background: #555; color: #fff; }
-        .btn-cancel:hover { background: #444; }
+        .form-promo input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+        .form-promo .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .form-promo .row input {
+            flex: 1;
+            min-width: 150px;
+        }
+        .form-promo .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .form-promo .actions button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-save {
+            background: #ffb703;
+            color: #1a1a1a;
+        }
+        .btn-save:hover {
+            background: #e6a500;
+        }
+        .btn-cancel {
+            background: #555;
+            color: #fff;
+        }
+        .btn-cancel:hover {
+            background: #444;
+        }
 
-        .hidden { display: none !important; }
+        .hidden {
+            display: none !important;
+        }
 
         @media (max-width: 600px) {
-            .product-item, .promo-item { flex-direction: column; align-items: stretch; }
-            .product-item label { justify-content: space-between; }
+            .product-item,
+            .promo-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .product-item label {
+                justify-content: space-between;
+            }
         }
     </style>
 </head>
@@ -190,15 +314,14 @@
     <div class="container">
         <h1>🍔 Admin Tech Burgers</h1>
 
-        <!-- ===== LOGIN / REGISTRO ===== -->
+        <!-- ===== LOGIN ===== -->
         <div id="authSection" class="card">
-            <h2 id="authTitle">🔐 Iniciar sesión</h2>
-            <input type="email" id="emailInput" placeholder="Correo electrónico" />
+            <h2>🔐 Iniciar sesión</h2>
+            <input type="email" id="emailInput" placeholder="Correo electrónico" value="admin@techburgers.com" />
             <input type="password" id="passInput" placeholder="Contraseña" />
             <div id="authError" class="error"></div>
             <button id="authButton">Ingresar</button>
-            <div id="authLink" class="link">¿No tenés cuenta? Registrate</div>
-            <div class="hint">Usá el correo y contraseña que configuraste en Firebase.</div>
+            <div class="hint">Usá el correo y contraseña configurado en Firebase.</div>
         </div>
 
         <!-- ===== PANEL DE ADMIN ===== -->
@@ -272,38 +395,16 @@
         // ============================================================
         const authSection = document.getElementById('authSection');
         const adminPanel = document.getElementById('adminPanel');
-        const authTitle = document.getElementById('authTitle');
         const authButton = document.getElementById('authButton');
-        const authLink = document.getElementById('authLink');
         const authError = document.getElementById('authError');
         const emailInput = document.getElementById('emailInput');
         const passInput = document.getElementById('passInput');
         const userEmail = document.getElementById('userEmail');
         const logoutBtn = document.getElementById('logoutBtn');
 
-        let isLoginMode = true;
-
         // ============================================================
         //  AUTENTICACIÓN
         // ============================================================
-        function setAuthMode(login) {
-            isLoginMode = login;
-            if (login) {
-                authTitle.textContent = '🔐 Iniciar sesión';
-                authButton.textContent = 'Ingresar';
-                authLink.textContent = '¿No tenés cuenta? Registrate';
-            } else {
-                authTitle.textContent = '📝 Crear cuenta';
-                authButton.textContent = 'Registrarme';
-                authLink.textContent = '¿Ya tenés cuenta? Iniciá sesión';
-            }
-            authError.textContent = '';
-        }
-
-        authLink.addEventListener('click', () => {
-            setAuthMode(!isLoginMode);
-        });
-
         authButton.addEventListener('click', () => {
             const email = emailInput.value.trim();
             const pass = passInput.value.trim();
@@ -318,25 +419,14 @@
 
             authError.textContent = '';
 
-            if (isLoginMode) {
-                // Login
-                auth.signInWithEmailAndPassword(email, pass)
-                    .then(userCredential => {
-                        // Éxito
-                    })
-                    .catch(error => {
-                        authError.textContent = error.message;
-                    });
-            } else {
-                // Registro
-                auth.createUserWithEmailAndPassword(email, pass)
-                    .then(userCredential => {
-                        // Éxito
-                    })
-                    .catch(error => {
-                        authError.textContent = error.message;
-                    });
-            }
+            // Login
+            auth.signInWithEmailAndPassword(email, pass)
+                .then(userCredential => {
+                    // Éxito
+                })
+                .catch(error => {
+                    authError.textContent = error.message;
+                });
         });
 
         // Enter para enviar
@@ -364,10 +454,8 @@
                 authSection.style.display = 'block';
                 adminPanel.classList.remove('active');
                 authError.textContent = '';
-                // Limpiar campos
-                emailInput.value = '';
+                // Limpiar campos (pero mantener el email prellenado)
                 passInput.value = '';
-                setAuthMode(true);
                 // Desconectar listeners de Firebase
                 db.ref('products').off();
                 db.ref('promotions').off();
