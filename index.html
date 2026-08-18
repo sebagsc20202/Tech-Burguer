@@ -1486,6 +1486,7 @@
         //  VARIABLES GLOBALES
         // ============================================================
         let productos = [];
+        window.excepciones = []; // Para almacenar las excepciones de horario
         const TOPPINGS = [
             'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
             'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
@@ -1501,7 +1502,7 @@
         }
 
         // ============================================================
-        //  INDICADOR ABIERTO/CERRADO
+        //  INDICADOR ABIERTO/CERRADO (CON EXCEPCIONES)
         // ============================================================
         function actualizarEstado() {
             const now = new Date();
@@ -1510,17 +1511,76 @@
             const minutos = now.getMinutes();
             const horaMin = hora + minutos / 60;
 
-            let estado = 'cerrado';
+            // ---- Verificar excepciones ----
+            let excepcion = null;
+            if (window.excepciones && window.excepciones.length > 0) {
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+                const hoyStr = hoy.toISOString().split('T')[0];
+                // Buscar excepción que coincida con la fecha actual
+                for (let ex of window.excepciones) {
+                    if (ex.fechaInicio && ex.fechaFin) {
+                        const inicio = new Date(ex.fechaInicio);
+                        const fin = new Date(ex.fechaFin);
+                        inicio.setHours(0, 0, 0, 0);
+                        fin.setHours(0, 0, 0, 0);
+                        if (hoy >= inicio && hoy <= fin) {
+                            excepcion = ex;
+                            break;
+                        }
+                    } else if (ex.fechaInicio) {
+                        const inicio = new Date(ex.fechaInicio);
+                        inicio.setHours(0, 0, 0, 0);
+                        if (hoy.getTime() === inicio.getTime()) {
+                            excepcion = ex;
+                            break;
+                        }
+                    }
+                }
+            }
 
-            if (dia === 1) {
-                estado = 'cerrado';
-            } else {
-                if (horaMin >= 20 && horaMin < 23.5) {
+            let estado = 'cerrado';
+            let mensajeExtra = '';
+
+            if (excepcion) {
+                // Usar la excepción
+                if (excepcion.tipo === 'abierto') {
                     estado = 'abierto';
-                } else if (horaMin >= 23.5 && horaMin < 24) {
-                    estado = 'casi';
+                    mensajeExtra = excepcion.mensaje || '';
+                } else if (excepcion.tipo === 'horario_especial') {
+                    // Verificar si está dentro del horario especial
+                    if (excepcion.horaApertura && excepcion.horaCierre) {
+                        const [hA, mA] = excepcion.horaApertura.split(':').map(Number);
+                        const [hC, mC] = excepcion.horaCierre.split(':').map(Number);
+                        const apertura = hA + mA / 60;
+                        const cierre = hC + mC / 60;
+                        if (horaMin >= apertura && horaMin < cierre) {
+                            estado = 'abierto';
+                        } else {
+                            estado = 'cerrado';
+                        }
+                        mensajeExtra = excepcion.mensaje || `Horario especial: ${excepcion.horaApertura} - ${excepcion.horaCierre}`;
+                    } else {
+                        estado = 'cerrado';
+                        mensajeExtra = excepcion.mensaje || 'Horario especial sin definir';
+                    }
                 } else {
+                    // cerrado
                     estado = 'cerrado';
+                    mensajeExtra = excepcion.mensaje || 'Cerrado por excepción';
+                }
+            } else {
+                // Comportamiento normal (sin excepción)
+                if (dia === 1) {
+                    estado = 'cerrado';
+                } else {
+                    if (horaMin >= 20 && horaMin < 23.5) {
+                        estado = 'abierto';
+                    } else if (horaMin >= 23.5 && horaMin < 24) {
+                        estado = 'casi';
+                    } else {
+                        estado = 'cerrado';
+                    }
                 }
             }
 
@@ -1531,13 +1591,13 @@
 
             if (estado === 'abierto') {
                 card.classList.add('abierto');
-                text.textContent = '🟢 ABIERTO · hasta las 00:00';
+                text.textContent = '🟢 ABIERTO' + (mensajeExtra ? ' · ' + mensajeExtra : ' · hasta las 00:00');
             } else if (estado === 'casi') {
                 card.classList.add('casi');
-                text.textContent = '🟡 Estamos casi cerrando pero podemos hacer tu pedido !!!';
+                text.textContent = '🟡 Estamos casi cerrando pero podemos hacer tu pedido !!!' + (mensajeExtra ? ' · ' + mensajeExtra : '');
             } else {
                 card.classList.add('cerrado');
-                text.textContent = '🔴 CERRADO';
+                text.textContent = '🔴 CERRADO' + (mensajeExtra ? ' · ' + mensajeExtra : '');
             }
         }
 
@@ -1558,6 +1618,22 @@
             toastTimer = setTimeout(function() {
                 toast.classList.remove('show');
             }, 750);
+        }
+
+        // ============================================================
+        //  CARGAR EXCEPCIONES DESDE FIREBASE
+        // ============================================================
+        function cargarExcepciones() {
+            db.ref('excepciones').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    window.excepciones = [];
+                    actualizarEstado();
+                    return;
+                }
+                window.excepciones = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                actualizarEstado();
+            });
         }
 
         // ============================================================
@@ -2379,6 +2455,7 @@
         // ============================================================
         cargarProductos();
         cargarPromociones();
+        cargarExcepciones(); // <-- NUEVO: cargar excepciones
         setTimeout(actualizarVisibilidadCancelar, 100);
         generarTrack();
     </script>
