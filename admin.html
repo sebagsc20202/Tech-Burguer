@@ -1491,7 +1491,7 @@
             titulo.textContent = `📦 ${producto.name}`;
             let precioInfo = `$${producto.price.toLocaleString()}`;
             if (producto.discount && producto.discount > 0 && producto.originalPrice) {
-                precioInfo = `<span style="text-decoration:line-through; color:#8aaa8a;">$${producto.originalPrice.toLocaleString()}</span> → <strong style="color:#ffb703;">$${producto.price.toLocaleString()}</strong> <span class="discount-badge" style="background:#f44336; color:#fff; padding:2px 10px; border-radius:30px; font-size:0.8rem;">-${producto.discount}%</span>`;
+                precioInfo = `<span style="text-decoration:line-through; color:#8aaa8a;">$${producto.originalPrice.toLocaleString()}</span> → <strong style="color:#ffb703;">$${producto.price.toLocaleString()}</strong> <span class="discount-badge" style="background:#f44336; color:#fff; padding:2px 10px; border-radius:30px; font-size:0.8rem;">¿${producto.discount}%?</span>`;
             }
             body.innerHTML = `
                 <div class="campo"><span class="etiqueta">ID</span><span class="valor">${producto.id || 'N/A'}</span></div>
@@ -1824,7 +1824,7 @@
                 if (p.discount && p.discount > 0 && p.originalPrice) {
                     precioHtml += `<span class="original-price">$${p.originalPrice.toLocaleString()}</span>`;
                     precioHtml += `<span class="final-price">$${p.price.toLocaleString()}</span>`;
-                    precioHtml += `<span class="discount-badge">-${p.discount}%</span>`;
+                    precioHtml += `<span class="discount-badge">¿${p.discount}%?</span>`;
                 } else {
                     precioHtml += `<span class="final-price">$${p.price.toLocaleString()}</span>`;
                 }
