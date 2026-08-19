@@ -31,10 +31,12 @@
         h2 { color: #ffb703; margin: 10px 0 5px; border-bottom: 1px solid #2f4a2f; padding-bottom: 4px; }
 
         /* ===== SCROLLBAR PERSONALIZADA ===== */
+        /* Firefox */
         * {
             scrollbar-width: thin;
             scrollbar-color: #ffb703 #1f331f;
         }
+        /* WebKit (Chrome, Edge, Safari) */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -473,7 +475,7 @@
         .estado-rapido .btn-estado.activo { box-shadow: 0 0 0 2px #fff, 0 0 20px rgba(255,255,255,0.2); }
 
         /* ===== LISTAS ===== */
-        .product-item {
+        .product-item, .promo-item, .excepcion-item {
             background: #1f331f;
             border: 1px solid #3a5a3a;
             border-radius: 8px;
@@ -483,18 +485,6 @@
             flex-wrap: wrap;
             align-items: center;
             gap: 8px;
-            transition: background 0.2s, border-color 0.2s;
-            cursor: grab;
-        }
-        .product-item.dragging {
-            opacity: 0.5;
-            border-color: #ffb703;
-            background: #2a3a2a;
-        }
-        .product-item.drag-over {
-            border-color: #ffb703;
-            border-style: dashed;
-            background: #2a4a2a;
         }
         .product-item .name { flex: 2; font-weight: 600; min-width: 100px; }
         .product-item .meta { font-size: 0.75rem; color: #b8d0b8; display: flex; flex-wrap: wrap; gap: 4px; }
@@ -538,6 +528,20 @@
             margin-left: 2px;
         }
         .product-item .actions .btn-eliminar:hover { background: #d32f2f; }
+        .product-item .actions .btn-mover {
+            background: #3a5a3a;
+            color: #e8f0e8;
+            font-size: 1rem;
+            line-height: 1;
+            padding: 2px 8px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .product-item .actions .btn-mover:hover { background: #4a6a4a; }
+        .product-item .actions .btn-mover:disabled { opacity: 0.3; cursor: not-allowed; }
         .product-item .actions .btn-editar {
             background: #2196F3;
             color: #fff;
@@ -562,20 +566,6 @@
             transition: background 0.2s;
         }
         .product-item .actions .btn-guardar:hover { background: #e6a500; }
-        .product-item .actions .btn-mover {
-            background: #3a5a3a;
-            color: #e8f0e8;
-            font-size: 1rem;
-            line-height: 1;
-            padding: 2px 8px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .product-item .actions .btn-mover:hover { background: #4a6a4a; }
-        .product-item .actions .btn-mover:disabled { opacity: 0.3; cursor: not-allowed; }
 
         .product-item .badge-preview {
             background: #e63946;
@@ -586,43 +576,14 @@
             font-weight: 600;
         }
 
-        /* ===== PROMOCIONES ===== */
-        .promo-item {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 8px 12px;
-            background: #1f331f;
-            border: 1px solid #3a5a3a;
-            border-radius: 8px;
-            padding: 8px 12px;
-            margin: 6px 0;
-        }
-        .promo-item .info {
-            flex: 2 1 180px;
-            min-width: 120px;
-        }
-        .promo-item .dates {
-            font-size: 0.75rem;
-            color: #b8d0b8;
-            flex: 1 1 auto;
-            white-space: nowrap;
-        }
-        .promo-item label {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.85rem;
-            white-space: nowrap;
-        }
-        .promo-item input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: #ffb703;
-            cursor: pointer;
-        }
+        /* PROMOCIONES */
+        .promo-item .info { flex: 1; min-width: 120px; }
+        .promo-item .dates { font-size: 0.75rem; color: #b8d0b8; }
+        .promo-item label { display: flex; align-items: center; gap: 4px; font-size: 0.85rem; }
+        .promo-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: #ffb703; cursor: pointer; }
         .promo-item .actions {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             gap: 6px;
             margin-left: auto;
@@ -1027,7 +988,7 @@
             </div>
             <div id="promoList"></div>
             <div id="formPromo" class="form-producto">
-                <h3 id="formPromoTitulo">✏️ Nueva promoción</h3>
+                <h3>✏️ Nueva promoción</h3>
                 <div class="form-group"><label for="promoTitulo">Título <span class="required">*</span></label><input type="text" id="promoTitulo" placeholder="Ej: 2x1 en Clásicas" /></div>
                 <div class="form-group"><label for="promoDesc">Descripción <span class="required">*</span></label><input type="text" id="promoDesc" placeholder="Ej: Llevá dos burgers por el precio de una" /></div>
                 <div class="form-group"><label for="promoImagen">URL imagen</label><input type="text" id="promoImagen" placeholder="Ej: images/promo1.jpg" /><span class="hint-text">Imagen del banner</span></div>
@@ -1111,7 +1072,6 @@
                 <label for="filtroCategoria">🔍 Filtrar:</label>
                 <select id="filtroCategoria"><option value="todas">Todas</option></select>
             </div>
-
             <div id="formProducto" class="form-producto">
                 <h3 id="formProductoTitulo">✏️ Nuevo producto</h3>
                 <div class="form-group"><label for="prodNombre">Nombre <span class="required">*</span></label><input type="text" id="prodNombre" placeholder="Ej: Doble Cheddar" /></div>
@@ -1407,7 +1367,6 @@
         const formPromo = document.getElementById('formPromo');
         const savePromoBtn = document.getElementById('savePromoBtn');
         const cancelPromoBtn = document.getElementById('cancelPromoBtn');
-        const formPromoTitulo = document.getElementById('formPromoTitulo');
 
         const addExcepcionBtn = document.getElementById('addExcepcionBtn');
         const formExcepcion = document.getElementById('formExcepcion');
@@ -1464,6 +1423,7 @@
                 db.ref('excepciones').off();
                 db.ref('pedidos').off();
                 ocultarAlerta();
+                // Si estaba en fullscreen, salir
                 if (document.fullscreenElement) {
                     document.exitFullscreen().catch(() => {});
                 }
@@ -1495,15 +1455,9 @@
                 productosCompletos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 productosCompletos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
                 const categorias = new Set();
-                productosCompletos.forEach(p => {
-                    if (p.categoria) categorias.add(p.categoria);
-                });
+                productosCompletos.forEach(p => { if (p.categoria) categorias.add(p.categoria); });
                 categoriasUnicas = Array.from(categorias).sort();
                 actualizarOpcionesFiltro();
-                // Siempre iniciar con "todas" a menos que se haya seleccionado algo previamente
-                if (!filtroCategoria.value || filtroCategoria.value === '') {
-                    filtroCategoria.value = 'todas';
-                }
                 aplicarFiltro();
             });
         }
@@ -1517,12 +1471,8 @@
                 opt.textContent = cat;
                 filtroCategoria.appendChild(opt);
             });
-            // Restaurar valor si aún existe
-            if (categoriasUnicas.includes(valorActual) || valorActual === 'todas') {
-                filtroCategoria.value = valorActual;
-            } else {
-                filtroCategoria.value = 'todas';
-            }
+            if (categoriasUnicas.includes(valorActual) || valorActual === 'todas') filtroCategoria.value = valorActual;
+            else filtroCategoria.value = 'todas';
         }
 
         function aplicarFiltro() {
@@ -1534,140 +1484,36 @@
             renderProductos(productosFiltrados);
         }
 
-        filtroCategoria.addEventListener('change', function() {
-            aplicarFiltro();
-        });
+        filtroCategoria.addEventListener('change', aplicarFiltro);
 
-        // ---- Renderizado de productos (con drag & drop) ----
         function renderProductos(productos) {
             const list = document.getElementById('productList');
             list.innerHTML = '';
-            if (productos.length === 0) {
-                list.innerHTML = '<p style="color:#b8d0b8; padding:6px 0;">No hay productos en esta categoría.</p>';
-                return;
-            }
-
-            for (let index = 0; index < productos.length; index++) {
-                const p = productos[index];
-                try {
-                    const id = p.id ? String(p.id).replace(/['"]/g, '\\$&') : '';
-                    const name = p.name ? String(p.name).replace(/['"]/g, '\\$&') : 'Sin nombre';
-
-                    const div = document.createElement('div');
-                    div.className = 'product-item';
-                    div.draggable = true;
-                    div.dataset.id = id;
-
-                    div.addEventListener('dragstart', handleDragStart);
-                    div.addEventListener('dragend', handleDragEnd);
-                    div.addEventListener('dragover', handleDragOver);
-                    div.addEventListener('dragenter', handleDragEnter);
-                    div.addEventListener('dragleave', handleDragLeave);
-                    div.addEventListener('drop', handleDrop);
-
-                    const badgeHtml = p.badge ? `<span class="badge-preview">${p.badge}</span>` : '';
-                    const metaHtml = `<div class="meta">${p.categoria ? `<span>📂 ${p.categoria}</span>` : ''}${p.tiempoPreparacion ? `<span>⏱️ ${p.tiempoPreparacion} min</span>` : ''}</div>`;
-                    const isFirst = index === 0;
-                    const isLast = index === productos.length - 1;
-                    const price = (p.price !== undefined && p.price !== null) ? p.price : 0;
-                    const available = p.available !== false;
-
-                    div.innerHTML = `
-                        <div style="flex:1; min-width:120px;"><div class="name">${name} ${badgeHtml}</div>${metaHtml}</div>
-                        <label>💰 <input type="number" value="${price}" data-id="${id}" class="price-input" style="width:90px;" /></label>
-                        <label>📦 <input type="checkbox" ${available ? 'checked' : ''} data-id="${id}" class="avail-input" /></label>
-                        <div class="actions">
-                            <button class="btn-mover" onclick="moverProducto('${id}', -1)" ${isFirst ? 'disabled' : ''} title="Subir">⬆</button>
-                            <button class="btn-mover" onclick="moverProducto('${id}', 1)" ${isLast ? 'disabled' : ''} title="Bajar">⬇</button>
-                            <button class="btn-editar" onclick="editarProducto('${id}')" title="Editar">✏️</button>
-                            <button class="btn-guardar" onclick="actualizarProducto('${id}')" title="Guardar">💾</button>
-                            <span class="separator">|</span>
-                            <button class="btn-eliminar" onclick="eliminarProducto('${id}')" title="Eliminar">🗑️</button>
-                        </div>
-                    `;
-                    list.appendChild(div);
-                } catch (error) {
-                    console.error('Error al renderizar producto:', p, error);
-                    const errorDiv = document.createElement('div');
-                    errorDiv.style.cssText = 'background: #3a1a1a; border: 1px solid #f44336; border-radius: 8px; padding: 8px; margin: 6px 0; color: #ef9a9a;';
-                    errorDiv.textContent = `⚠️ Error al renderizar "${p.name || p.id || 'elemento'}"`;
-                    list.appendChild(errorDiv);
-                }
-            }
+            if (productos.length === 0) { list.innerHTML = '<p style="color:#b8d0b8; padding:6px 0;">No hay productos en esta categoría.</p>'; return; }
+            productos.forEach((p, index) => {
+                const div = document.createElement('div');
+                div.className = 'product-item';
+                const badgeHtml = p.badge ? `<span class="badge-preview">${p.badge}</span>` : '';
+                const metaHtml = `<div class="meta">${p.categoria ? `<span>📂 ${p.categoria}</span>` : ''}${p.tiempoPreparacion ? `<span>⏱️ ${p.tiempoPreparacion} min</span>` : ''}</div>`;
+                const isFirst = index === 0;
+                const isLast = index === productos.length - 1;
+                div.innerHTML = `
+                    <div style="flex:1; min-width:120px;"><div class="name">${p.name} ${badgeHtml}</div>${metaHtml}</div>
+                    <label>💰 <input type="number" value="${p.price}" data-id="${p.id}" class="price-input" style="width:90px;" /></label>
+                    <label>📦 <input type="checkbox" ${p.available !== false ? 'checked' : ''} data-id="${p.id}" class="avail-input" /></label>
+                    <div class="actions">
+                        <button class="btn-mover" onclick="moverProducto('${p.id}', -1)" ${isFirst ? 'disabled' : ''} title="Subir">⬆</button>
+                        <button class="btn-mover" onclick="moverProducto('${p.id}', 1)" ${isLast ? 'disabled' : ''} title="Bajar">⬇</button>
+                        <button class="btn-editar" onclick="editarProducto('${p.id}')" title="Editar">✏️</button>
+                        <button class="btn-guardar" onclick="actualizarProducto('${p.id}')" title="Guardar">💾</button>
+                        <span class="separator">|</span>
+                        <button class="btn-eliminar" onclick="eliminarProducto('${p.id}')" title="Eliminar">🗑️</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
         }
 
-        // ----- Drag & drop -----
-        let draggedId = null;
-
-        function handleDragStart(e) {
-            const el = e.currentTarget;
-            draggedId = el.dataset.id;
-            el.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', draggedId);
-        }
-
-        function handleDragEnd(e) {
-            const el = e.currentTarget;
-            el.classList.remove('dragging');
-            document.querySelectorAll('.product-item.drag-over').forEach(item => item.classList.remove('drag-over'));
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-        }
-
-        function handleDragEnter(e) {
-            e.preventDefault();
-            const target = e.currentTarget;
-            if (target.dataset.id !== draggedId) {
-                target.classList.add('drag-over');
-            }
-        }
-
-        function handleDragLeave(e) {
-            const target = e.currentTarget;
-            target.classList.remove('drag-over');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            const target = e.currentTarget;
-            target.classList.remove('drag-over');
-
-            const origenId = e.dataTransfer.getData('text/plain');
-            const destinoId = target.dataset.id;
-
-            if (!origenId || !destinoId || origenId === destinoId) return;
-
-            intercambiarOrden(origenId, destinoId);
-        }
-
-        async function intercambiarOrden(id1, id2) {
-            try {
-                const snapshot = await db.ref('products').once('value');
-                const data = snapshot.val();
-                if (!data) return;
-
-                const producto1 = data[id1];
-                const producto2 = data[id2];
-                if (!producto1 || !producto2) return;
-
-                const orden1 = producto1.orden !== undefined ? producto1.orden : 999;
-                const orden2 = producto2.orden !== undefined ? producto2.orden : 999;
-
-                const updates = {};
-                updates['products/' + id1 + '/orden'] = orden2;
-                updates['products/' + id2 + '/orden'] = orden1;
-                await db.ref().update(updates);
-                mostrarToast('Orden actualizado', 'success');
-            } catch (error) {
-                mostrarToast('Error al reordenar: ' + error.message, 'error');
-            }
-        }
-
-        // ---- Funciones de movimiento (botones) ----
         window.moverProducto = async function(id, direccion) {
             const snapshot = await db.ref('products').once('value');
             const data = snapshot.val();
@@ -1688,15 +1534,11 @@
             await db.ref().update(updates);
         };
 
-        // ---- CRUD productos ----
-        let editandoProductoId = null;
-
         window.editarProducto = async function(id) {
             try {
                 const snapshot = await db.ref('products/' + id).once('value');
                 const producto = snapshot.val();
                 if (!producto) { mostrarToast('Producto no encontrado', 'error'); return; }
-
                 document.getElementById('prodNombre').value = producto.name || '';
                 document.getElementById('prodPrecio').value = producto.price || '';
                 document.getElementById('prodDesc').value = producto.desc || '';
@@ -1709,7 +1551,7 @@
                 document.getElementById('prodId').readOnly = true;
                 document.getElementById('prodHasExtras').checked = producto.hasExtras || false;
                 document.getElementById('prodDisponible').checked = producto.available !== false;
-                editandoProductoId = id;
+                window.editandoProductoId = id;
                 formProductoTitulo.textContent = '✏️ Editando: ' + producto.name;
                 formProducto.classList.add('active');
                 formProducto.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1719,7 +1561,7 @@
         };
 
         window.eliminarProducto = async function(id) {
-            const confirmado = await mostrarConfirm('Eliminar', `¿Eliminar este elemento permanentemente?`);
+            const confirmado = await mostrarConfirm('Eliminar producto', `¿Eliminar el producto "${id}" permanentemente?`);
             if (!confirmado) return;
             try {
                 await db.ref('products/' + id).remove();
@@ -1763,10 +1605,8 @@
             });
         }
 
-        function ocultarFormProducto() {
-            formProducto.classList.remove('active');
-            editandoProductoId = null;
-            document.getElementById('prodId').readOnly = false;
+        let editandoProductoId = null;
+        function mostrarFormProducto() {
             document.getElementById('prodNombre').value = '';
             document.getElementById('prodPrecio').value = '';
             document.getElementById('prodDesc').value = '';
@@ -1776,61 +1616,52 @@
             document.getElementById('prodTiempo').value = 15;
             document.getElementById('prodBadge').value = '';
             document.getElementById('prodId').value = '';
+            document.getElementById('prodId').readOnly = false;
             document.getElementById('prodHasExtras').checked = false;
             document.getElementById('prodDisponible').checked = true;
-        }
-
-        addProductBtn.addEventListener('click', () => {
-            ocultarFormProducto();
             formProductoTitulo.textContent = '✏️ Nuevo producto';
+            editandoProductoId = null;
+            window.editandoProductoId = null;
             formProducto.classList.add('active');
             document.getElementById('prodNombre').focus();
-        });
+        }
+        function ocultarFormProducto() {
+            formProducto.classList.remove('active');
+            editandoProductoId = null;
+            window.editandoProductoId = null;
+            document.getElementById('prodId').readOnly = false;
+        }
 
+        addProductBtn.addEventListener('click', mostrarFormProducto);
         cancelProductBtn.addEventListener('click', ocultarFormProducto);
 
         saveProductBtn.addEventListener('click', async function() {
             const nombre = document.getElementById('prodNombre').value.trim();
-            let id = document.getElementById('prodId').value.trim().toLowerCase().replace(/\s+/g, '-');
             const precio = parseInt(document.getElementById('prodPrecio').value.trim());
-            const desc = document.getElementById('prodDesc').value.trim() || '';
-            const imagen = document.getElementById('prodImagen').value.trim() || 'images/placeholder.jpg';
-            const popupImg = document.getElementById('prodPopupImg').value.trim() || imagen;
+            const desc = document.getElementById('prodDesc').value.trim();
+            const imagen = document.getElementById('prodImagen').value.trim();
+            const popupImg = document.getElementById('prodPopupImg').value.trim();
             const categoria = document.getElementById('prodCategoria').value;
             const tiempoPreparacion = parseInt(document.getElementById('prodTiempo').value) || 15;
             const badge = document.getElementById('prodBadge').value.trim() || null;
+            let id = document.getElementById('prodId').value.trim().toLowerCase().replace(/\s+/g, '-');
             const hasExtras = document.getElementById('prodHasExtras').checked;
             const disponible = document.getElementById('prodDisponible').checked;
-
             if (!nombre || !precio || !id) { mostrarToast('Nombre, precio e ID son obligatorios.', 'error'); return; }
             if (isNaN(precio) || precio <= 0) { mostrarToast('Ingresá un precio válido.', 'error'); return; }
             if (!/^[a-z0-9\-]+$/.test(id)) { mostrarToast('El ID solo puede contener letras minúsculas, números y guiones. Sin espacios.', 'error'); return; }
-
-            const nuevoProducto = {
-                id,
-                name: nombre,
-                price: precio,
-                desc: desc,
-                imagen: imagen,
-                popupImg: popupImg,
-                categoria,
-                tiempoPreparacion,
-                badge,
-                hasExtras,
-                available: disponible
-            };
-
+            const nuevoProducto = { id, name: nombre, price: precio, desc: desc || '', imagen: imagen || 'images/placeholder.jpg', popupImg: popupImg || imagen || 'images/placeholder.jpg', categoria, tiempoPreparacion, badge, hasExtras, available: disponible };
             try {
-                if (editandoProductoId) {
-                    await db.ref('products/' + editandoProductoId).update(nuevoProducto);
+                if (window.editandoProductoId) {
+                    await db.ref('products/' + window.editandoProductoId).update(nuevoProducto);
                     mostrarToast('Producto actualizado', 'success');
                 } else {
                     const snapshot = await db.ref('products').orderByChild('orden').once('value');
                     const data = snapshot.val();
                     let maxOrden = 0;
                     if (data) {
-                        const prods = Object.keys(data).map(key => ({ ...data[key] }));
-                        prods.forEach(p => { if (p.orden !== undefined && p.orden > maxOrden) maxOrden = p.orden; });
+                        const productos = Object.keys(data).map(key => ({ ...data[key] }));
+                        productos.forEach(p => { if (p.orden !== undefined && p.orden > maxOrden) maxOrden = p.orden; });
                     }
                     nuevoProducto.orden = maxOrden + 1;
                     const exist = await db.ref('products/' + id).once('value');
@@ -1846,8 +1677,6 @@
 
         // ---- PROMOCIONES ----
         let actualizandoPromo = false;
-        let editandoPromoId = null;
-
         function cargarPromociones() {
             db.ref('promotions').on('value', (snapshot) => {
                 if (actualizandoPromo) return;
@@ -1898,35 +1727,23 @@
                 });
         }
 
-        function ocultarFormPromo() {
-            formPromo.classList.remove('active');
-            editandoPromoId = null;
-            formPromoTitulo.textContent = '✏️ Nueva promoción';
-        }
-
+        function ocultarFormPromo() { formPromo.classList.remove('active'); }
         addPromoBtn.addEventListener('click', () => {
-            editandoPromoId = null;
-            formPromoTitulo.textContent = '✏️ Nueva promoción';
+            formPromo.classList.add('active');
             document.getElementById('promoTitulo').value = '';
             document.getElementById('promoDesc').value = '';
             document.getElementById('promoImagen').value = '';
             document.getElementById('promoInicio').value = '';
             document.getElementById('promoFin').value = '';
             document.getElementById('promoActiva').checked = true;
-            formPromo.classList.add('active');
             document.getElementById('promoTitulo').focus();
         });
-
         cancelPromoBtn.addEventListener('click', ocultarFormPromo);
 
         savePromoBtn.addEventListener('click', async function() {
             const titulo = document.getElementById('promoTitulo').value.trim();
             const desc = document.getElementById('promoDesc').value.trim();
-            if (!titulo || !desc) {
-                mostrarToast('Título y descripción son obligatorios', 'error');
-                return;
-            }
-
+            if (!titulo || !desc) { mostrarToast('Título y descripción son obligatorios', 'error'); return; }
             const data = {
                 title: titulo,
                 description: desc,
@@ -1935,15 +1752,9 @@
                 endDate: document.getElementById('promoFin').value || '',
                 active: document.getElementById('promoActiva').checked
             };
-
             try {
-                if (editandoPromoId) {
-                    await db.ref('promotions/' + editandoPromoId).update(data);
-                    mostrarToast('Promoción actualizada', 'success');
-                } else {
-                    await db.ref('promotions').push(data);
-                    mostrarToast('Promoción creada', 'success');
-                }
+                await db.ref('promotions').push(data);
+                mostrarToast('Promoción creada', 'success');
                 ocultarFormPromo();
             } catch (error) {
                 mostrarToast('Error: ' + error.message, 'error');
@@ -1965,20 +1776,39 @@
             try {
                 const snapshot = await db.ref('promotions/' + id).once('value');
                 const promo = snapshot.val();
-                if (!promo) {
-                    mostrarToast('Promoción no encontrada', 'error');
-                    return;
-                }
+                if (!promo) { mostrarToast('Promoción no encontrada', 'error'); return; }
                 document.getElementById('promoTitulo').value = promo.title || '';
                 document.getElementById('promoDesc').value = promo.description || '';
                 document.getElementById('promoImagen').value = promo.image || '';
                 document.getElementById('promoInicio').value = promo.startDate || '';
                 document.getElementById('promoFin').value = promo.endDate || '';
                 document.getElementById('promoActiva').checked = promo.active !== false;
-
-                editandoPromoId = id;
-                formPromoTitulo.textContent = '✏️ Editando: ' + promo.title;
                 formPromo.classList.add('active');
+                document.getElementById('promoTitulo').focus();
+                window.editandoPromoId = id;
+                formPromo.querySelector('h3').textContent = '✏️ Editando: ' + promo.title;
+                const originalClick = savePromoBtn.onclick;
+                savePromoBtn.onclick = async function() {
+                    const titulo = document.getElementById('promoTitulo').value.trim();
+                    const desc = document.getElementById('promoDesc').value.trim();
+                    if (!titulo || !desc) { mostrarToast('Título y descripción son obligatorios', 'error'); return; }
+                    const data = {
+                        title: titulo,
+                        description: desc,
+                        image: document.getElementById('promoImagen').value.trim() || '',
+                        startDate: document.getElementById('promoInicio').value || '',
+                        endDate: document.getElementById('promoFin').value || '',
+                        active: document.getElementById('promoActiva').checked
+                    };
+                    try {
+                        await db.ref('promotions/' + id).update(data);
+                        mostrarToast('Promoción actualizada', 'success');
+                        ocultarFormPromo();
+                        savePromoBtn.onclick = originalClick;
+                    } catch (error) {
+                        mostrarToast('Error: ' + error.message, 'error');
+                    }
+                };
                 formPromo.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } catch (error) {
                 mostrarToast('Error al cargar promoción: ' + error.message, 'error');
@@ -2239,7 +2069,9 @@
             return fecha.getTime() === hoy.getTime();
         }
 
-        function actualizarContadorPedidos() {}
+        function actualizarContadorPedidos() {
+            // El contador se actualiza en aplicarFiltroPedidos
+        }
 
         function aplicarFiltroPedidos() {
             const filtroEstadoValue = filtroEstado.value;
@@ -2247,6 +2079,7 @@
 
             let pedidosFiltrados = [...pedidosActuales];
 
+            // Si se seleccionó un estado (no vacío), filtrar
             if (filtroEstadoValue && filtroEstadoValue !== '') {
                 pedidosFiltrados = pedidosFiltrados.filter(p => p.estado === filtroEstadoValue);
             }
@@ -2256,6 +2089,8 @@
             }
 
             renderPedidos(pedidosFiltrados);
+
+            // Actualizar título con el contador (sin paréntesis)
             pedidosTitulo.textContent = `📦 Pedidos ${pedidosFiltrados.length}`;
         }
 
@@ -2529,8 +2364,10 @@
             const hoy = new Date();
             hoy.setHours(0, 0, 0, 0);
 
+            // Filtrar pedidos de hoy (incluyendo cancelados para el contador, pero no para el monto)
             const pedidosHoy = pedidosActuales.filter(p => esFechaHoy(p.fecha));
 
+            // Agrupar por día (solo será hoy)
             const mapaDiario = new Map();
             const conteoDiario = new Map();
 
@@ -2555,6 +2392,7 @@
             if (chartDiario) chartDiario.destroy();
             const ctxDiario = document.getElementById('chartDiario').getContext('2d');
             if (diasOrdenados.length === 0) {
+                // Si no hay pedidos hoy, mostramos un gráfico vacío con una barra en cero.
                 chartDiario = new Chart(ctxDiario, {
                     type: 'bar',
                     data: {
