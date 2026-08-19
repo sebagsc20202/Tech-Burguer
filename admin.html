@@ -1289,7 +1289,7 @@
             cargarPedidos();
         }
 
-        // ---- PRODUCTOS (código abreviado, igual que antes) ----
+        // ---- PRODUCTOS (código abreviado) ----
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -2074,13 +2074,12 @@
         };
 
         // ============================================================
-        //  GRÁFICOS DE INGRESOS (con selector mensual)
+        //  GRÁFICOS DE INGRESOS (excluyendo cancelados del monto)
         // ============================================================
         let chartDiario, chartSemanal, chartMensual;
         let mesesDisponibles = [];
 
         function actualizarSelectorMeses() {
-            // Obtener todos los meses con pedidos
             const mesesSet = new Set();
             pedidosActuales.forEach(p => {
                 if (!p.fecha || !p.total) return;
@@ -2089,7 +2088,6 @@
                 mesesSet.add(mes);
             });
             mesesDisponibles = Array.from(mesesSet).sort();
-            // Llenar selector
             const selector = selectorMes;
             const valorActual = selector.value;
             selector.innerHTML = '';
@@ -2105,14 +2103,14 @@
                 option.textContent = `${nombreMes} ${year}`;
                 selector.appendChild(option);
             });
-            // Seleccionar el mes más reciente o mantener el seleccionado
             if (mesesDisponibles.includes(valorActual)) {
                 selector.value = valorActual;
             } else {
                 selector.value = mesesDisponibles[mesesDisponibles.length - 1];
             }
-            // Forzar actualización del gráfico mensual
-            actualizarGraficoMensual(selector.value);
+            if (selector.value) {
+                actualizarGraficoMensual(selector.value);
+            }
         }
 
         function actualizarGraficoMensual(mesKey) {
@@ -2129,13 +2127,17 @@
                 const mes = fecha.getFullYear() + '-' + String(fecha.getMonth() + 1).padStart(2, '0');
                 return mes === mesKey;
             });
-            // Agrupar por día
+            // Agrupar por día: montos excluyendo cancelados, conteo incluyendo todos
             const mapaDia = new Map();
             const conteoDia = new Map();
             pedidosMes.forEach(p => {
                 const fecha = new Date(p.fecha);
                 const dia = fecha.getDate();
-                mapaDia.set(dia, (mapaDia.get(dia) || 0) + p.total);
+                // Sumar al total solo si NO está cancelado
+                if (p.estado !== 'cancelado') {
+                    mapaDia.set(dia, (mapaDia.get(dia) || 0) + p.total);
+                }
+                // Conteo de pedidos (todos)
                 conteoDia.set(dia, (conteoDia.get(dia) || 0) + 1);
             });
             const dias = Array.from(mapaDia.keys()).sort((a, b) => a - b);
@@ -2172,14 +2174,18 @@
         }
 
         function actualizarGraficos() {
-            // Diario (todos los días)
+            // Diario: montos excluyendo cancelados, conteo incluyendo todos
             const mapaDiario = new Map();
             const conteoDiario = new Map();
             pedidosActuales.forEach(p => {
                 if (!p.fecha || !p.total) return;
                 const fecha = new Date(p.fecha);
                 const clave = fecha.toISOString().split('T')[0];
-                mapaDiario.set(clave, (mapaDiario.get(clave) || 0) + p.total);
+                // Monto: solo si NO está cancelado
+                if (p.estado !== 'cancelado') {
+                    mapaDiario.set(clave, (mapaDiario.get(clave) || 0) + p.total);
+                }
+                // Conteo: todos los pedidos
                 conteoDiario.set(clave, (conteoDiario.get(clave) || 0) + 1);
             });
             const diasOrdenados = Array.from(mapaDiario.keys()).sort();
@@ -2213,7 +2219,7 @@
                 }
             });
 
-            // Semanal (últimos 7 días)
+            // Semanal: últimos 7 días, excluyendo cancelados del monto
             const hoy = new Date();
             const semanaInicio = new Date(hoy);
             semanaInicio.setDate(hoy.getDate() - 6);
@@ -2224,7 +2230,9 @@
                 const fecha = new Date(p.fecha);
                 if (fecha >= semanaInicio) {
                     const clave = fecha.toISOString().split('T')[0];
-                    semanalMap.set(clave, (semanalMap.get(clave) || 0) + p.total);
+                    if (p.estado !== 'cancelado') {
+                        semanalMap.set(clave, (semanalMap.get(clave) || 0) + p.total);
+                    }
                     conteoSemanal.set(clave, (conteoSemanal.get(clave) || 0) + 1);
                 }
             });
