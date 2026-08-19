@@ -10,8 +10,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="manifest.json" />
 
-    <!-- ===== TÍTULO (solo para la pestaña) ===== -->
     <title>Tech Classic Burgers · Pedido</title>
+
+    <!-- ===== FIREBASE SDK ===== -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
     <style>
         /* ===== RESET & BASE ===== */
@@ -105,6 +108,107 @@
             font-weight: 400;
             color: #b8d0b8;
             margin-top: 4px;
+        }
+
+        /* ===== PROMO BANNER ===== */
+        #promoBanner {
+            display: none;
+            background: linear-gradient(135deg, #1f331f, #2a4a2a);
+            border: 2px solid #ffb703;
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 20px rgba(255, 183, 3, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #promoBanner.active {
+            display: block;
+        }
+
+        .promo-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 8px 0;
+        }
+
+        .promo-item:not(:last-child) {
+            border-bottom: 1px solid #2f4a2f;
+            margin-bottom: 8px;
+        }
+
+        .promo-img-container {
+            flex-shrink: 0;
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #2a4a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ffb703;
+        }
+
+        .promo-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .promo-img-container .emoji {
+            font-size: 3rem;
+        }
+
+        .promo-info {
+            flex: 1;
+        }
+
+        .promo-info h3 {
+            color: #ffb703;
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        .promo-info p {
+            color: #b8d0b8;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .promo-info .fechas {
+            font-size: 0.75rem;
+            color: #6a8a6a;
+            margin-top: 4px;
+        }
+
+        .promo-tag {
+            background: #ffb703;
+            color: #1a1a1a;
+            font-weight: 700;
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 480px) {
+            .promo-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            .promo-img-container {
+                width: 120px;
+                height: 120px;
+            }
+            .promo-tag {
+                align-self: center;
+            }
         }
 
         /* ===== TOAST ===== */
@@ -531,7 +635,7 @@
             display: flex;
         }
 
-        /* ===== FORM ===== */
+        /* ===== FORM SECTION ===== */
         .form-section {
             background: #1f331f;
             border-radius: 18px;
@@ -539,6 +643,62 @@
             border: 1px solid #3a5a3a;
             margin-top: 10px;
             box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
+            transition: opacity 0.3s ease, max-height 0.4s ease, margin 0.3s ease;
+            overflow: hidden;
+            max-height: 2000px;
+        }
+
+        .form-section.cerrado {
+            opacity: 0.6;
+            pointer-events: none;
+            max-height: 280px;
+            padding: 20px 18px 10px;
+            margin-top: 10px;
+        }
+
+        .form-section.cerrado .form-group,
+        .form-section.cerrado .total-box,
+        .form-section.cerrado .btn-send,
+        .form-section.cerrado .footnote {
+            display: none;
+        }
+
+        .form-section .mensaje-cerrado {
+            display: none;
+            text-align: center;
+            padding: 20px 10px;
+            color: #ffb703;
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        .form-section.cerrado .mensaje-cerrado {
+            display: block;
+        }
+
+        .form-section.cerrado .mensaje-cerrado .emoji {
+            font-size: 2.8rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .form-section.cerrado .mensaje-cerrado .sub {
+            display: block;
+            font-size: 0.9rem;
+            color: #b8d0b8;
+            font-weight: 400;
+            margin-top: 6px;
+        }
+
+        .form-section.cerrado .mensaje-cerrado .horario-info {
+            display: block;
+            font-size: 0.85rem;
+            color: #8aaa8a;
+            font-weight: 300;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #2f4a2f;
         }
 
         .form-section h2 {
@@ -550,6 +710,10 @@
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        .form-section.cerrado h2 {
+            margin-bottom: 0;
         }
 
         .form-group {
@@ -826,7 +990,7 @@
             scrollbar-width: none;
         }
 
-        /* ===== FLECHAS INDICADORAS (MÁS GRANDES E INTENSAS) ===== */
+        /* ===== FLECHAS INDICADORAS ===== */
         .nav-arrow {
             position: absolute;
             top: 50%;
@@ -970,8 +1134,29 @@
             .nav-arrow {
                 font-size: 4.5rem;
             }
-            .nav-arrow-left { left: 8px; }
-            .nav-arrow-right { right: 8px; }
+            .nav-arrow-left {
+                left: 8px;
+            }
+            .nav-arrow-right {
+                right: 8px;
+            }
+            .form-section.cerrado {
+                max-height: 260px;
+                padding: 12px 18px 6px;
+            }
+            .form-section.cerrado .mensaje-cerrado {
+                font-size: 1rem;
+                padding: 10px 0;
+            }
+            .form-section.cerrado .mensaje-cerrado .emoji {
+                font-size: 2.2rem;
+            }
+            .form-section.cerrado .mensaje-cerrado .sub {
+                font-size: 0.8rem;
+            }
+            .form-section.cerrado .mensaje-cerrado .horario-info {
+                font-size: 0.75rem;
+            }
         }
 
         /* ===== BOTONES FLOTANTES ===== */
@@ -1047,12 +1232,157 @@
             fill: #e8f0e8;
             display: block;
         }
+
+        /* ===== MODALES DE CANTIDAD (inline) ===== */
+        .qty-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .qty-modal.active {
+            display: flex;
+        }
+        .qty-modal-content {
+            background: #1f331f;
+            border-radius: 24px;
+            padding: 28px 20px 20px;
+            border: 2px solid #3a5a3a;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+        }
+        .qty-modal-title {
+            color: #ffb703;
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+        }
+        .qty-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            justify-items: center;
+            margin-bottom: 12px;
+        }
+        .qty-grid button {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-width: 80px;
+            border: none;
+            border-radius: 50%;
+            background: #2a4a2a;
+            color: #fff;
+            font-size: 1.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, transform 0.1s;
+        }
+        .qty-grid button:active {
+            transform: scale(0.92);
+            background: #3a6a3a;
+        }
+        .qty-grid .qty-empty {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .med-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .med-modal.active {
+            display: flex;
+        }
+        .med-modal-content {
+            background: #1f331f;
+            border-radius: 24px;
+            padding: 28px 20px 20px;
+            border: 2px solid #3a5a3a;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            max-width: 280px;
+            width: 85%;
+            text-align: center;
+        }
+        .med-modal-title {
+            color: #ffb703;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 16px;
+        }
+        .med-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            justify-items: center;
+            margin-bottom: 16px;
+        }
+        .med-grid button {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-width: 70px;
+            border: none;
+            border-radius: 50%;
+            background: #2a4a2a;
+            color: #fff;
+            font-size: 1.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, transform 0.1s;
+        }
+        .med-grid button:active {
+            transform: scale(0.92);
+            background: #3a6a3a;
+        }
+        .med-cancelar {
+            width: 100%;
+            border: 2px solid #f44336;
+            border-radius: 40px;
+            background: #3a1a1a;
+            color: #ff6b6b;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 12px 10px;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        .med-cancelar:active {
+            background: #5a2a2a;
+            transform: scale(0.97);
+        }
     </style>
 </head>
 <body>
     <div class="container">
 
-        <!-- BRAND -->
+        <!-- ===== BRAND ===== -->
         <div class="brand">
             <img src="images/logo_tech.webp" alt="Tech Classic Burgers" class="logo" />
             <div class="tagline">¿<span>QUÉ TECH</span> SE TE ANTOJA HOY?</div>
@@ -1062,12 +1392,24 @@
             </div>
         </div>
 
-        <!-- PRODUCTOS -->
+        <!-- ===== BANNER DE PROMOCIONES ===== -->
+        <div id="promoBanner"></div>
+
+        <!-- ===== PRODUCTOS ===== -->
         <div class="product-grid" id="productGrid"></div>
 
-        <!-- FORMULARIO -->
+        <!-- ===== FORMULARIO ===== -->
         <div class="form-section" id="formSection">
             <h2>📋 DATOS DEL PEDIDO</h2>
+
+            <!-- Mensaje cuando el local está cerrado -->
+            <div class="mensaje-cerrado">
+                <span class="emoji">⏰</span>
+                <span>¡Ups! La cocina está descansando</span>
+                <span class="sub">Los pedidos online están disponibles en horario comercial</span>
+                <span class="horario-info">🕒 Mar–Dom · 20:00 a 00:00</span>
+                <span class="horario-info" style="font-size:0.75rem; color:#6a8a6a; border-top:none; padding-top:4px;">¡Volvé más tarde para disfrutar la mejor Tech!</span>
+            </div>
 
             <div class="form-group">
                 <label for="nombre">Nombre completo</label>
@@ -1136,42 +1478,42 @@
     </div>
 
     <!-- ===== MODALES ===== -->
-    <div id="qtyModal" class="qty-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center; backdrop-filter:blur(4px);">
-        <div style="background:#1f331f; border-radius:24px; padding:28px 20px 20px; border:2px solid #3a5a3a; max-width:320px; width:90%; text-align:center;">
-            <div style="color:#ffb703; font-weight:700; font-size:1.4rem; margin-bottom:20px;">➕ Cuantas querés..?</div>
-            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; justify-items:center; margin-bottom:12px;">
-                <button data-value="1" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">1</button>
-                <button data-value="2" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">2</button>
-                <button data-value="3" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">3</button>
-                <button data-value="4" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">4</button>
-                <button data-value="5" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">5</button>
-                <button data-value="6" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">6</button>
-                <button data-value="7" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">7</button>
-                <button data-value="8" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">8</button>
-                <button data-value="9" style="width:100%; aspect-ratio:1/1; max-width:80px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">9</button>
-                <span style="visibility:hidden;"></span>
-                <span style="visibility:hidden;"></span>
-                <span style="visibility:hidden;"></span>
+    <div id="qtyModal" class="qty-modal">
+        <div class="qty-modal-content">
+            <div class="qty-modal-title">➕ Cuantas querés..?</div>
+            <div class="qty-grid">
+                <button data-value="1">1</button>
+                <button data-value="2">2</button>
+                <button data-value="3">3</button>
+                <button data-value="4">4</button>
+                <button data-value="5">5</button>
+                <button data-value="6">6</button>
+                <button data-value="7">7</button>
+                <button data-value="8">8</button>
+                <button data-value="9">9</button>
+                <span class="qty-empty"></span>
+                <span class="qty-empty"></span>
+                <span class="qty-empty"></span>
             </div>
         </div>
     </div>
 
-    <div id="medModal" class="med-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; justify-content:center; align-items:center; backdrop-filter:blur(4px);">
-        <div style="background:#1f331f; border-radius:24px; padding:28px 20px 20px; border:2px solid #3a5a3a; max-width:280px; width:85%; text-align:center;">
-            <div style="color:#ffb703; font-weight:700; font-size:1rem; margin-bottom:16px;">➕ Medallones extra</div>
-            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; justify-items:center; margin-bottom:16px;">
-                <button data-value="1" style="width:100%; aspect-ratio:1/1; max-width:70px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">1</button>
-                <button data-value="2" style="width:100%; aspect-ratio:1/1; max-width:70px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">2</button>
-                <button data-value="3" style="width:100%; aspect-ratio:1/1; max-width:70px; border:none; border-radius:50%; background:#2a4a2a; color:#fff; font-size:1.8rem; font-weight:700; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">3</button>
+    <div id="medModal" class="med-modal">
+        <div class="med-modal-content">
+            <div class="med-modal-title">➕ Medallones extra</div>
+            <div class="med-grid">
+                <button data-value="1">1</button>
+                <button data-value="2">2</button>
+                <button data-value="3">3</button>
             </div>
-            <button id="medCancelar" style="width:100%; border:2px solid #f44336; border-radius:40px; background:#3a1a1a; color:#ff6b6b; font-size:1rem; font-weight:600; padding:12px 10px; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.5);">Cancelar</button>
+            <button class="med-cancelar" id="medCancelar">Cancelar</button>
         </div>
     </div>
 
-    <div id="cancelModal" class="cancel-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:99998; justify-content:center; align-items:center; backdrop-filter:blur(4px); padding:16px;">
-        <div style="background:#1f331f; border-radius:24px; padding:40px 30px 30px; border:2px solid #3a5a3a; max-width:340px; width:100%; text-align:center;">
-            <span style="font-size:4rem; display:block; margin-bottom:12px;">👍</span>
-            <div style="font-size:1.4rem; font-weight:700; color:#e8f0e8; line-height:1.4;">Elegí tranquilo</div>
+    <div id="cancelModal" class="cancel-modal">
+        <div class="cancel-modal-content">
+            <span class="emoji">👍</span>
+            <div class="mensaje">Elegí tranquilo</div>
         </div>
     </div>
 
@@ -1211,6 +1553,41 @@
 
     <script>
         // ============================================================
+        //  CONFIGURACIÓN DE FIREBASE
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbS9zdQcpj0HThGqQVKcfsNjMFQ9gjf9U",
+            authDomain: "tech-burgers.firebaseapp.com",
+            databaseURL: "https://tech-burgers-default-rtdb.firebaseio.com",
+            projectId: "tech-burgers",
+            storageBucket: "tech-burgers.firebasestorage.app",
+            messagingSenderId: "795678558305",
+            appId: "1:795678558305:web:5929a7d3789a939d6f4220"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // ============================================================
+        //  VARIABLES GLOBALES
+        // ============================================================
+        let productos = [];
+        window.excepciones = [];
+        let localAbierto = true;
+        let promocionesCargadas = false;
+        const TOPPINGS = [
+            'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
+            'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
+        ];
+
+        // ============================================================
+        //  FUNCIÓN PARA OBTENER FECHA LOCAL EN FORMATO YYYY-MM-DD
+        // ============================================================
+        function getHoyLocal() {
+            return new Date().toLocaleDateString('en-CA');
+        }
+
+        // ============================================================
         //  REGISTRO DE SERVICE WORKER (PWA)
         // ============================================================
         if ('serviceWorker' in navigator) {
@@ -1220,7 +1597,22 @@
         }
 
         // ============================================================
-        //  INDICADOR ABIERTO/CERRADO
+        //  ESTADO DEL LOCAL - CONTROL DE FORMULARIO
+        // ============================================================
+        const formSection = document.getElementById('formSection');
+
+        function actualizarFormularioSegunEstado(estado) {
+            if (estado === 'abierto' || estado === 'casi') {
+                formSection.classList.remove('cerrado');
+                localAbierto = true;
+            } else {
+                formSection.classList.add('cerrado');
+                localAbierto = false;
+            }
+        }
+
+        // ============================================================
+        //  INDICADOR ABIERTO/CERRADO (sincronizado con Firebase)
         // ============================================================
         function actualizarEstado() {
             const now = new Date();
@@ -1228,18 +1620,64 @@
             const hora = now.getHours();
             const minutos = now.getMinutes();
             const horaMin = hora + minutos / 60;
+            const hoyStr = getHoyLocal();
+
+            let excepcionesActivas = [];
+            if (window.excepciones && window.excepciones.length > 0) {
+                excepcionesActivas = window.excepciones.filter(ex => {
+                    if (ex.fechaInicio && ex.fechaFin) {
+                        return hoyStr >= ex.fechaInicio && hoyStr <= ex.fechaFin;
+                    } else if (ex.fechaInicio) {
+                        return hoyStr === ex.fechaInicio;
+                    }
+                    return false;
+                });
+            }
 
             let estado = 'cerrado';
+            let mensajesExtra = [];
 
-            if (dia === 1) {
-                estado = 'cerrado';
-            } else {
-                if (horaMin >= 20 && horaMin < 23.5) {
+            if (excepcionesActivas.length > 0) {
+                const hayCerrado = excepcionesActivas.some(ex => ex.tipo === 'cerrado');
+                const hayHorarioEspecial = excepcionesActivas.some(ex => ex.tipo === 'horario_especial');
+                const hayAbierto = excepcionesActivas.some(ex => ex.tipo === 'abierto');
+
+                excepcionesActivas.forEach(ex => {
+                    if (ex.mensaje) mensajesExtra.push(ex.mensaje);
+                    else if (ex.tipo === 'cerrado') mensajesExtra.push('Cerrado');
+                    else if (ex.tipo === 'abierto') mensajesExtra.push('Abierto');
+                    else if (ex.tipo === 'horario_especial') mensajesExtra.push(`Horario especial: ${ex.horaApertura} - ${ex.horaCierre}`);
+                });
+
+                if (hayCerrado) {
+                    estado = 'cerrado';
+                } else if (hayHorarioEspecial) {
+                    const ex = excepcionesActivas.find(e => e.tipo === 'horario_especial');
+                    if (ex && ex.horaApertura && ex.horaCierre) {
+                        const [hA, mA] = ex.horaApertura.split(':').map(Number);
+                        const [hC, mC] = ex.horaCierre.split(':').map(Number);
+                        const apertura = hA + mA / 60;
+                        const cierre = hC + mC / 60;
+                        estado = (horaMin >= apertura && horaMin < cierre) ? 'abierto' : 'cerrado';
+                    } else {
+                        estado = 'cerrado';
+                    }
+                } else if (hayAbierto) {
                     estado = 'abierto';
-                } else if (horaMin >= 23.5 && horaMin < 24) {
-                    estado = 'casi';
                 } else {
                     estado = 'cerrado';
+                }
+            } else {
+                if (dia === 1) {
+                    estado = 'cerrado';
+                } else {
+                    if (horaMin >= 20 && horaMin < 23.5) {
+                        estado = 'abierto';
+                    } else if (horaMin >= 23.5 && horaMin < 24) {
+                        estado = 'casi';
+                    } else {
+                        estado = 'cerrado';
+                    }
                 }
             }
 
@@ -1248,104 +1686,177 @@
 
             card.classList.remove('abierto', 'cerrado', 'casi');
 
+            let mensajeFinal = mensajesExtra.length > 0 ? ' · ' + mensajesExtra.join(' | ') : '';
+
             if (estado === 'abierto') {
                 card.classList.add('abierto');
-                text.textContent = '🟢 ABIERTO · hasta las 00:00';
+                text.textContent = '🟢 ABIERTO' + (mensajeFinal || ' · hasta las 00:00');
             } else if (estado === 'casi') {
                 card.classList.add('casi');
-                text.textContent = '🟡 Estamos casi cerrando pero podemos hacer tu pedido !!!';
+                text.textContent = '🟡 Estamos casi cerrando pero podemos hacer tu pedido !!!' + mensajeFinal;
             } else {
                 card.classList.add('cerrado');
-                text.textContent = '🔴 CERRADO';
+                text.textContent = '🔴 CERRADO' + mensajeFinal;
             }
-        }
 
-        actualizarEstado();
-        setInterval(actualizarEstado, 60000);
-
-        // ============================================================
-        //  TOAST
-        // ============================================================
-        var toastTimer = null;
-
-        function mostrarToast(mensaje) {
-            var toast = document.getElementById('toastConfirm');
-            var content = document.getElementById('toastContent');
-            content.innerHTML = mensaje + ' <span class="emoji">👍</span>';
-            toast.classList.add('show');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(function() {
-                toast.classList.remove('show');
-            }, 750);
+            actualizarFormularioSegunEstado(estado);
         }
 
         // ============================================================
-        //  DATOS DE PRODUCTOS
+        //  ESCUCHAR ESTADO DEL LOCAL DESDE FIREBASE
         // ============================================================
-        const PRODUCTS = [{
-            id: 'armatuburger',
-            name: 'Armá tu Burger',
-            price: 12000,
-            desc: '1 medallón 120gr · doble cheddar · salsa Tech. Agregá medallones y toppings.',
-            hasExtras: true,
-            badge: 'BASE',
-            imagen: 'images/arm.jpg',
-            popupImg: 'images/bn1.webp'
-        }, {
-            id: 'doblep',
-            name: 'Doble Provoleta',
-            price: 18000,
-            desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.',
-            hasExtras: false,
-            imagen: 'images/pro.jpg',
-            popupImg: 'images/bn2.webp'
-        }, {
-            id: 'intense',
-            name: 'Intense',
-            price: 18000,
-            desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.',
-            hasExtras: false,
-            imagen: 'images/int.jpg',
-            popupImg: 'images/bn3.webp'
-        }, {
-            id: 'techmex',
-            name: 'Tech Mex',
-            price: 18000,
-            desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.',
-            hasExtras: false,
-            imagen: 'images/mex.jpg',
-            popupImg: 'images/bn4.webp'
-        }, {
-            id: 'yankee',
-            name: 'Yankee',
-            price: 16000,
-            desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.',
-            hasExtras: false,
-            imagen: 'images/yan.jpg',
-            popupImg: 'images/bn5.webp'
-        }, {
-            id: 'clasica',
-            name: 'Clásica',
-            price: 16000,
-            desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.',
-            hasExtras: false,
-            imagen: 'images/cla.jpg',
-            popupImg: 'images/bn6.webp'
-        }];
+        function escucharEstadoLocal() {
+            db.ref('estado_local').on('value', (snapshot) => {
+                const estado = snapshot.val() || 'abierto';
+                if (estado === 'cerrado') {
+                    const card = document.getElementById('statusCard');
+                    const text = document.getElementById('statusText');
+                    card.classList.remove('abierto', 'cerrado', 'casi');
+                    card.classList.add('cerrado');
+                    text.textContent = '🔴 CERRADO · El local está cerrado';
+                    actualizarFormularioSegunEstado('cerrado');
+                } else {
+                    actualizarEstado();
+                }
+            });
+        }
 
-        const TOPPINGS = [
-            'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
-            'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
-        ];
+        // ============================================================
+        //  CARGAR EXCEPCIONES
+        // ============================================================
+        function cargarExcepciones() {
+            db.ref('excepciones').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    window.excepciones = [];
+                    actualizarEstado();
+                    return;
+                }
+                window.excepciones = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                actualizarEstado();
+            }, (error) => {
+                console.error('❌ Error en listener de excepciones:', error);
+            });
+        }
+
+        // ============================================================
+        //  CARGAR PROMOCIONES (FUNCIÓN CORREGIDA)
+        // ============================================================
+        function cargarPromociones() {
+            db.ref('promotions').on('value', (snapshot) => {
+                const data = snapshot.val();
+                const container = document.getElementById('promoBanner');
+                if (!container) return;
+
+                if (!data) {
+                    container.classList.remove('active');
+                    promocionesCargadas = true;
+                    return;
+                }
+
+                const promos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                const now = new Date();
+                const activas = promos.filter(p => {
+                    if (!p.active) return false;
+                    if (p.startDate && new Date(p.startDate) > now) return false;
+                    if (p.endDate && new Date(p.endDate) < now) return false;
+                    return true;
+                });
+
+                if (activas.length === 0) {
+                    container.classList.remove('active');
+                    promocionesCargadas = true;
+                    return;
+                }
+
+                container.classList.add('active');
+                container.innerHTML = '';
+
+                activas.forEach((promo, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'promo-item';
+                    if (index > 0) {
+                        div.style.borderTop = '1px solid #2f4a2f';
+                        div.style.paddingTop = '12px';
+                        div.style.marginTop = '8px';
+                    }
+
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'promo-img-container';
+
+                    const img = document.createElement('img');
+                    img.alt = promo.title || 'Promoción';
+                    if (promo.image && promo.image.trim() !== '') {
+                        img.src = promo.image;
+                        img.onerror = function() {
+                            this.style.display = 'none';
+                            const emoji = document.createElement('span');
+                            emoji.className = 'emoji';
+                            emoji.textContent = '🍔';
+                            imgContainer.appendChild(emoji);
+                        };
+                    } else {
+                        img.style.display = 'none';
+                        const emoji = document.createElement('span');
+                        emoji.className = 'emoji';
+                        emoji.textContent = '🍔';
+                        imgContainer.appendChild(emoji);
+                    }
+                    imgContainer.appendChild(img);
+                    div.appendChild(imgContainer);
+
+                    const info = document.createElement('div');
+                    info.className = 'promo-info';
+                    info.innerHTML = `
+                        <h3>${promo.title || 'Promoción'}</h3>
+                        <p>${promo.description || ''}</p>
+                        ${promo.startDate && promo.endDate ? `<div class="fechas">📅 ${new Date(promo.startDate).toLocaleDateString('es-AR')} → ${new Date(promo.endDate).toLocaleDateString('es-AR')}</div>` : ''}
+                    `;
+                    div.appendChild(info);
+
+                    const tag = document.createElement('span');
+                    tag.className = 'promo-tag';
+                    tag.textContent = '🔥 Promo';
+                    div.appendChild(tag);
+
+                    container.appendChild(div);
+                });
+                promocionesCargadas = true;
+            }, (error) => {
+                console.error('❌ Error en listener de promociones:', error);
+                promocionesCargadas = true;
+            });
+        }
+
+        // ============================================================
+        //  CARGAR PRODUCTOS
+        // ============================================================
+        function cargarProductos() {
+            db.ref('products').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+                productos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                productos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
+                renderProducts();
+                generarTrack();
+            });
+        }
 
         // ============================================================
         //  RENDER PRODUCTOS
         // ============================================================
-        const grid = document.getElementById('productGrid');
-
         function renderProducts() {
+            const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
-            PRODUCTS.forEach(p => {
+
+            const disponibles = productos.filter(p => p.available !== false);
+
+            if (disponibles.length === 0) {
+                grid.innerHTML = '<p style="color:#b8d0b8; text-align:center;">No hay productos disponibles en este momento.</p>';
+                return;
+            }
+
+            disponibles.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.dataset.id = p.id;
@@ -1382,7 +1893,23 @@
 
                 const desc = document.createElement('div');
                 desc.className = 'product-desc';
-                desc.textContent = p.desc;
+                desc.textContent = p.desc || '';
+
+                if (p.categoria || p.tiempoPreparacion) {
+                    const meta = document.createElement('div');
+                    meta.style.cssText = 'font-size:0.75rem; color:#8aaa8a; margin-top:4px; display:flex; gap:12px; flex-wrap:wrap;';
+                    if (p.categoria) {
+                        const catSpan = document.createElement('span');
+                        catSpan.textContent = '📂 ' + p.categoria;
+                        meta.appendChild(catSpan);
+                    }
+                    if (p.tiempoPreparacion) {
+                        const timeSpan = document.createElement('span');
+                        timeSpan.textContent = '⏱️ ' + p.tiempoPreparacion + ' min';
+                        meta.appendChild(timeSpan);
+                    }
+                    info.appendChild(meta);
+                }
 
                 const extras = document.createElement('div');
                 extras.className = 'product-extras';
@@ -1438,9 +1965,9 @@
                 card.appendChild(info);
                 grid.appendChild(card);
             });
-        }
 
-        renderProducts();
+            actualizarVisibilidadCancelar();
+        }
 
         // ============================================================
         //  MANEJAR VISIBILIDAD DEL BOTÓN DE CANCELAR
@@ -1451,36 +1978,28 @@
                 const cancelBtn = card.querySelector('.btn-cancelar-item');
                 if (qtyInput && cancelBtn) {
                     const val = parseInt(qtyInput.value) || 0;
-                    if (val > 0) {
-                        cancelBtn.classList.add('visible');
-                    } else {
-                        cancelBtn.classList.remove('visible');
-                    }
+                    cancelBtn.classList.toggle('visible', val > 0);
                 }
             });
         }
 
         // ============================================================
-        //  FUNCIÓN PARA RESETEAR UN PRODUCTO COMPLETO
+        //  RESETEAR PRODUCTO
         // ============================================================
         function resetearProducto(productId) {
             const qtyInput = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
             if (qtyInput) {
                 qtyInput.value = 0;
-                const evt = new Event('input', { bubbles: true });
-                qtyInput.dispatchEvent(evt);
+                qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
             }
             const medInput = document.querySelector(`.med-extra-input[data-product-id="${productId}"]`);
             if (medInput) {
                 medInput.value = 0;
-                const evt = new Event('input', { bubbles: true });
-                medInput.dispatchEvent(evt);
+                medInput.dispatchEvent(new Event('input', { bubbles: true }));
             }
-            const checks = document.querySelectorAll(`.topping-check[data-product-id="${productId}"]:checked`);
-            checks.forEach(cb => {
+            document.querySelectorAll(`.topping-check[data-product-id="${productId}"]:checked`).forEach(cb => {
                 cb.checked = false;
-                const evt = new Event('change', { bubbles: true });
-                cb.dispatchEvent(evt);
+                cb.dispatchEvent(new Event('change', { bubbles: true }));
             });
             actualizarVisibilidadCancelar();
             updateTotal();
@@ -1492,16 +2011,14 @@
         const cancelModal = document.getElementById('cancelModal');
 
         function mostrarCancelModal() {
-            cancelModal.style.display = 'flex';
+            cancelModal.classList.add('active');
             clearTimeout(cancelModal._timer);
-            cancelModal._timer = setTimeout(function() {
-                cancelModal.style.display = 'none';
-            }, 900);
+            cancelModal._timer = setTimeout(() => cancelModal.classList.remove('active'), 900);
         }
 
         cancelModal.addEventListener('click', function(e) {
             if (e.target === this) {
-                cancelModal.style.display = 'none';
+                cancelModal.classList.remove('active');
                 clearTimeout(cancelModal._timer);
             }
         });
@@ -1509,23 +2026,23 @@
         let currentInput = null;
         let currentProductId = null;
         const qtyModal = document.getElementById('qtyModal');
-        const qtyModalButtons = qtyModal.querySelectorAll('button');
+        const qtyModalButtons = qtyModal.querySelectorAll('.qty-grid button');
 
         let currentMedInput = null;
         const medModal = document.getElementById('medModal');
-        const medModalButtons = medModal.querySelectorAll('button');
+        const medModalButtons = medModal.querySelectorAll('.med-grid button');
         const medCancelar = document.getElementById('medCancelar');
 
         function openQtyModal(input) {
             if (input) {
                 currentInput = input;
                 currentProductId = input.dataset.productId;
-                qtyModal.style.display = 'flex';
+                qtyModal.classList.add('active');
             }
         }
 
         function closeQtyModal() {
-            qtyModal.style.display = 'none';
+            qtyModal.classList.remove('active');
             currentInput = null;
             currentProductId = null;
         }
@@ -1533,28 +2050,25 @@
         function openMedModal(input) {
             if (input) {
                 currentMedInput = input;
-                medModal.style.display = 'flex';
+                medModal.classList.add('active');
             }
         }
 
         function closeMedModal() {
-            medModal.style.display = 'none';
+            medModal.classList.remove('active');
             currentMedInput = null;
         }
 
         document.getElementById('productGrid').addEventListener('click', function(e) {
             const target = e.target;
-
             if (target.classList.contains('qty-input')) {
                 openQtyModal(target);
                 return;
             }
-
             if (target.classList.contains('med-extra-input')) {
                 openMedModal(target);
                 return;
             }
-
             if (target.classList.contains('btn-cancelar-item')) {
                 const productId = target.dataset.productId;
                 if (productId) {
@@ -1569,40 +2083,30 @@
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const val = parseInt(this.dataset.value, 10);
-                if (!isNaN(val) && val >= 1 && val <= 9) {
-                    if (currentInput) {
-                        currentInput.value = val;
-                        const product = PRODUCTS.find(p => p.id === currentProductId);
-                        if (product) {
-                            mostrarToast(val + ' ' + product.name);
-                        }
-                        const evt = new Event('input', { bubbles: true });
-                        currentInput.dispatchEvent(evt);
-                        actualizarVisibilidadCancelar();
-                        updateTotal();
-                    }
+                if (!isNaN(val) && val >= 1 && val <= 9 && currentInput) {
+                    currentInput.value = val;
+                    const product = productos.find(p => p.id === currentProductId);
+                    if (product) mostrarToast(val + ' ' + product.name);
+                    currentInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    actualizarVisibilidadCancelar();
+                    updateTotal();
                 }
                 closeQtyModal();
             });
         });
 
         qtyModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeQtyModal();
-            }
+            if (e.target === this) closeQtyModal();
         });
 
         medModalButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const val = parseInt(this.dataset.value, 10);
-                if (!isNaN(val) && val >= 1 && val <= 3) {
-                    if (currentMedInput) {
-                        currentMedInput.value = val;
-                        const evt = new Event('input', { bubbles: true });
-                        currentMedInput.dispatchEvent(evt);
-                        updateTotal();
-                    }
+                if (!isNaN(val) && val >= 1 && val <= 3 && currentMedInput) {
+                    currentMedInput.value = val;
+                    currentMedInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    updateTotal();
                 }
                 closeMedModal();
             });
@@ -1614,9 +2118,7 @@
         });
 
         medModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeMedModal();
-            }
+            if (e.target === this) closeMedModal();
         });
 
         // ============================================================
@@ -1681,11 +2183,7 @@
         }
 
         function toggleAddress() {
-            if (isEntregaSelected()) {
-                addressField.classList.add('active');
-            } else {
-                addressField.classList.remove('active');
-            }
+            addressField.classList.toggle('active', isEntregaSelected());
         }
 
         toggleAddress();
@@ -1694,12 +2192,11 @@
             let total = 0;
             document.querySelectorAll('.qty-input').forEach(input => {
                 const cant = parseInt(input.value) || 0;
-                const product = PRODUCTS.find(p => p.id === input.dataset.productId);
+                const product = productos.find(p => p.id === input.dataset.productId);
                 if (product) total += cant * product.price;
             });
             document.querySelectorAll('.med-extra-input').forEach(input => {
-                const cant = parseInt(input.value) || 0;
-                total += cant * 4000;
+                total += (parseInt(input.value) || 0) * 4000;
             });
             if (isEntregaSelected()) total += COSTO_ENVIO;
             return total;
@@ -1735,7 +2232,7 @@
             document.querySelectorAll('.qty-input').forEach(input => {
                 const cant = parseInt(input.value) || 0;
                 if (cant > 0) {
-                    const product = PRODUCTS.find(p => p.id === input.dataset.productId);
+                    const product = productos.find(p => p.id === input.dataset.productId);
                     if (product) {
                         const subtotal = cant * product.price;
                         total += subtotal;
@@ -1800,18 +2297,20 @@
         }
 
         document.getElementById('sendBtn').addEventListener('click', function() {
+            if (!localAbierto) {
+                alert('⏰ El local está cerrado. Los pedidos online están disponibles en horario comercial.');
+                return;
+            }
             const nombre = document.getElementById('nombre').value.trim();
             const telefono = document.getElementById('telefono').value.trim();
             if (!nombre || !telefono) {
                 alert('Completá nombre y teléfono.');
                 return;
             }
-
             if (isEntregaSelected() && !direccionInput.value.trim()) {
                 alert('Ingresá la dirección de entrega.');
                 return;
             }
-
             if (generarResumen()) {
                 resumenModal.classList.add('active');
             }
@@ -1827,9 +2326,7 @@
         });
 
         resumenModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                resumenModal.classList.remove('active');
-            }
+            if (e.target === this) resumenModal.classList.remove('active');
         });
 
         // ============================================================
@@ -1839,20 +2336,51 @@
             document.querySelectorAll('.qty-input').forEach(input => input.value = 0);
             document.querySelectorAll('.med-extra-input').forEach(input => input.value = 0);
             document.querySelectorAll('.topping-check').forEach(cb => cb.checked = false);
-
             document.getElementById('nombre').value = '';
             document.getElementById('telefono').value = '';
             document.getElementById('direccion').value = '';
-
             pagoBotones.forEach(btn => btn.classList.remove('activo'));
             pagoSeleccionado = null;
-
             updateTotal();
             mostrarToast('✅ Pedido enviado. ¡Todo listo para otro!');
         }
 
         // ============================================================
-        //  ENVÍO POR WHATSAPP
+        //  TOAST
+        // ============================================================
+        var toastTimer = null;
+
+        function mostrarToast(mensaje) {
+            var toast = document.getElementById('toastConfirm');
+            var content = document.getElementById('toastContent');
+            content.innerHTML = mensaje + ' <span class="emoji">👍</span>';
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function() {
+                toast.classList.remove('show');
+            }, 750);
+        }
+
+        // ============================================================
+        //  GUARDAR PEDIDO EN FIREBASE
+        // ============================================================
+        function guardarPedidoEnFirebase(datosPedido) {
+            if (typeof db === 'undefined') {
+                console.warn('⚠️ Firebase no inicializado, no se guardó el pedido');
+                return;
+            }
+            const pedido = {
+                ...datosPedido,
+                fecha: new Date().toISOString(),
+                estado: 'pendiente'
+            };
+            db.ref('pedidos').push(pedido)
+                .then(() => console.log('✅ Pedido guardado en Firebase'))
+                .catch(err => console.error('❌ Error al guardar pedido:', err));
+        }
+
+        // ============================================================
+        //  ENVÍO POR WHATSAPP (CON GUARDADO EN FIREBASE)
         // ============================================================
         const BUSINESS_PHONE = '5493518692251';
 
@@ -1866,26 +2394,44 @@
 
             let tieneProductos = false;
             let totalHamburguesas = 0;
+            const productosPedido = [];
+            let totalPedido = 0;
 
             document.querySelectorAll('.qty-input').forEach(input => {
                 const cant = parseInt(input.value) || 0;
                 totalHamburguesas += cant;
                 if (cant > 0) {
-                    const product = PRODUCTS.find(p => p.id === input.dataset.productId);
+                    const product = productos.find(p => p.id === input.dataset.productId);
                     if (product) {
-                        mensaje += `\n• *${product.name}* x${cant} — $${(cant * product.price).toLocaleString()}`;
+                        const subtotal = cant * product.price;
+                        totalPedido += subtotal;
+                        mensaje += `\n• *${product.name}* x${cant} — $${subtotal.toLocaleString()}`;
                         tieneProductos = true;
+
+                        const item = {
+                            nombre: product.name,
+                            cantidad: cant,
+                            precio: product.price,
+                            subtotal: subtotal
+                        };
+
                         if (product.hasExtras) {
                             const medInput = document.querySelector(`.med-extra-input[data-product-id="${product.id}"]`);
                             if (medInput) {
                                 const mc = parseInt(medInput.value) || 0;
-                                if (mc > 0) mensaje += `\n  ➕ Medallones extra: ${mc} ($${(mc * 4000).toLocaleString()})`;
+                                if (mc > 0) {
+                                    mensaje += `\n  ➕ Medallones extra: ${mc} ($${(mc * 4000).toLocaleString()})`;
+                                    item.medallonesExtra = mc;
+                                }
                             }
                             const checks = document.querySelectorAll(`.topping-check[data-product-id="${product.id}"]:checked`);
                             if (checks.length > 0) {
-                                mensaje += `\n  🧂 Toppings: ${Array.from(checks).map(cb => cb.value).join(', ')}`;
+                                const tops = Array.from(checks).map(cb => cb.value).join(', ');
+                                mensaje += `\n  🧂 Toppings: ${tops}`;
+                                item.toppings = tops;
                             }
                         }
+                        productosPedido.push(item);
                     }
                 }
             });
@@ -1910,18 +2456,32 @@
             const envioLabel = isEntregaSelected() ? 'Entrega a domicilio' : 'Retiro en local';
             mensaje += `\n🚚 *Envío:* ${envioLabel}`;
 
+            let direccion = '';
             if (isEntregaSelected()) {
-                const direccion = direccionInput.value.trim();
+                direccion = direccionInput.value.trim();
                 const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(direccion)}`;
                 mensaje += `\n📍 *Dirección:* ${direccion}`;
                 mensaje += `\n🗺️ *Ver ruta:* ${mapsUrl}`;
                 mensaje += `\n🚚 *Costo envío:* $${COSTO_ENVIO.toLocaleString()}`;
+                totalPedido += COSTO_ENVIO;
             } else {
                 mensaje += `\n📍 *Retirala en este lugar!* https://bit.ly/4xOCf1o`;
             }
 
-            mensaje += `\n\n💰 *TOTAL:* $${calcularTotal().toLocaleString()}`;
+            mensaje += `\n\n💰 *TOTAL:* $${totalPedido.toLocaleString()}`;
             mensaje += '\n\n📲 ¡Gracias por tu pedido!';
+
+            const datosPedido = {
+                nombre: nombre,
+                telefono: telefono,
+                productos: productosPedido,
+                total: totalPedido,
+                metodoPago: pagoValue,
+                envio: envioLabel,
+                direccion: direccion || null,
+                totalHamburguesas: totalHamburguesas
+            };
+            guardarPedidoEnFirebase(datosPedido);
 
             window.open(`https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(mensaje)}`, '_blank');
             limpiarPedido();
@@ -1933,13 +2493,12 @@
         document.getElementById('shareBtn').addEventListener('click', function() {
             const url = window.location.href;
             const title = document.title || 'Tech Classic Burgers';
-
             if (navigator.share) {
                 navigator.share({
                     title: title,
                     text: '🍔 Pedí tus burgers favoritas en Tech Classic Burgers',
                     url: url
-                }).catch(err => {});
+                }).catch(() => {});
             } else {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(url).then(() => {
@@ -1954,26 +2513,20 @@
         });
 
         // ============================================================
-        //  INICIALIZAR VISIBILIDAD DEL BOTÓN DE CANCELAR
-        // ============================================================
-        setTimeout(actualizarVisibilidadCancelar, 100);
-
-        // ============================================================
-        //  POPUP DE IMAGEN (CARRUSEL CON FLECHAS)
+        //  POPUP DE IMAGEN (CARRUSEL)
         // ============================================================
         const imagePopup = document.getElementById('imagePopup');
         const popupSlider = document.getElementById('popupSlider');
         const popupTrack = document.getElementById('popupTrack');
         const arrowLeft = document.getElementById('arrowLeft');
         const arrowRight = document.getElementById('arrowRight');
-
         let arrowInterval = null;
 
         function generarTrack() {
             popupTrack.innerHTML = '';
-            PRODUCTS.forEach(p => {
+            productos.forEach(p => {
                 const img = document.createElement('img');
-                img.src = p.popupImg;
+                img.src = p.popupImg || p.imagen || 'images/placeholder.jpg';
                 img.alt = p.name;
                 img.loading = 'lazy';
                 popupTrack.appendChild(img);
@@ -2001,16 +2554,12 @@
         }
 
         function abrirPopupImagen(index) {
-            if (popupTrack.children.length === 0) {
-                generarTrack();
-            }
+            if (popupTrack.children.length === 0) generarTrack();
             centrarImagen(index);
             imagePopup.classList.add('active');
             document.body.style.overflow = 'hidden';
-
             if (arrowInterval) clearInterval(arrowInterval);
             arrowInterval = setInterval(actualizarFlechas, 300);
-
             setTimeout(actualizarFlechas, 250);
         }
 
@@ -2023,43 +2572,30 @@
             }
         }
 
-        // Cerrar al hacer clic en el fondo
         imagePopup.addEventListener('click', function(e) {
-            if (e.target === imagePopup) {
-                cerrarPopup();
-            }
+            if (e.target === imagePopup) cerrarPopup();
         });
 
-        // **Clic en imagen cierra el popup**
         popupTrack.addEventListener('click', function(e) {
-            const img = e.target.closest('img');
-            if (!img) return;
-            cerrarPopup();
+            if (e.target.closest('img')) cerrarPopup();
         });
 
         popupSlider.addEventListener('scroll', actualizarFlechas);
         popupSlider.addEventListener('touchmove', actualizarFlechas);
-        popupSlider.addEventListener('touchend', function() {
-            setTimeout(actualizarFlechas, 150);
-        });
+        popupSlider.addEventListener('touchend', () => setTimeout(actualizarFlechas, 150));
 
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && imagePopup.classList.contains('active')) {
-                cerrarPopup();
-            }
+            if (e.key === 'Escape' && imagePopup.classList.contains('active')) cerrarPopup();
         });
 
         document.getElementById('productGrid').addEventListener('click', function(e) {
-            const target = e.target;
-            const imgDiv = target.closest('.product-img');
+            const imgDiv = e.target.closest('.product-img');
             if (imgDiv) {
                 const card = imgDiv.closest('.product-card');
                 if (card) {
                     const productId = card.dataset.id;
-                    const index = PRODUCTS.findIndex(p => p.id === productId);
-                    if (index !== -1) {
-                        abrirPopupImagen(index);
-                    }
+                    const index = productos.findIndex(p => p.id === productId);
+                    if (index !== -1) abrirPopupImagen(index);
                 }
             }
         });
@@ -2069,10 +2605,10 @@
             if (imagePopup.classList.contains('active')) {
                 clearTimeout(resizeTimeout);
                 resizeTimeout = setTimeout(() => {
-                    const currentScroll = popupSlider.scrollLeft;
-                    const sliderWidth = popupSlider.clientWidth;
-                    if (sliderWidth > 0) {
-                        const index = Math.round(currentScroll / sliderWidth);
+                    const scroll = popupSlider.scrollLeft;
+                    const w = popupSlider.clientWidth;
+                    if (w > 0) {
+                        const index = Math.round(scroll / w);
                         centrarImagen(index);
                     }
                     actualizarFlechas();
@@ -2080,8 +2616,15 @@
             }
         });
 
+        // ============================================================
+        //  INICIALIZAR
+        // ============================================================
+        cargarProductos();
+        cargarPromociones(); // Ahora está definida correctamente
+        cargarExcepciones();
+        escucharEstadoLocal();
+        setTimeout(actualizarVisibilidadCancelar, 100);
         generarTrack();
-        actualizarFlechas();
     </script>
 </body>
 </html>
