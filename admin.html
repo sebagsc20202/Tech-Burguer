@@ -764,71 +764,197 @@
             border-color: #ffb703;
         }
 
+        /* ===== PANEL LATERAL DERECHO ===== */
+        .panel-lateral {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 320px;
+            height: 100vh;
+            background: #1f331f;
+            border-left: 2px solid #ffb703;
+            padding: 20px 16px;
+            overflow-y: auto;
+            z-index: 999;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.6);
+        }
+        .panel-lateral.abierto {
+            transform: translateX(0);
+        }
+        .panel-lateral h3 {
+            color: #ffb703;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #2f4a2f;
+            padding-bottom: 10px;
+        }
+        .panel-lateral .contenedor-whatsapp {
+            background: #1a2e1a;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid #3a5a3a;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .panel-lateral .contenedor-whatsapp .icono-grande {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+        .panel-lateral .contenedor-whatsapp p {
+            color: #b8d0b8;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+        .panel-lateral .contenedor-whatsapp .btn-abrir-whatsapp {
+            display: inline-block;
+            background: #25D366;
+            color: #fff;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 24px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.2s;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .panel-lateral .contenedor-whatsapp .btn-abrir-whatsapp:hover {
+            background: #1ebe5a;
+        }
+        .panel-lateral .contenedor-whatsapp .btn-abrir-whatsapp .icon {
+            margin-right: 8px;
+        }
+        .panel-lateral .btn-toggle-panel {
+            position: absolute;
+            left: -48px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ffb703;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 40px 0 0 40px;
+            padding: 12px 10px;
+            font-weight: 700;
+            cursor: pointer;
+            writing-mode: vertical-lr;
+            letter-spacing: 2px;
+            font-size: 0.85rem;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.4);
+            transition: background 0.2s;
+        }
+        .panel-lateral .btn-toggle-panel:hover {
+            background: #e6a500;
+        }
+        .panel-lateral .qr-container {
+            background: #1a2e1a;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 1px solid #3a5a3a;
+        }
+        .panel-lateral .qr-container img {
+            max-width: 160px;
+            width: 100%;
+            height: auto;
+            background: #fff;
+            padding: 8px;
+            border-radius: 8px;
+        }
+        .panel-lateral .qr-container p {
+            font-size: 0.8rem;
+            color: #b8d0b8;
+            margin-top: 6px;
+        }
+
+        /* Botón flotante para abrir el panel */
+        .btn-flotante-whatsapp {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #25D366;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            z-index: 998;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-flotante-whatsapp:hover {
+            transform: scale(1.1);
+        }
+        .btn-flotante-whatsapp.hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .panel-lateral {
+                width: 280px;
+            }
+            .panel-lateral .btn-toggle-panel {
+                left: -40px;
+                padding: 10px 8px;
+                font-size: 0.7rem;
+            }
+        }
         @media (max-width: 600px) {
-            .product-item, .promo-item, .excepcion-item, .pedido-item {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .product-item label { justify-content: space-between; }
-            .product-item .actions,
-            .promo-item .actions,
-            .excepcion-item .actions,
-            .pedido-item .actions {
-                margin-left: 0;
-                justify-content: flex-end;
-            }
-            .form-row { flex-direction: column; }
-            .form-row .form-group { min-width: auto; }
-            .form-actions { flex-direction: column; }
-            .filtro-container { flex-direction: column; align-items: stretch; }
-            .estado-rapido { flex-direction: column; }
-            .product-item .actions .separator,
-            .promo-item .actions .separator,
-            .excepcion-item .actions .separator {
-                display: none;
-            }
-            .product-item .actions .btn-eliminar,
-            .promo-item .actions .btn-eliminar-promo,
-            .excepcion-item .actions .btn-eliminar-excepcion,
-            .pedido-item .actions .btn-eliminar-pedido {
-                margin-left: 0;
+            .panel-lateral {
                 width: 100%;
-                text-align: center;
-                margin-top: 4px;
+                max-width: 320px;
             }
-            .product-item .actions .btn-mover,
-            .product-item .actions .btn-editar,
-            .product-item .actions .btn-guardar {
-                flex: 1;
-                text-align: center;
-            }
-            .promo-item .actions .btn-editar-promo,
-            .promo-item .actions .btn-eliminar-promo {
-                flex: 1;
-                text-align: center;
-            }
-            .excepcion-item .actions .btn-editar-excepcion,
-            .excepcion-item .actions .btn-eliminar-excepcion {
-                flex: 1;
-                text-align: center;
-            }
-            .pedido-item .actions .btn-whatsapp,
-            .pedido-item .actions .btn-eliminar-pedido {
-                width: 100%;
-                text-align: center;
-                justify-content: center;
-            }
-            .grafico-container {
-                min-width: auto;
-            }
-            .selector-mes {
-                flex-direction: column;
-                gap: 6px;
+        }
+        body.panel-abierto .container {
+            padding-right: 340px;
+        }
+        @media (max-width: 768px) {
+            body.panel-abierto .container {
+                padding-right: 0;
             }
         }
     </style>
 </head>
 <body>
+    <!-- ===== PANEL LATERAL DERECHO ===== -->
+    <div class="panel-lateral" id="panelLateral">
+        <button class="btn-toggle-panel" id="btnTogglePanel">📱 WhatsApp</button>
+        <h3>📱 WhatsApp Web</h3>
+
+        <!-- Contenedor para WhatsApp Web (simulado, ya que no se puede incrustar) -->
+        <div class="contenedor-whatsapp">
+            <div class="icono-grande">📲</div>
+            <p>Escanea el código QR de WhatsApp Web desde tu celular para usar tus chats directamente aquí.</p>
+            <p style="font-size:0.8rem; color:#6a8a6a;">(No se puede incrustar por políticas de seguridad, pero puedes abrirlo en una nueva pestaña)</p>
+            <a href="https://web.whatsapp.com/" target="_blank" class="btn-abrir-whatsapp">
+                <span class="icon">🌐</span> Abrir WhatsApp Web
+            </a>
+        </div>
+
+        <!-- QR para contacto directo con el local (para clientes) -->
+        <div class="qr-container">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://wa.me/5491123456789?text=Hola%20Tech%20Burgers" alt="QR WhatsApp Local" />
+            <p>📲 QR para que los clientes chateen con nosotros</p>
+        </div>
+    </div>
+
+    <!-- Botón flotante para abrir el panel -->
+    <button class="btn-flotante-whatsapp" id="btnFlotanteWhatsapp" title="Abrir WhatsApp">
+        💬
+    </button>
+
     <div class="container">
         <h1>🍔 Admin Tech Burgers</h1>
 
@@ -1213,6 +1339,22 @@
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && alertaActiva) ocultarAlerta(); });
 
         // ============================================================
+        //  PANEL LATERAL - TOGGLE
+        // ============================================================
+        const panelLateral = document.getElementById('panelLateral');
+        const btnTogglePanel = document.getElementById('btnTogglePanel');
+        const btnFlotanteWhatsapp = document.getElementById('btnFlotanteWhatsapp');
+
+        function togglePanel() {
+            const abierto = panelLateral.classList.toggle('abierto');
+            document.body.classList.toggle('panel-abierto', abierto);
+            btnFlotanteWhatsapp.classList.toggle('hidden', abierto);
+        }
+
+        btnTogglePanel.addEventListener('click', togglePanel);
+        btnFlotanteWhatsapp.addEventListener('click', togglePanel);
+
+        // ============================================================
         //  REFERENCIAS DOM
         // ============================================================
         const authSection = document.getElementById('authSection');
@@ -1277,6 +1419,9 @@
                 ocultarFormPromo();
                 ocultarFormExcepcion();
                 actualizarBotonesEstado();
+                // Mostrar panel lateral
+                document.querySelector('.panel-lateral').style.display = 'block';
+                document.querySelector('.btn-flotante-whatsapp').style.display = 'flex';
             } else {
                 authSection.style.display = 'block';
                 adminPanel.classList.remove('active');
@@ -1288,6 +1433,11 @@
                 db.ref('excepciones').off();
                 db.ref('pedidos').off();
                 ocultarAlerta();
+                // Ocultar panel lateral
+                document.querySelector('.panel-lateral').style.display = 'none';
+                document.querySelector('.btn-flotante-whatsapp').style.display = 'none';
+                document.body.classList.remove('panel-abierto');
+                panelLateral.classList.remove('abierto');
             }
         });
 
