@@ -635,7 +635,7 @@
             display: flex;
         }
 
-        /* ===== FORM ===== */
+        /* ===== FORM SECTION (se oculta/muestra según estado del local) ===== */
         .form-section {
             background: #1f331f;
             border-radius: 18px;
@@ -643,6 +643,45 @@
             border: 1px solid #3a5a3a;
             margin-top: 10px;
             box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
+            transition: opacity 0.3s ease, max-height 0.4s ease, margin 0.3s ease;
+            overflow: hidden;
+            max-height: 2000px;
+        }
+
+        .form-section.cerrado {
+            opacity: 0.4;
+            pointer-events: none;
+            max-height: 100px;
+            padding: 20px 18px 10px;
+            margin-top: 10px;
+        }
+
+        .form-section.cerrado .form-group,
+        .form-section.cerrado .total-box,
+        .form-section.cerrado .btn-send,
+        .form-section.cerrado .footnote {
+            display: none;
+        }
+
+        .form-section .mensaje-cerrado {
+            display: none;
+            text-align: center;
+            padding: 20px 10px;
+            color: #ff6b6b;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .form-section.cerrado .mensaje-cerrado {
+            display: block;
+        }
+
+        .form-section.cerrado .mensaje-cerrado span {
+            display: block;
+            font-size: 0.9rem;
+            color: #b8d0b8;
+            font-weight: 400;
+            margin-top: 6px;
         }
 
         .form-section h2 {
@@ -654,6 +693,10 @@
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        .form-section.cerrado h2 {
+            margin-bottom: 0;
         }
 
         .form-group {
@@ -1080,6 +1123,14 @@
             .nav-arrow-right {
                 right: 8px;
             }
+            .form-section.cerrado {
+                max-height: 80px;
+                padding: 12px 18px 6px;
+            }
+            .form-section.cerrado .mensaje-cerrado {
+                font-size: 1rem;
+                padding: 10px 0;
+            }
         }
 
         /* ===== BOTONES FLOTANTES ===== */
@@ -1325,6 +1376,12 @@
         <div class="form-section" id="formSection">
             <h2>📋 DATOS DEL PEDIDO</h2>
 
+            <!-- Mensaje cuando el local está cerrado -->
+            <div class="mensaje-cerrado">
+                🔒 El local está cerrado
+                <span>Vuelve más tarde para realizar tu pedido.</span>
+            </div>
+
             <div class="form-group">
                 <label for="nombre">Nombre completo</label>
                 <input type="text" id="nombre" placeholder="Tu nombre" required autocomplete="name" />
@@ -1487,6 +1544,7 @@
         // ============================================================
         let productos = [];
         window.excepciones = [];
+        let localAbierto = true; // Estado actual del local
         const TOPPINGS = [
             'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
             'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
@@ -1509,7 +1567,22 @@
         }
 
         // ============================================================
-        //  INDICADOR ABIERTO/CERRADO
+        //  ESTADO DEL LOCAL - CONTROL DE FORMULARIO
+        // ============================================================
+        const formSection = document.getElementById('formSection');
+
+        function actualizarFormularioSegunEstado(estado) {
+            if (estado === 'abierto' || estado === 'casi') {
+                formSection.classList.remove('cerrado');
+                localAbierto = true;
+            } else {
+                formSection.classList.add('cerrado');
+                localAbierto = false;
+            }
+        }
+
+        // ============================================================
+        //  INDICADOR ABIERTO/CERRADO (sincronizado con Firebase)
         // ============================================================
         function actualizarEstado() {
             const now = new Date();
@@ -1595,6 +1668,31 @@
                 card.classList.add('cerrado');
                 text.textContent = '🔴 CERRADO' + mensajeFinal;
             }
+
+            // Actualizar formulario según estado
+            actualizarFormularioSegunEstado(estado);
+        }
+
+        // ============================================================
+        //  ESCUCHAR ESTADO DEL LOCAL DESDE FIREBASE (para sincronizar con admin)
+        // ============================================================
+        function escucharEstadoLocal() {
+            db.ref('estado_local').on('value', (snapshot) => {
+                const estado = snapshot.val() || 'abierto';
+                // Si Firebase dice que está cerrado, forzamos el estado a cerrado
+                // Esto sobrescribe el cálculo automático cuando el admin cambia el toggle
+                if (estado === 'cerrado') {
+                    const card = document.getElementById('statusCard');
+                    const text = document.getElementById('statusText');
+                    card.classList.remove('abierto', 'cerrado', 'casi');
+                    card.classList.add('cerrado');
+                    text.textContent = '🔴 CERRADO · El local está cerrado';
+                    actualizarFormularioSegunEstado('cerrado');
+                } else {
+                    // Si está abierto, volvemos a calcular con el horario normal
+                    actualizarEstado();
+                }
+            });
         }
 
         // ============================================================
@@ -1754,89 +1852,6 @@
             });
 
             actualizarVisibilidadCancelar();
-        }
-
-        // ============================================================
-        //  CARGAR PROMOCIONES
-        // ============================================================
-        function cargarPromociones() {
-            db.ref('promotions').on('value', (snapshot) => {
-                const data = snapshot.val();
-                const container = document.getElementById('promoBanner');
-                if (!container) return;
-
-                if (!data) {
-                    container.classList.remove('active');
-                    return;
-                }
-
-                const promos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                const now = new Date();
-                const activas = promos.filter(p => {
-                    if (!p.active) return false;
-                    if (p.startDate && new Date(p.startDate) > now) return false;
-                    if (p.endDate && new Date(p.endDate) < now) return false;
-                    return true;
-                });
-
-                if (activas.length === 0) {
-                    container.classList.remove('active');
-                    return;
-                }
-
-                container.classList.add('active');
-                container.innerHTML = '';
-
-                activas.forEach((promo, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'promo-item';
-                    if (index > 0) {
-                        div.style.borderTop = '1px solid #2f4a2f';
-                        div.style.paddingTop = '12px';
-                        div.style.marginTop = '8px';
-                    }
-
-                    const imgContainer = document.createElement('div');
-                    imgContainer.className = 'promo-img-container';
-
-                    const img = document.createElement('img');
-                    img.alt = promo.title || 'Promoción';
-                    if (promo.image && promo.image.trim() !== '') {
-                        img.src = promo.image;
-                        img.onerror = function() {
-                            this.style.display = 'none';
-                            const emoji = document.createElement('span');
-                            emoji.className = 'emoji';
-                            emoji.textContent = '🍔';
-                            imgContainer.appendChild(emoji);
-                        };
-                    } else {
-                        img.style.display = 'none';
-                        const emoji = document.createElement('span');
-                        emoji.className = 'emoji';
-                        emoji.textContent = '🍔';
-                        imgContainer.appendChild(emoji);
-                    }
-                    imgContainer.appendChild(img);
-                    div.appendChild(imgContainer);
-
-                    const info = document.createElement('div');
-                    info.className = 'promo-info';
-                    info.innerHTML = `
-                        <h3>${promo.title || 'Promoción'}</h3>
-                        <p>${promo.description || ''}</p>
-                        ${promo.startDate && promo.endDate ? `<div class="fechas">📅 ${new Date(promo.startDate).toLocaleDateString('es-AR')} → ${new Date(promo.endDate).toLocaleDateString('es-AR')}</div>` : ''}
-                    `;
-                    div.appendChild(info);
-
-                    const tag = document.createElement('span');
-                    tag.className = 'promo-tag';
-                    tag.textContent = '🔥 Promo';
-                    div.appendChild(tag);
-
-                    container.appendChild(div);
-                });
-            });
         }
 
         // ============================================================
@@ -2167,6 +2182,10 @@
         }
 
         document.getElementById('sendBtn').addEventListener('click', function() {
+            if (!localAbierto) {
+                alert('🔒 El local está cerrado. No se pueden realizar pedidos.');
+                return;
+            }
             const nombre = document.getElementById('nombre').value.trim();
             const telefono = document.getElementById('telefono').value.trim();
             if (!nombre || !telefono) {
@@ -2491,6 +2510,7 @@
         cargarProductos();
         cargarPromociones();
         cargarExcepciones();
+        escucharEstadoLocal(); // Escuchar cambios desde el admin
         setTimeout(actualizarVisibilidadCancelar, 100);
         generarTrack();
     </script>
