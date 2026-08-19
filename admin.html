@@ -918,7 +918,6 @@
         // ============================================================
         //  CONSTANTES DE DIRECCIÓN
         // ============================================================
-        const DIRECCION_LOCAL = 'Av. Always 1234'; // Cambiar por la dirección real del local
         const ENLACE_LOCAL = 'https://bit.ly/4xOCf1o'; // Enlace acortado a la ubicación en Google Maps
 
         // ============================================================
@@ -1747,18 +1746,16 @@
 
         filtroEstado.addEventListener('change', aplicarFiltroPedidos);
 
-        // ===== FUNCIÓN PARA GENERAR MENSAJE DE WHATSAPP (con total de ítems y mensaje específico para envío) =====
+        // ===== FUNCIÓN PARA GENERAR MENSAJE DE WHATSAPP =====
         function generarMensajeWhatsApp(pedido, estado) {
             const nombreCliente = pedido.nombre || 'Cliente';
             let estadoTexto = '';
             const envio = pedido.envio || 'Retiro en local';
             const esEnvio = envio.includes('Entrega') || envio.includes('domicilio') || envio.includes('envío');
 
-            // Si es envío a domicilio, usamos el mensaje fijo
             if (esEnvio) {
                 estadoTexto = 'está en manos del repartidor, llega en breve !!';
             } else {
-                // Para retiro en local, mantenemos el comportamiento original según el estado
                 switch (estado) {
                     case 'pendiente':
                         estadoTexto = 'recibido y está en cola de preparación';
@@ -1782,7 +1779,6 @@
 
             const direccion = pedido.direccion || '';
 
-            // Calcular total de ítems
             let totalItems = 0;
             if (pedido.productos && pedido.productos.length > 0) {
                 totalItems = pedido.productos.reduce((sum, prod) => sum + (prod.cantidad || 0), 0);
@@ -1799,9 +1795,9 @@
                     mensaje += `🔗 ${mapsLink}\n`;
                 }
             } else {
-                mensaje += `📍 *Retiro en local*\n`;
-                mensaje += `📍 Dirección: ${DIRECCION_LOCAL}\n`;
-                mensaje += `🔗 ${ENLACE_LOCAL}\n`;
+                // RETIRO EN LOCAL: solo mostramos el enlace acortado
+                mensaje += `📍 Retiro en local\n`;
+                mensaje += `📍 ${ENLACE_LOCAL}\n`;
             }
 
             mensaje += `\n📦 *Detalle del pedido (${totalItems} ítems):*\n`;
@@ -1847,13 +1843,15 @@
                                     p.estado === 'listo' ? '#2196F3' :
                                     p.estado === 'entregado' ? '#8aaa8a' : '#f44336';
 
-                // Calcular total de ítems
                 let totalItems = 0;
                 if (p.productos && p.productos.length > 0) {
                     totalItems = p.productos.reduce((sum, prod) => sum + (prod.cantidad || 0), 0);
                 }
 
-                const itemsText = totalItems > 0 ? ` (${totalItems} ítems)` : '';
+                let itemsText = '';
+                if (totalItems > 0) {
+                    itemsText = `<strong style="color:#ffffff;">(${totalItems} ítems)</strong> `;
+                }
 
                 div.innerHTML = `
                     <div class="info">
@@ -1865,7 +1863,7 @@
                             <strong style="color:#ffb703;">${total}</strong>
                         </div>
                         <div style="font-size:0.8rem; color:#b8d0b8;">
-                            📦 ${itemsText} ${p.productos ? p.productos.map(prod => `${prod.cantidad}x ${prod.nombre}`).join(', ') : 'Sin productos'}
+                            📦 ${itemsText}${p.productos ? p.productos.map(prod => `${prod.cantidad}x ${prod.nombre}`).join(', ') : 'Sin productos'}
                         </div>
                         <div style="font-size:0.8rem; color:#b8d0b8;">
                             💳 ${p.metodoPago || 'N/E'} · 🚚 ${p.envio || 'N/E'}
