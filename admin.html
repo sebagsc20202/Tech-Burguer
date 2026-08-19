@@ -1442,7 +1442,6 @@
                 ocultarFormPromo();
                 ocultarFormExcepcion();
                 actualizarBotonesEstado();
-                // Badge se actualiza dentro de actualizarBotonesEstado
             } else {
                 authSection.style.display = 'block';
                 adminPanel.classList.remove('active');
@@ -2213,47 +2212,45 @@
         filtroEstado.addEventListener('change', aplicarFiltroPedidos);
         filtroHoy.addEventListener('change', aplicarFiltroPedidos);
 
+        // ===== NUEVA FUNCIÓN PARA GENERAR MENSAJE PERSONALIZADO =====
         function generarMensajeWhatsApp(pedido, estado) {
             const nombreCliente = pedido.nombre || 'Cliente';
-            let estadoTexto = '';
+            const idPedido = pedido.idPedido || 'N/A';
             const envio = pedido.envio || 'Retiro en local';
             const esEnvio = envio.includes('Entrega') || envio.includes('domicilio') || envio.includes('envío');
+            const direccion = pedido.direccion || '';
 
-            if (esEnvio) {
-                estadoTexto = 'está en manos del repartidor, llega en breve !!';
-            } else {
-                switch (estado) {
-                    case 'pendiente': estadoTexto = 'recibido y está en cola de preparación'; break;
-                    case 'preparando': estadoTexto = 'ya está en preparación. ¡En breve estará listo!'; break;
-                    case 'listo': estadoTexto = 'está listo para retirar. ¡Pasá a buscarlo cuando quieras!'; break;
-                    case 'entregado': estadoTexto = 'ya fue entregado. ¡Gracias por elegirnos!'; break;
-                    case 'cancelado': estadoTexto = 'ha sido cancelado. Si tenés dudas, contactanos.'; break;
-                    default: estadoTexto = 'está siendo procesado';
-                }
+            // Mensaje base
+            let mensaje = `🍔 *Tech Classic Burgers* 🍔\n\n`;
+            mensaje += `Hola ${nombreCliente}, `;
+
+            // Personalizar según estado
+            switch (estado) {
+                case 'pendiente':
+                    mensaje += `recibimos tu pedido **#${idPedido}** y ya está en cola de preparación. ¡En breve comenzamos a cocinarlo! 🍳\n\n`;
+                    break;
+                case 'preparando':
+                    mensaje += `tu pedido **#${idPedido}** ya está en preparación. ¡En unos minutos estará listo! 🔥\n\n`;
+                    break;
+                case 'listo':
+                    mensaje += `tu pedido **#${idPedido}** está listo para retirar. ¡Pasá a buscarlo cuando quieras! 🍔\n\n`;
+                    break;
+                case 'entregado':
+                    mensaje += `tu pedido **#${idPedido}** ya fue entregado. ¡Gracias por elegirnos! 🎉\n\n`;
+                    break;
+                case 'cancelado':
+                    mensaje += `lamentamos informarte que tu pedido **#${idPedido}** ha sido cancelado. Si tenés dudas, contactanos. 😔\n\n`;
+                    break;
+                default:
+                    mensaje += `tu pedido **#${idPedido}** está siendo procesado. 🔄\n\n`;
             }
 
-            const direccion = pedido.direccion || '';
+            // Detalle del pedido
             let totalItems = 0;
             if (pedido.productos && pedido.productos.length > 0) {
                 totalItems = pedido.productos.reduce((sum, prod) => sum + (prod.cantidad || 0), 0);
             }
-
-            let mensaje = `🍔 *Tech Classic Burgers* 🍔\n\n`;
-            mensaje += `Hola ${nombreCliente}, tu pedido ${estadoTexto}\n\n`;
-
-            if (esEnvio) {
-                mensaje += `🚚 *Envío a domicilio*\n`;
-                mensaje += `📍 Dirección: ${direccion || 'No especificada'}\n`;
-                if (direccion) {
-                    const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(direccion)}`;
-                    mensaje += `🔗 ${mapsLink}\n`;
-                }
-            } else {
-                mensaje += `📍 Retiro en local\n`;
-                mensaje += `📍 ${ENLACE_LOCAL}\n`;
-            }
-
-            mensaje += `\n📦 *Detalle del pedido (${totalItems} ítems):*\n`;
+            mensaje += `📦 *Detalle del pedido (${totalItems} ítems):*\n`;
             if (pedido.productos && pedido.productos.length > 0) {
                 pedido.productos.forEach(prod => {
                     mensaje += `* ${prod.cantidad}x ${prod.nombre}`;
@@ -2265,12 +2262,47 @@
                 mensaje += `Sin productos.\n`;
             }
 
+            // Total
             mensaje += `\n💰 *Total:* $${(pedido.total || 0).toLocaleString()}`;
+
+            // Información de envío
+            if (esEnvio) {
+                mensaje += `\n\n🚚 *Envío a domicilio*`;
+                if (direccion) {
+                    const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(direccion)}`;
+                    mensaje += `\n📍 *Dirección:* ${direccion}`;
+                    mensaje += `\n🗺️ *Ver ruta:* ${mapsLink}`;
+                } else {
+                    mensaje += `\n📍 Dirección no especificada.`;
+                }
+            } else {
+                mensaje += `\n\n📍 *Retiro en local*`;
+                mensaje += `\n📍 ${ENLACE_LOCAL}`;
+            }
+
+            // Mensaje de cierre
             mensaje += `\n\n📲 ¡Gracias por tu pedido!`;
             return mensaje;
         }
 
-        // ===== FUNCIÓN RENDER PEDIDOS (MODIFICADA PARA MOSTRAR ID) =====
+        // ===== FUNCIÓN ABRIR WHATSAPP MODIFICADA =====
+        window.abrirWhatsApp = function(id) {
+            const pedido = pedidosActuales.find(p => p.id === id);
+            if (!pedido) { mostrarToast('Pedido no encontrado', 'error'); return; }
+            const telefono = pedido.telefono;
+            if (!telefono) { mostrarToast('El pedido no tiene número de teléfono', 'error'); return; }
+            const telefonoLimpio = telefono.replace(/\D/g, '');
+            if (telefonoLimpio.length < 8) { mostrarToast('Número de teléfono inválido', 'error'); return; }
+
+            // Obtener estado actual del pedido (del select si existe, o del pedido)
+            const select = document.querySelector(`.estado-select[data-id="${id}"]`);
+            const estado = select ? select.value : pedido.estado || 'pendiente';
+
+            const mensaje = generarMensajeWhatsApp(pedido, estado);
+            window.open(`https://wa.me/${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        };
+
+        // ===== RENDER PEDIDOS (con ID) =====
         function renderPedidos(pedidos) {
             const list = document.getElementById('pedidoList');
             list.innerHTML = '';
@@ -2299,7 +2331,6 @@
                 }
                 let itemsText = totalItems > 0 ? `<strong style="color:#ffffff;">(${totalItems} ítems)</strong> ` : '';
 
-                // ===== ID DEL PEDIDO =====
                 const idPedido = p.idPedido || 'N/A';
 
                 div.innerHTML = `
@@ -2352,19 +2383,6 @@
             const wrapper = document.getElementById('pedidoListWrapper');
             wrapper.style.maxHeight = pedidos.length > 3 ? '480px' : 'auto';
         }
-
-        window.abrirWhatsApp = function(id) {
-            const pedido = pedidosActuales.find(p => p.id === id);
-            if (!pedido) { mostrarToast('Pedido no encontrado', 'error'); return; }
-            const telefono = pedido.telefono;
-            if (!telefono) { mostrarToast('El pedido no tiene número de teléfono', 'error'); return; }
-            const telefonoLimpio = telefono.replace(/\D/g, '');
-            if (telefonoLimpio.length < 8) { mostrarToast('Número de teléfono inválido', 'error'); return; }
-            const select = document.querySelector(`.estado-select[data-id="${id}"]`);
-            const estado = select ? select.value : pedido.estado || 'pendiente';
-            const mensaje = generarMensajeWhatsApp(pedido, estado);
-            window.open(`https://wa.me/${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
-        };
 
         function handleEstadoChange(e) {
             const select = e.target;
