@@ -30,6 +30,30 @@
         h1 { color: #ffb703; text-align: center; margin-bottom: 15px; font-size: 2rem; }
         h2 { color: #ffb703; margin: 10px 0 5px; border-bottom: 1px solid #2f4a2f; padding-bottom: 4px; }
 
+        /* ===== SCROLLBAR PERSONALIZADA ===== */
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #ffb703 #1f331f;
+        }
+        /* WebKit (Chrome, Edge, Safari) */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f331f;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ffb703;
+            border-radius: 8px;
+            border: 1px solid #1a2e1a;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e6a500;
+        }
+
         .card {
             background: #1f331f;
             border: 2px solid #3a5a3a;
@@ -91,6 +115,23 @@
             transition: background 0.2s;
         }
         .btn-logout:hover { background: #5a2a2a; }
+        .btn-fullscreen {
+            background: #1f331f;
+            color: #ffb703;
+            border: 1px solid #ffb703;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-fullscreen:hover {
+            background: #2f4a2f;
+        }
 
         /* ===== TOAST ===== */
         #toastAdmin {
@@ -854,6 +895,10 @@
             }
             .container { padding-top: 6px; }
             h1 { font-size: 1.6rem; margin-bottom: 10px; }
+            .panel-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
     </style>
 </head>
@@ -905,7 +950,10 @@
         <div id="adminPanel">
             <div class="panel-header">
                 <span class="user-info">👤 <strong id="userEmail">admin@techburgers.com</strong></span>
-                <button class="btn-logout" id="logoutBtn">🚪 Cerrar sesión</button>
+                <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                    <button class="btn-fullscreen" id="btnFullscreen" title="Pantalla completa">⛶ Pantalla completa</button>
+                    <button class="btn-logout" id="logoutBtn">🚪 Cerrar sesión</button>
+                </div>
             </div>
 
             <!-- ===== 1️⃣ PEDIDOS ===== -->
@@ -1271,6 +1319,33 @@
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && alertaActiva) ocultarAlerta(); });
 
         // ============================================================
+        //  FULLSCREEN
+        // ============================================================
+        const btnFullscreen = document.getElementById('btnFullscreen');
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+                btnFullscreen.textContent = '⛶ Salir pantalla completa';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    btnFullscreen.textContent = '⛶ Pantalla completa';
+                }
+            }
+        }
+
+        btnFullscreen.addEventListener('click', toggleFullscreen);
+
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                btnFullscreen.textContent = '⛶ Salir pantalla completa';
+            } else {
+                btnFullscreen.textContent = '⛶ Pantalla completa';
+            }
+        });
+
+        // ============================================================
         //  REFERENCIAS DOM
         // ============================================================
         const authSection = document.getElementById('authSection');
@@ -1348,6 +1423,10 @@
                 db.ref('excepciones').off();
                 db.ref('pedidos').off();
                 ocultarAlerta();
+                // Si estaba en fullscreen, salir
+                if (document.fullscreenElement) {
+                    document.exitFullscreen().catch(() => {});
+                }
             }
         });
 
@@ -2313,8 +2392,7 @@
             if (chartDiario) chartDiario.destroy();
             const ctxDiario = document.getElementById('chartDiario').getContext('2d');
             if (diasOrdenados.length === 0) {
-                // Si no hay pedidos hoy, mostramos un gráfico vacío con un mensaje o una barra en cero.
-                // Para evitar error, creamos un dataset vacío.
+                // Si no hay pedidos hoy, mostramos un gráfico vacío con una barra en cero.
                 chartDiario = new Chart(ctxDiario, {
                     type: 'bar',
                     data: {
