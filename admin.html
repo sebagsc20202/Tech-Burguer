@@ -256,6 +256,62 @@
             100% { transform: scale(1.02); box-shadow: 0 0 40px rgba(255,183,3,0.9); }
         }
 
+        /* ===== TOGGLE SWITCH ===== */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #1f331f;
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: 1px solid #3a5a3a;
+        }
+        .toggle-container .estado-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .toggle-container .estado-label.abierto { color: #4caf50; }
+        .toggle-container .estado-label.cerrado { color: #f44336; }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #3a5a3a;
+            transition: 0.3s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #fff;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        .switch input:checked + .slider {
+            background-color: #4caf50;
+        }
+        .switch input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
         /* ===== FORMULARIOS ===== */
         .form-producto {
             background: #1f331f;
@@ -410,6 +466,7 @@
             flex-wrap: wrap;
             gap: 8px;
             margin: 6px 0 12px;
+            align-items: center;
         }
         .estado-rapido .btn-estado {
             padding: 8px 16px;
@@ -449,8 +506,8 @@
         .product-item .meta span { background: #2a4a2a; padding: 2px 8px; border-radius: 30px; }
         .product-item label { display: flex; align-items: center; gap: 4px; font-size: 0.85rem; }
         .product-item input[type="number"] {
-            width: 60px;
-            padding: 4px 6px;
+            width: 90px;
+            padding: 4px 8px;
             border-radius: 30px;
             border: 1px solid #3a5a3a;
             background: #1a2e1a;
@@ -845,6 +902,7 @@
             }
             .container { padding-top: 6px; }
             h1 { font-size: 1.6rem; margin-bottom: 10px; }
+            .toggle-container { flex-wrap: wrap; justify-content: center; }
         }
     </style>
 </head>
@@ -899,9 +957,21 @@
                 <button class="btn-logout" id="logoutBtn">🚪 Cerrar sesión</button>
             </div>
 
+            <!-- ===== 0️⃣ ESTADO DEL LOCAL (TOGGLE) ===== -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
+                <h2 style="margin:0;">🏪 Estado del local</h2>
+                <div class="toggle-container">
+                    <span class="estado-label abierto" id="estadoTextoLocal">🟢 Abierto</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleEstadoLocal">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
             <!-- ===== 1️⃣ PEDIDOS ===== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-                <h2>📦 Pedidos</h2>
+                <h2 id="pedidosTitulo">📦 Pedidos (0)</h2>
                 <div class="filtro-container" style="margin:0;">
                     <label for="filtroEstado">Filtrar:</label>
                     <select id="filtroEstado">
@@ -956,9 +1026,9 @@
                 <button class="btn-add" id="addExcepcionBtn">➕ Agregar</button>
             </div>
             <div class="estado-rapido">
-                <button class="btn-estado btn-abrir" id="btnAbrirAhora" title="Abrir el local ahora">🔓 Abrir ahora</button>
-                <button class="btn-estado btn-cerrar" id="btnCerrarAhora" title="Cerrar el local ahora">🔒 Cerrar ahora</button>
-                <button class="btn-estado btn-normal" id="btnVolverNormal" title="Volver al horario normal">⏰ Normal</button>
+                <button class="btn-estado btn-abrir" id="btnAbrirAhora" title="Abrir el local ahora (crea excepción)">🔓 Abrir ahora</button>
+                <button class="btn-estado btn-cerrar" id="btnCerrarAhora" title="Cerrar el local ahora (crea excepción)">🔒 Cerrar ahora</button>
+                <button class="btn-estado btn-normal" id="btnVolverNormal" title="Eliminar excepción de hoy">⏰ Normal</button>
             </div>
             <div id="excepcionList"></div>
             <div id="formExcepcion" class="form-producto">
@@ -1262,6 +1332,46 @@
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && alertaActiva) ocultarAlerta(); });
 
         // ============================================================
+        //  TOGGLE ESTADO LOCAL
+        // ============================================================
+        const toggleEstado = document.getElementById('toggleEstadoLocal');
+        const estadoTexto = document.getElementById('estadoTextoLocal');
+
+        function actualizarToggle(estado) {
+            if (estado === 'abierto') {
+                toggleEstado.checked = true;
+                estadoTexto.textContent = '🟢 Abierto';
+                estadoTexto.className = 'estado-label abierto';
+            } else {
+                toggleEstado.checked = false;
+                estadoTexto.textContent = '🔴 Cerrado';
+                estadoTexto.className = 'estado-label cerrado';
+            }
+        }
+
+        // Cargar estado desde Firebase
+        function cargarEstadoLocal() {
+            db.ref('estado_local').on('value', (snapshot) => {
+                const estado = snapshot.val() || 'abierto';
+                actualizarToggle(estado);
+            });
+        }
+
+        // Guardar cambio
+        toggleEstado.addEventListener('change', function() {
+            const nuevoEstado = this.checked ? 'abierto' : 'cerrado';
+            db.ref('estado_local').set(nuevoEstado)
+                .then(() => {
+                    mostrarToast(`Local ${nuevoEstado === 'abierto' ? 'abierto' : 'cerrado'}`, 'success');
+                })
+                .catch(err => {
+                    mostrarToast('Error al guardar estado: ' + err.message, 'error');
+                    // Revertir visualmente
+                    actualizarToggle(nuevoEstado === 'abierto' ? 'cerrado' : 'abierto');
+                });
+        });
+
+        // ============================================================
         //  REFERENCIAS DOM
         // ============================================================
         const authSection = document.getElementById('authSection');
@@ -1302,6 +1412,8 @@
 
         const selectorMes = document.getElementById('selectorMes');
 
+        const pedidosTitulo = document.getElementById('pedidosTitulo');
+
         // ============================================================
         //  AUTENTICACIÓN
         // ============================================================
@@ -1322,6 +1434,7 @@
                 adminPanel.classList.add('active');
                 userEmail.textContent = user.email;
                 cargarDatos();
+                cargarEstadoLocal();
                 ocultarFormProducto();
                 ocultarFormPromo();
                 ocultarFormExcepcion();
@@ -1336,6 +1449,7 @@
                 db.ref('promotions').off();
                 db.ref('excepciones').off();
                 db.ref('pedidos').off();
+                db.ref('estado_local').off();
                 ocultarAlerta();
             }
         });
@@ -1409,7 +1523,7 @@
                 const isLast = index === productos.length - 1;
                 div.innerHTML = `
                     <div style="flex:1; min-width:120px;"><div class="name">${p.name} ${badgeHtml}</div>${metaHtml}</div>
-                    <label>💰 <input type="number" value="${p.price}" data-id="${p.id}" class="price-input" style="width:60px;" /></label>
+                    <label>💰 <input type="number" value="${p.price}" data-id="${p.id}" class="price-input" style="width:90px;" /></label>
                     <label>📦 <input type="checkbox" ${p.available !== false ? 'checked' : ''} data-id="${p.id}" class="avail-input" /></label>
                     <div class="actions">
                         <button class="btn-mover" onclick="moverProducto('${p.id}', -1)" ${isFirst ? 'disabled' : ''} title="Subir">⬆</button>
@@ -1610,7 +1724,7 @@
                     <div class="dates">${fechaInicio} ${fechaInicio && fechaFin ? '→' : ''} ${fechaFin}</div>
                     <label><input type="checkbox" ${p.active !== false ? 'checked' : ''} data-id="${p.id}" class="promo-active-check" /> Activa</label>
                     <div class="actions">
-                        <button class="btn-editar-promo" onclick="editarPromocion('${p.id}')" title="Editar promoción">✏️</button>
+                        <button class="btn-editar-promo" onclick="editarPromocion('${p.id}')" title="Editar">✏️</button>
                         <span class="separator">|</span>
                         <button class="btn-eliminar-promo" onclick="eliminarPromocion('${p.id}')" title="Eliminar">🗑️</button>
                     </div>
@@ -1946,6 +2060,7 @@
                     document.getElementById('pedidoList').innerHTML = '<p style="color:#b8d0b8; padding:6px 0;">No hay pedidos aún.</p>';
                     actualizarGraficos();
                     actualizarEstadisticasAvanzadas();
+                    actualizarContadorPedidos();
                     return;
                 }
                 pedidosActuales = Object.keys(data).map(key => ({ id: key, ...data[key] }));
@@ -1954,6 +2069,7 @@
                 actualizarGraficos();
                 actualizarSelectorMeses();
                 actualizarEstadisticasAvanzadas();
+                actualizarContadorPedidos();
             });
 
             db.ref('pedidos').on('child_added', (snapshot) => {
@@ -1977,6 +2093,10 @@
             return fecha.getTime() === hoy.getTime();
         }
 
+        function actualizarContadorPedidos() {
+            // El contador se actualiza en aplicarFiltroPedidos
+        }
+
         function aplicarFiltroPedidos() {
             const filtroEstadoValue = filtroEstado.value;
             const soloHoy = filtroHoy.checked;
@@ -1992,6 +2112,9 @@
             }
 
             renderPedidos(pedidosFiltrados);
+
+            // Actualizar título con el contador
+            pedidosTitulo.textContent = `📦 Pedidos (${pedidosFiltrados.length})`;
         }
 
         filtroEstado.addEventListener('change', aplicarFiltroPedidos);
