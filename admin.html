@@ -443,37 +443,6 @@
             cursor: pointer;
         }
 
-        /* ===== BOTONES DE CATEGORÍA ===== */
-        .categoria-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 6px 0 10px;
-        }
-        .categoria-buttons .btn-categoria {
-            padding: 6px 16px;
-            border: 2px solid #3a5a3a;
-            border-radius: 8px;
-            background: #1f331f;
-            color: #b8d0b8;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-            user-select: none;
-            text-transform: capitalize;
-        }
-        .categoria-buttons .btn-categoria:hover {
-            border-color: #6a8a6a;
-            background: #2a4a2a;
-        }
-        .categoria-buttons .btn-categoria.active {
-            border-color: #ffb703;
-            background: #2a4a2a;
-            color: #ffb703;
-            box-shadow: 0 0 12px rgba(255,183,3,0.2);
-        }
-
         /* ===== BOTONES DE ESTADO RÁPIDO ===== */
         .estado-rapido {
             display: flex;
@@ -920,7 +889,6 @@
             .form-actions { flex-direction: column; }
             .filtro-container { flex-direction: column; align-items: stretch; }
             .estado-rapido { flex-direction: column; }
-            .categoria-buttons { justify-content: center; }
             .product-item .actions .separator,
             .promo-item .actions .separator,
             .excepcion-item .actions .separator {
@@ -1143,9 +1111,6 @@
                 <label for="filtroCategoria">🔍 Filtrar:</label>
                 <select id="filtroCategoria"><option value="todas">Todas</option></select>
             </div>
-
-            <!-- ===== BOTONES DE CATEGORÍA ===== -->
-            <div id="categoriaButtons" class="categoria-buttons"></div>
 
             <div id="formProducto" class="form-producto">
                 <h3 id="formProductoTitulo">✏️ Nuevo producto</h3>
@@ -1463,7 +1428,6 @@
         const selectorMes = document.getElementById('selectorMes');
 
         const pedidosTitulo = document.getElementById('pedidosTitulo');
-        const categoriaButtons = document.getElementById('categoriaButtons');
 
         // ============================================================
         //  AUTENTICACIÓN
@@ -1536,89 +1500,14 @@
                 });
                 categoriasUnicas = Array.from(categorias).sort();
                 actualizarOpcionesFiltro();
-                // Actualizar botones de categoría y seleccionar la por defecto
-                actualizarBotonesCategoria();
-                seleccionarCategoriaPorDefecto();
+                // Siempre iniciar con "todas" a menos que se haya seleccionado algo previamente
+                if (!filtroCategoria.value || filtroCategoria.value === '') {
+                    filtroCategoria.value = 'todas';
+                }
                 aplicarFiltro();
             });
         }
 
-        // ===== NUEVA FUNCIÓN: Botones de categoría =====
-        function actualizarBotonesCategoria() {
-            // Obtener categorías con al menos un producto activo (available === true)
-            const categoriasConActivos = new Set();
-            productosCompletos.forEach(p => {
-                if (p.available !== false && p.categoria) {
-                    categoriasConActivos.add(p.categoria);
-                }
-            });
-
-            // Limpiar contenedor
-            categoriaButtons.innerHTML = '';
-
-            // Si no hay categorías con activos, no mostrar botones
-            if (categoriasConActivos.size === 0) {
-                categoriaButtons.style.display = 'none';
-                return;
-            }
-            categoriaButtons.style.display = 'flex';
-
-            // Crear botón para cada categoría
-            categoriasConActivos.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.className = 'btn-categoria';
-                btn.textContent = cat;
-                btn.dataset.categoria = cat;
-                btn.addEventListener('click', function() {
-                    // Actualizar select y disparar filtro
-                    filtroCategoria.value = cat;
-                    aplicarFiltro();
-                });
-                categoriaButtons.appendChild(btn);
-            });
-        }
-
-        // ===== Seleccionar categoría por defecto =====
-        function seleccionarCategoriaPorDefecto() {
-            // Si el filtro ya tiene un valor (por ejemplo, 'todas'), no forzamos
-            if (filtroCategoria.value && filtroCategoria.value !== 'todas') {
-                // Ya hay una selección, mantenerla
-                return;
-            }
-
-            // Buscar si existe "Hamburguesas" con productos activos
-            const hayHamburguesasActivas = productosCompletos.some(p => p.categoria === 'Hamburguesas' && p.available !== false);
-            if (hayHamburguesasActivas) {
-                filtroCategoria.value = 'Hamburguesas';
-            } else {
-                // Si no, elegir la primera categoría con productos activos
-                const categoriasConActivos = new Set();
-                productosCompletos.forEach(p => {
-                    if (p.available !== false && p.categoria) {
-                        categoriasConActivos.add(p.categoria);
-                    }
-                });
-                if (categoriasConActivos.size > 0) {
-                    const primera = categoriasConActivos.values().next().value;
-                    filtroCategoria.value = primera;
-                } else {
-                    // Si no hay ninguna activa, dejar 'todas'
-                    filtroCategoria.value = 'todas';
-                }
-            }
-            // Aplicar el filtro
-            aplicarFiltro();
-        }
-
-        // ===== Sincronizar botones con el select =====
-        function sincronizarBotonesCategoria(categoriaSeleccionada) {
-            const botones = categoriaButtons.querySelectorAll('.btn-categoria');
-            botones.forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.categoria === categoriaSeleccionada);
-            });
-        }
-
-        // ---- Filtro y renderizado ----
         function actualizarOpcionesFiltro() {
             const valorActual = filtroCategoria.value;
             filtroCategoria.innerHTML = '<option value="todas">Todas</option>';
@@ -1643,11 +1532,8 @@
                 productosFiltrados = productosFiltrados.filter(p => p.categoria === categoriaSeleccionada);
             }
             renderProductos(productosFiltrados);
-            // Sincronizar botones
-            sincronizarBotonesCategoria(categoriaSeleccionada);
         }
 
-        // Escuchar cambios en el select para sincronizar botones
         filtroCategoria.addEventListener('change', function() {
             aplicarFiltro();
         });
@@ -1852,7 +1738,6 @@
             try {
                 await db.ref('products/' + id).update({ price, available });
                 mostrarToast('Producto actualizado', 'success');
-                // Después de actualizar, se refrescará automáticamente la lista de productos
             } catch (error) {
                 mostrarToast('Error: ' + error.message, 'error');
             }
