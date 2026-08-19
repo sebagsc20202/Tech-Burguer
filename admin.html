@@ -402,6 +402,18 @@
             margin: 6px 0;
         }
         .btn-add:hover { background: #388e3c; }
+        .btn-add-separator {
+            background: #ff9800;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: #1a1a1a;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin: 6px 0;
+        }
+        .btn-add-separator:hover { background: #e68900; }
         .form-divider { border: none; border-top: 1px solid #2f4a2f; margin: 6px 0 8px; }
 
         /* ===== FILTRO ===== */
@@ -575,6 +587,79 @@
             font-size: 0.65rem;
             font-weight: 600;
         }
+
+        /* Estilo para separadores */
+        .separador-item {
+            background: #2a3a2a;
+            border: 2px dashed #ffb703;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 6px 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .separador-item .separador-texto {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffb703;
+            text-align: center;
+            flex: 1;
+            letter-spacing: 1px;
+        }
+        .separador-item .actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+        .separador-item .actions .separator {
+            color: #4a6a4a;
+            font-weight: 300;
+            margin: 0 4px 0 8px;
+            font-size: 1rem;
+            user-select: none;
+        }
+        .separador-item .actions .btn-eliminar {
+            background: #f44336;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .separador-item .actions .btn-eliminar:hover { background: #d32f2f; }
+        .separador-item .actions .btn-mover {
+            background: #3a5a3a;
+            color: #e8f0e8;
+            font-size: 1rem;
+            line-height: 1;
+            padding: 2px 8px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .separador-item .actions .btn-mover:hover { background: #4a6a4a; }
+        .separador-item .actions .btn-mover:disabled { opacity: 0.3; cursor: not-allowed; }
+        .separador-item .actions .btn-editar {
+            background: #2196F3;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .separador-item .actions .btn-editar:hover { background: #1976D2; }
 
         /* PROMOCIONES */
         .promo-item .info { flex: 1; min-width: 120px; }
@@ -833,7 +918,7 @@
         }
 
         @media (max-width: 600px) {
-            .product-item, .promo-item, .excepcion-item, .pedido-item {
+            .product-item, .promo-item, .excepcion-item, .pedido-item, .separador-item {
                 flex-direction: column;
                 align-items: stretch;
             }
@@ -841,7 +926,8 @@
             .product-item .actions,
             .promo-item .actions,
             .excepcion-item .actions,
-            .pedido-item .actions {
+            .pedido-item .actions,
+            .separador-item .actions {
                 margin-left: 0;
                 justify-content: flex-end;
             }
@@ -852,13 +938,15 @@
             .estado-rapido { flex-direction: column; }
             .product-item .actions .separator,
             .promo-item .actions .separator,
-            .excepcion-item .actions .separator {
+            .excepcion-item .actions .separator,
+            .separador-item .actions .separator {
                 display: none;
             }
             .product-item .actions .btn-eliminar,
             .promo-item .actions .btn-eliminar-promo,
             .excepcion-item .actions .btn-eliminar-excepcion,
-            .pedido-item .actions .btn-eliminar-pedido {
+            .pedido-item .actions .btn-eliminar-pedido,
+            .separador-item .actions .btn-eliminar {
                 margin-left: 0;
                 width: 100%;
                 text-align: center;
@@ -866,7 +954,9 @@
             }
             .product-item .actions .btn-mover,
             .product-item .actions .btn-editar,
-            .product-item .actions .btn-guardar {
+            .product-item .actions .btn-guardar,
+            .separador-item .actions .btn-mover,
+            .separador-item .actions .btn-editar {
                 flex: 1;
                 text-align: center;
             }
@@ -1066,7 +1156,10 @@
             <!-- ===== 4️⃣ PRODUCTOS ===== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
                 <h2>📋 Productos</h2>
-                <button class="btn-add" id="addProductBtn">➕ Nuevo</button>
+                <div style="display:flex; gap:6px;">
+                    <button class="btn-add" id="addProductBtn">➕ Nuevo</button>
+                    <button class="btn-add-separator" id="addSeparatorBtn">➕ Separador</button>
+                </div>
             </div>
             <div class="filtro-container">
                 <label for="filtroCategoria">🔍 Filtrar:</label>
@@ -1074,14 +1167,14 @@
             </div>
             <div id="formProducto" class="form-producto">
                 <h3 id="formProductoTitulo">✏️ Nuevo producto</h3>
-                <div class="form-group"><label for="prodNombre">Nombre <span class="required">*</span></label><input type="text" id="prodNombre" placeholder="Ej: Doble Cheddar" /></div>
-                <div class="form-group"><label for="prodPrecio">Precio <span class="required">*</span></label><input type="text" id="prodPrecio" placeholder="Ej: 15000" /></div>
-                <div class="form-group"><label for="prodDesc">Descripción</label><textarea id="prodDesc" placeholder="Ej: Doble medallón 120gr · doble cheddar · salsa Tech."></textarea></div>
-                <div class="form-row">
+                <div class="form-group" id="prodNombreGroup"><label for="prodNombre">Nombre <span class="required">*</span></label><input type="text" id="prodNombre" placeholder="Ej: Doble Cheddar" /></div>
+                <div class="form-group hidden" id="prodPrecioGroup"><label for="prodPrecio">Precio <span class="required">*</span></label><input type="text" id="prodPrecio" placeholder="Ej: 15000" /></div>
+                <div class="form-group hidden" id="prodDescGroup"><label for="prodDesc">Descripción</label><textarea id="prodDesc" placeholder="Ej: Doble medallón 120gr · doble cheddar · salsa Tech."></textarea></div>
+                <div class="form-row hidden" id="prodImagenGroup">
                     <div class="form-group"><label for="prodImagen">URL imagen</label><input type="text" id="prodImagen" placeholder="Ej: images/cheddar.jpg" /><span class="hint-text">Imagen de tarjeta</span></div>
                     <div class="form-group"><label for="prodPopupImg">URL popup</label><input type="text" id="prodPopupImg" placeholder="Ej: images/cheddar-popup.jpg" /><span class="hint-text">Imagen ampliada</span></div>
                 </div>
-                <div class="form-row">
+                <div class="form-row hidden" id="prodCategoriaTiempoGroup">
                     <div class="form-group"><label for="prodCategoria">Categoría</label>
                         <select id="prodCategoria">
                             <option value="Hamburguesas">🍔 Hamburguesas</option>
@@ -1089,6 +1182,7 @@
                             <option value="Bebidas">🥤 Bebidas</option>
                             <option value="Postres">🍰 Postres</option>
                             <option value="Otros">📦 Otros</option>
+                            <option value="Separador">📌 Separador</option>
                         </select>
                     </div>
                     <div class="form-group"><label for="prodTiempo">Tiempo (min)</label><input type="number" id="prodTiempo" value="15" min="1" /><span class="hint-text">Tiempo estimado</span></div>
@@ -1097,8 +1191,8 @@
                     <div class="form-group"><label for="prodBadge">Badge</label><input type="text" id="prodBadge" placeholder="Ej: NUEVO, BASE, PROMO" /><span class="hint-text">Etiqueta destacada</span></div>
                     <div class="form-group"><label for="prodId">ID <span class="required">*</span></label><input type="text" id="prodId" placeholder="Ej: doble-cheddar" /><span class="hint-text">🔑 Único, sin espacios. <strong>No editable.</strong></span></div>
                 </div>
-                <hr class="form-divider" />
-                <div class="form-checkbox-group">
+                <hr class="form-divider hidden" id="prodExtrasDivider" />
+                <div class="form-checkbox-group hidden" id="prodExtrasGroup">
                     <label><input type="checkbox" id="prodHasExtras" /> Tiene extras</label>
                     <label><input type="checkbox" id="prodDisponible" checked /> Disponible</label>
                 </div>
@@ -1358,10 +1452,20 @@
         const logoutBtn = document.getElementById('logoutBtn');
 
         const addProductBtn = document.getElementById('addProductBtn');
+        const addSeparatorBtn = document.getElementById('addSeparatorBtn');
         const formProducto = document.getElementById('formProducto');
         const saveProductBtn = document.getElementById('saveProductBtn');
         const cancelProductBtn = document.getElementById('cancelProductBtn');
         const formProductoTitulo = document.getElementById('formProductoTitulo');
+
+        // Elementos del formulario que se ocultan/muestran según modo
+        const prodNombreGroup = document.getElementById('prodNombreGroup');
+        const prodPrecioGroup = document.getElementById('prodPrecioGroup');
+        const prodDescGroup = document.getElementById('prodDescGroup');
+        const prodImagenGroup = document.getElementById('prodImagenGroup');
+        const prodCategoriaTiempoGroup = document.getElementById('prodCategoriaTiempoGroup');
+        const prodExtrasDivider = document.getElementById('prodExtrasDivider');
+        const prodExtrasGroup = document.getElementById('prodExtrasGroup');
 
         const addPromoBtn = document.getElementById('addPromoBtn');
         const formPromo = document.getElementById('formPromo');
@@ -1453,9 +1557,17 @@
                 const data = snapshot.val();
                 if (!data) { crearProductosDefault(); return; }
                 productosCompletos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                // Ordenar por 'orden', si no existe, usar índice
                 productosCompletos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
+                // Obtener categorías únicas (excluyendo separadores para el filtro, o incluyéndolos)
                 const categorias = new Set();
-                productosCompletos.forEach(p => { if (p.categoria) categorias.add(p.categoria); });
+                productosCompletos.forEach(p => {
+                    if (p.categoria && !p.isSeparador) categorias.add(p.categoria);
+                });
+                // Agregar la categoría "Separador" solo si hay separadores
+                if (productosCompletos.some(p => p.isSeparador)) {
+                    categorias.add('Separador');
+                }
                 categoriasUnicas = Array.from(categorias).sort();
                 actualizarOpcionesFiltro();
                 aplicarFiltro();
@@ -1489,8 +1601,32 @@
         function renderProductos(productos) {
             const list = document.getElementById('productList');
             list.innerHTML = '';
-            if (productos.length === 0) { list.innerHTML = '<p style="color:#b8d0b8; padding:6px 0;">No hay productos en esta categoría.</p>'; return; }
+            if (productos.length === 0) {
+                list.innerHTML = '<p style="color:#b8d0b8; padding:6px 0;">No hay productos en esta categoría.</p>';
+                return;
+            }
             productos.forEach((p, index) => {
+                // Si es separador, renderizar con estilo especial
+                if (p.isSeparador) {
+                    const div = document.createElement('div');
+                    div.className = 'separador-item';
+                    const isFirst = index === 0;
+                    const isLast = index === productos.length - 1;
+                    div.innerHTML = `
+                        <div class="separador-texto">${p.name || 'Separador'}</div>
+                        <div class="actions">
+                            <button class="btn-mover" onclick="moverProducto('${p.id}', -1)" ${isFirst ? 'disabled' : ''} title="Subir">⬆</button>
+                            <button class="btn-mover" onclick="moverProducto('${p.id}', 1)" ${isLast ? 'disabled' : ''} title="Bajar">⬇</button>
+                            <button class="btn-editar" onclick="editarProducto('${p.id}')" title="Editar">✏️</button>
+                            <span class="separator">|</span>
+                            <button class="btn-eliminar" onclick="eliminarProducto('${p.id}')" title="Eliminar">🗑️</button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                    return;
+                }
+
+                // Producto normal
                 const div = document.createElement('div');
                 div.className = 'product-item';
                 const badgeHtml = p.badge ? `<span class="badge-preview">${p.badge}</span>` : '';
@@ -1539,6 +1675,24 @@
                 const snapshot = await db.ref('products/' + id).once('value');
                 const producto = snapshot.val();
                 if (!producto) { mostrarToast('Producto no encontrado', 'error'); return; }
+
+                // Determinar modo
+                const esSeparador = producto.isSeparador || false;
+                if (esSeparador) {
+                    // Configurar formulario para separador
+                    setModoFormulario('separador');
+                    document.getElementById('prodNombre').value = producto.name || '';
+                    document.getElementById('prodId').value = producto.id || '';
+                    document.getElementById('prodId').readOnly = true;
+                    window.editandoProductoId = id;
+                    formProductoTitulo.textContent = '✏️ Editando separador: ' + (producto.name || '');
+                    formProducto.classList.add('active');
+                    formProducto.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    return;
+                }
+
+                // Modo producto normal
+                setModoFormulario('producto');
                 document.getElementById('prodNombre').value = producto.name || '';
                 document.getElementById('prodPrecio').value = producto.price || '';
                 document.getElementById('prodDesc').value = producto.desc || '';
@@ -1561,11 +1715,11 @@
         };
 
         window.eliminarProducto = async function(id) {
-            const confirmado = await mostrarConfirm('Eliminar producto', `¿Eliminar el producto "${id}" permanentemente?`);
+            const confirmado = await mostrarConfirm('Eliminar', `¿Eliminar este elemento permanentemente?`);
             if (!confirmado) return;
             try {
                 await db.ref('products/' + id).remove();
-                mostrarToast('Producto eliminado', 'success');
+                mostrarToast('Elemento eliminado', 'success');
             } catch (error) {
                 mostrarToast('Error al eliminar: ' + error.message, 'error');
             }
@@ -1606,7 +1760,51 @@
         }
 
         let editandoProductoId = null;
-        function mostrarFormProducto() {
+        let modoFormulario = 'producto'; // 'producto' o 'separador'
+
+        function setModoFormulario(modo) {
+            modoFormulario = modo;
+            const esSeparador = modo === 'separador';
+            // Mostrar/ocultar campos
+            prodPrecioGroup.classList.toggle('hidden', esSeparador);
+            prodDescGroup.classList.toggle('hidden', esSeparador);
+            prodImagenGroup.classList.toggle('hidden', esSeparador);
+            prodCategoriaTiempoGroup.classList.toggle('hidden', esSeparador);
+            prodExtrasDivider.classList.toggle('hidden', esSeparador);
+            prodExtrasGroup.classList.toggle('hidden', esSeparador);
+            // Para separadores, el campo ID sigue visible pero opcional
+            // Cambiar el texto del título
+            if (esSeparador) {
+                formProductoTitulo.textContent = editandoProductoId ? '✏️ Editando separador' : '✏️ Nuevo separador';
+            } else {
+                formProductoTitulo.textContent = editandoProductoId ? '✏️ Editando producto' : '✏️ Nuevo producto';
+            }
+        }
+
+        function ocultarFormProducto() {
+            formProducto.classList.remove('active');
+            editandoProductoId = null;
+            window.editandoProductoId = null;
+            document.getElementById('prodId').readOnly = false;
+            // Restaurar modo producto por defecto
+            setModoFormulario('producto');
+            // Limpiar campos
+            document.getElementById('prodNombre').value = '';
+            document.getElementById('prodPrecio').value = '';
+            document.getElementById('prodDesc').value = '';
+            document.getElementById('prodImagen').value = '';
+            document.getElementById('prodPopupImg').value = '';
+            document.getElementById('prodCategoria').value = 'Hamburguesas';
+            document.getElementById('prodTiempo').value = 15;
+            document.getElementById('prodBadge').value = '';
+            document.getElementById('prodId').value = '';
+            document.getElementById('prodHasExtras').checked = false;
+            document.getElementById('prodDisponible').checked = true;
+            modoFormulario = 'producto';
+        }
+
+        function mostrarFormProducto(modo = 'producto') {
+            // Limpiar todo
             document.getElementById('prodNombre').value = '';
             document.getElementById('prodPrecio').value = '';
             document.getElementById('prodDesc').value = '';
@@ -1619,55 +1817,96 @@
             document.getElementById('prodId').readOnly = false;
             document.getElementById('prodHasExtras').checked = false;
             document.getElementById('prodDisponible').checked = true;
-            formProductoTitulo.textContent = '✏️ Nuevo producto';
             editandoProductoId = null;
             window.editandoProductoId = null;
+            setModoFormulario(modo);
             formProducto.classList.add('active');
             document.getElementById('prodNombre').focus();
         }
-        function ocultarFormProducto() {
-            formProducto.classList.remove('active');
-            editandoProductoId = null;
-            window.editandoProductoId = null;
-            document.getElementById('prodId').readOnly = false;
-        }
 
-        addProductBtn.addEventListener('click', mostrarFormProducto);
+        addProductBtn.addEventListener('click', () => mostrarFormProducto('producto'));
+        addSeparatorBtn.addEventListener('click', () => mostrarFormProducto('separador'));
         cancelProductBtn.addEventListener('click', ocultarFormProducto);
 
         saveProductBtn.addEventListener('click', async function() {
             const nombre = document.getElementById('prodNombre').value.trim();
-            const precio = parseInt(document.getElementById('prodPrecio').value.trim());
-            const desc = document.getElementById('prodDesc').value.trim();
-            const imagen = document.getElementById('prodImagen').value.trim();
-            const popupImg = document.getElementById('prodPopupImg').value.trim();
-            const categoria = document.getElementById('prodCategoria').value;
-            const tiempoPreparacion = parseInt(document.getElementById('prodTiempo').value) || 15;
-            const badge = document.getElementById('prodBadge').value.trim() || null;
             let id = document.getElementById('prodId').value.trim().toLowerCase().replace(/\s+/g, '-');
-            const hasExtras = document.getElementById('prodHasExtras').checked;
-            const disponible = document.getElementById('prodDisponible').checked;
-            if (!nombre || !precio || !id) { mostrarToast('Nombre, precio e ID son obligatorios.', 'error'); return; }
-            if (isNaN(precio) || precio <= 0) { mostrarToast('Ingresá un precio válido.', 'error'); return; }
-            if (!/^[a-z0-9\-]+$/.test(id)) { mostrarToast('El ID solo puede contener letras minúsculas, números y guiones. Sin espacios.', 'error'); return; }
-            const nuevoProducto = { id, name: nombre, price: precio, desc: desc || '', imagen: imagen || 'images/placeholder.jpg', popupImg: popupImg || imagen || 'images/placeholder.jpg', categoria, tiempoPreparacion, badge, hasExtras, available: disponible };
-            try {
-                if (window.editandoProductoId) {
-                    await db.ref('products/' + window.editandoProductoId).update(nuevoProducto);
-                    mostrarToast('Producto actualizado', 'success');
+            const esSeparador = modoFormulario === 'separador';
+
+            if (!nombre) { mostrarToast('El nombre es obligatorio.', 'error'); return; }
+
+            // Validar ID: si no se ingresa, generar uno
+            if (!id) {
+                if (esSeparador) {
+                    id = 'separador-' + Date.now();
                 } else {
+                    id = nombre.toLowerCase().replace(/\s+/g, '-');
+                }
+            }
+            if (!/^[a-z0-9\-]+$/.test(id)) {
+                mostrarToast('El ID solo puede contener letras minúsculas, números y guiones. Sin espacios.', 'error');
+                return;
+            }
+
+            // Verificar duplicado si es nuevo
+            if (!editandoProductoId) {
+                const exist = await db.ref('products/' + id).once('value');
+                if (exist.exists()) {
+                    mostrarToast('Ya existe un elemento con ese ID. Usá otro.', 'error');
+                    return;
+                }
+            }
+
+            // Construir objeto
+            let nuevoProducto = {
+                id,
+                name: nombre,
+                isSeparador: esSeparador,
+                categoria: esSeparador ? 'Separador' : document.getElementById('prodCategoria').value,
+            };
+
+            if (esSeparador) {
+                // Solo guardamos lo mínimo
+                nuevoProducto.price = null;
+                nuevoProducto.desc = '';
+                nuevoProducto.imagen = '';
+                nuevoProducto.popupImg = '';
+                nuevoProducto.tiempoPreparacion = null;
+                nuevoProducto.badge = '';
+                nuevoProducto.hasExtras = false;
+                nuevoProducto.available = true;
+            } else {
+                // Producto normal
+                const precio = parseInt(document.getElementById('prodPrecio').value.trim());
+                if (!precio || precio <= 0) { mostrarToast('Ingresá un precio válido.', 'error'); return; }
+                nuevoProducto.price = precio;
+                nuevoProducto.desc = document.getElementById('prodDesc').value.trim() || '';
+                nuevoProducto.imagen = document.getElementById('prodImagen').value.trim() || 'images/placeholder.jpg';
+                nuevoProducto.popupImg = document.getElementById('prodPopupImg').value.trim() || nuevoProducto.imagen;
+                nuevoProducto.tiempoPreparacion = parseInt(document.getElementById('prodTiempo').value) || 15;
+                nuevoProducto.badge = document.getElementById('prodBadge').value.trim() || null;
+                nuevoProducto.hasExtras = document.getElementById('prodHasExtras').checked;
+                nuevoProducto.available = document.getElementById('prodDisponible').checked;
+                nuevoProducto.categoria = document.getElementById('prodCategoria').value;
+            }
+
+            try {
+                if (editandoProductoId) {
+                    // Actualizar
+                    await db.ref('products/' + editandoProductoId).update(nuevoProducto);
+                    mostrarToast('Elemento actualizado', 'success');
+                } else {
+                    // Crear: asignar orden al final
                     const snapshot = await db.ref('products').orderByChild('orden').once('value');
                     const data = snapshot.val();
                     let maxOrden = 0;
                     if (data) {
-                        const productos = Object.keys(data).map(key => ({ ...data[key] }));
-                        productos.forEach(p => { if (p.orden !== undefined && p.orden > maxOrden) maxOrden = p.orden; });
+                        const prods = Object.keys(data).map(key => ({ ...data[key] }));
+                        prods.forEach(p => { if (p.orden !== undefined && p.orden > maxOrden) maxOrden = p.orden; });
                     }
                     nuevoProducto.orden = maxOrden + 1;
-                    const exist = await db.ref('products/' + id).once('value');
-                    if (exist.exists()) { mostrarToast('Ya existe un producto con ese ID. Usá otro.', 'error'); return; }
                     await db.ref('products/' + id).set(nuevoProducto);
-                    mostrarToast('Producto creado', 'success');
+                    mostrarToast('Elemento creado', 'success');
                 }
                 ocultarFormProducto();
             } catch (error) {
@@ -1677,7 +1916,7 @@
 
         // ---- PROMOCIONES ----
         let actualizandoPromo = false;
-        let editandoPromoId = null; // Variable global para controlar edición
+        let editandoPromoId = null;
 
         function cargarPromociones() {
             db.ref('promotions').on('value', (snapshot) => {
@@ -1736,7 +1975,6 @@
         }
 
         addPromoBtn.addEventListener('click', () => {
-            // Limpiar estado de edición
             editandoPromoId = null;
             formPromoTitulo.textContent = '✏️ Nueva promoción';
             document.getElementById('promoTitulo').value = '';
@@ -1751,7 +1989,6 @@
 
         cancelPromoBtn.addEventListener('click', ocultarFormPromo);
 
-        // Listener ÚNICO para guardar promociones
         savePromoBtn.addEventListener('click', async function() {
             const titulo = document.getElementById('promoTitulo').value.trim();
             const desc = document.getElementById('promoDesc').value.trim();
@@ -1771,11 +2008,9 @@
 
             try {
                 if (editandoPromoId) {
-                    // Actualizar promoción existente
                     await db.ref('promotions/' + editandoPromoId).update(data);
                     mostrarToast('Promoción actualizada', 'success');
                 } else {
-                    // Crear nueva promoción
                     await db.ref('promotions').push(data);
                     mostrarToast('Promoción creada', 'success');
                 }
@@ -1804,7 +2039,6 @@
                     mostrarToast('Promoción no encontrada', 'error');
                     return;
                 }
-                // Rellenar formulario
                 document.getElementById('promoTitulo').value = promo.title || '';
                 document.getElementById('promoDesc').value = promo.description || '';
                 document.getElementById('promoImagen').value = promo.image || '';
@@ -1812,7 +2046,6 @@
                 document.getElementById('promoFin').value = promo.endDate || '';
                 document.getElementById('promoActiva').checked = promo.active !== false;
 
-                // Marcar edición
                 editandoPromoId = id;
                 formPromoTitulo.textContent = '✏️ Editando: ' + promo.title;
                 formPromo.classList.add('active');
@@ -2578,8 +2811,10 @@
             // 2. Ventas por categoría
             const productCategoryMap = {};
             productosCompletos.forEach(p => {
-                productCategoryMap[p.name] = p.categoria || 'Sin categoría';
-                if (p.id) productCategoryMap[p.id] = p.categoria || 'Sin categoría';
+                if (!p.isSeparador) {
+                    productCategoryMap[p.name] = p.categoria || 'Sin categoría';
+                    if (p.id) productCategoryMap[p.id] = p.categoria || 'Sin categoría';
+                }
             });
 
             const categoryCount = {};
