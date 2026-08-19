@@ -1354,30 +1354,16 @@
             }
         }
 
-        // Cargar estado normal desde Firebase y sincronizar con excepciones
-        function cargarEstadoLocal() {
-            // Escuchar estado normal
-            db.ref('estado_local').on('value', (snapshot) => {
-                const estadoNormal = snapshot.val() || 'abierto';
-                // Guardar estado normal para referencia
-                window.estadoNormal = estadoNormal;
-                // Actualizar toggle según el estado real (considerando excepciones)
-                actualizarEstadoReal();
-            });
+        // Estado normal guardado (se actualiza desde Firebase)
+        let estadoNormalGlobal = 'abierto';
 
-            // Escuchar excepciones
-            db.ref('excepciones').on('value', () => {
-                actualizarEstadoReal();
-            });
-        }
-
-        function actualizarEstadoReal() {
-            // Buscar excepción activa para hoy
+        // Función para determinar el estado real considerando excepciones
+        function calcularEstadoReal() {
             const hoy = new Date();
             hoy.setHours(0, 0, 0, 0);
             const hoyStr = hoy.toISOString().split('T')[0];
 
-            // Buscar excepción en excepcionesActuales (que se actualiza en cargarExcepciones)
+            // Buscar excepción activa en excepcionesActuales
             let excepcionActiva = excepcionesActuales.find(ex => {
                 if (ex.fechaInicio && ex.fechaFin) {
                     const inicio = new Date(ex.fechaInicio);
@@ -1392,63 +1378,29 @@
             });
 
             if (excepcionActiva) {
-                // Si hay excepción, el estado real es el de la excepción
-                actualizarToggle(excepcionActiva.tipo);
+                return excepcionActiva.tipo;
             } else {
-                // Si no, usar el estado normal
-                const estadoNormal = window.estadoNormal || 'abierto';
-                actualizarToggle(estadoNormal);
+                return estadoNormalGlobal;
             }
         }
 
-        // Al cambiar el toggle, eliminar excepción y guardar estado normal
-        toggleEstado.addEventListener('change', function() {
-            const nuevoEstado = this.checked ? 'abierto' : 'cerrado';
-            // Si hay una excepción activa, eliminarla
-            eliminarExcepcionActiva().then(() => {
-                // Guardar el nuevo estado normal
-                db.ref('estado_local').set(nuevoEstado)
-                    .then(() => {
-                        mostrarToast(`Local ${nuevoEstado === 'abierto' ? 'abierto' : 'cerrado'}`, 'success');
-                    })
-                    .catch(err => {
-                        mostrarToast('Error al guardar estado: ' + err.message, 'error');
-                        // Revertir visualmente
-                        actualizarToggle(nuevoEstado === 'abierto' ? 'cerrado' : 'abierto');
-                    });
+        // Actualiza el toggle con el estado real calculado
+        function actualizarEstadoReal() {
+            const estado = calcularEstadoReal();
+            actualizarToggle(estado);
+        }
+
+        // Cargar estado normal desde Firebase
+        function cargarEstadoNormal() {
+            db.ref('estado_local').on('value', (snapshot) => {
+                estadoNormalGlobal = snapshot.val() || 'abierto';
+                actualizarEstadoReal();
             });
-        });
-
-        async function eliminarExcepcionActiva() {
-            const hoyStr = getHoyStr();
-            const snapshot = await db.ref('excepciones').once('value');
-            const data = snapshot.val();
-            if (!data) return;
-            const keys = Object.keys(data);
-            for (let key of keys) {
-                const ex = data[key];
-                if (ex.fechaInicio && ex.fechaFin) {
-                    const inicio = new Date(ex.fechaInicio);
-                    const fin = new Date(ex.fechaFin);
-                    const hoy = new Date();
-                    hoy.setHours(0, 0, 0, 0);
-                    inicio.setHours(0, 0, 0, 0);
-                    fin.setHours(0, 0, 0, 0);
-                    if (hoy >= inicio && hoy <= fin) {
-                        await db.ref('excepciones/' + key).remove();
-                        return;
-                    }
-                } else if (ex.fechaInicio === hoyStr) {
-                    await db.ref('excepciones/' + key).remove();
-                    return;
-                }
-            }
         }
 
-        function getHoyStr() {
-            const d = new Date();
-            return d.toISOString().split('T')[0];
-        }
+        // Escuchar cambios en excepciones (ya lo hace cargarExcepciones, pero también necesitamos actualizar el toggle)
+        // Para no duplicar listeners, usaremos el mismo listener de excepciones que ya está en cargarExcepciones
+        // y llamaremos a actualizarEstadoReal() después de actualizar excepcionesActuales.
 
         // ============================================================
         //  REFERENCIAS DOM
@@ -1513,7 +1465,7 @@
                 adminPanel.classList.add('active');
                 userEmail.textContent = user.email;
                 cargarDatos();
-                cargarEstadoLocal();
+                cargarEstadoNormal();
                 ocultarFormProducto();
                 ocultarFormPromo();
                 ocultarFormExcepcion();
@@ -1927,15 +1879,13 @@
                     excepcionesActuales = [];
                     document.getElementById('excepcionList').innerHTML = '<p style="color:#b8d0b8; padding:6px 0;">No hay excepciones.</p>';
                     actualizarBotonesEstado();
-                    // Actualizar toggle por si hay cambio
-                    if (window.estadoNormal) actualizarEstadoReal();
+                    actualizarEstadoReal(); // Actualizar toggle al cargar excepciones
                     return;
                 }
                 excepcionesActuales = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 renderExcepciones(excepcionesActuales);
                 actualizarBotonesEstado();
-                // Actualizar toggle por si hay cambio
-                if (window.estadoNormal) actualizarEstadoReal();
+                actualizarEstadoReal(); // Actualizar toggle al cambiar excepciones
             });
         }
 
@@ -2023,7 +1973,7 @@
                 mostrarToast('Estado actualizado', 'success');
                 setTimeout(() => {
                     actualizarBotonesEstado();
-                    if (window.estadoNormal) actualizarEstadoReal();
+                    actualizarEstadoReal();
                 }, 500);
             } catch (error) {
                 mostrarToast('Error: ' + error.message, 'error');
@@ -2043,7 +1993,7 @@
                 mostrarToast('Horario normal restaurado', 'success');
                 setTimeout(() => {
                     actualizarBotonesEstado();
-                    if (window.estadoNormal) actualizarEstadoReal();
+                    actualizarEstadoReal();
                 }, 500);
             } catch (error) {
                 mostrarToast('Error: ' + error.message, 'error');
@@ -2079,7 +2029,7 @@
                 await db.ref('excepciones/' + id).remove();
                 mostrarToast('Excepción eliminada', 'success');
                 actualizarBotonesEstado();
-                if (window.estadoNormal) actualizarEstadoReal();
+                actualizarEstadoReal();
             } catch (error) {
                 mostrarToast('Error: ' + error.message, 'error');
             }
