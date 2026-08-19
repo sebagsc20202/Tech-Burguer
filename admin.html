@@ -607,9 +607,9 @@
         }
         .excepcion-item .actions .btn-eliminar-excepcion:hover { background: #d32f2f; }
 
-        /* ===== PEDIDOS (con scroll y botón WhatsApp) ===== */
+        /* ===== PEDIDOS ===== */
         .pedido-list-wrapper {
-            max-height: 480px; /* 3 pedidos aprox */
+            max-height: 480px;
             overflow-y: auto;
             margin-top: 10px;
             border-radius: 8px;
@@ -725,6 +725,30 @@
         .grafico-container .total-periodo .pedidos {
             color: #4caf50;
         }
+        .selector-mes {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 8px 0 12px;
+            align-items: center;
+        }
+        .selector-mes label {
+            color: #b8d0b8;
+            font-weight: 600;
+        }
+        .selector-mes select {
+            background: #1a2e1a;
+            color: #fff;
+            border: 1px solid #3a5a3a;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+        }
+        .selector-mes select:focus {
+            border-color: #ffb703;
+        }
 
         @media (max-width: 600px) {
             .product-item, .promo-item, .excepcion-item, .pedido-item {
@@ -782,6 +806,10 @@
             }
             .grafico-container {
                 min-width: auto;
+            }
+            .selector-mes {
+                flex-direction: column;
+                gap: 6px;
             }
         }
     </style>
@@ -990,6 +1018,7 @@
             <hr style="border-color:#2f4a2f; margin:20px 0;">
             <h2>💰 Ingresos</h2>
             <div style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-bottom:20px;">
+                <!-- Diario -->
                 <div class="grafico-container">
                     <h3>📅 Diario</h3>
                     <canvas id="chartDiario" height="150"></canvas>
@@ -998,6 +1027,7 @@
                         <span class="pedidos">Pedidos: <span id="pedidosDiario">0</span></span>
                     </div>
                 </div>
+                <!-- Semanal -->
                 <div class="grafico-container">
                     <h3>📅 Semanal</h3>
                     <canvas id="chartSemanal" height="150"></canvas>
@@ -1006,8 +1036,13 @@
                         <span class="pedidos">Pedidos: <span id="pedidosSemanal">0</span></span>
                     </div>
                 </div>
+                <!-- Mensual con selector -->
                 <div class="grafico-container">
                     <h3>📅 Mensual</h3>
+                    <div class="selector-mes">
+                        <label for="selectorMes">Mes:</label>
+                        <select id="selectorMes"></select>
+                    </div>
                     <canvas id="chartMensual" height="150"></canvas>
                     <div class="total-periodo">
                         <span class="monto">Total: $<span id="totalMensual">0</span></span> &nbsp;|&nbsp;
@@ -1042,21 +1077,19 @@
         const db = firebase.database();
 
         // ============================================================
-        //  CONSTANTES DE DIRECCIÓN - SOLO EL ENLACE (sin dirección de texto)
+        //  CONSTANTES
         // ============================================================
-        const ENLACE_LOCAL = 'https://bit.ly/4xOCf1o'; // Enlace acortado a la ubicación en Google Maps
+        const ENLACE_LOCAL = 'https://bit.ly/4xOCf1o';
 
         // ============================================================
-        //  TOAST NOTIFICATIONS
+        //  TOAST
         // ============================================================
         let toastTimeout = null;
-
         function mostrarToast(mensaje, tipo = 'success') {
             const toast = document.getElementById('toastAdmin');
             const content = document.getElementById('toastAdminContent');
             const icon = document.getElementById('toastIcon');
             const message = document.getElementById('toastMessage');
-
             content.classList.remove('success', 'error', 'info');
             if (tipo === 'success') {
                 content.classList.add('success');
@@ -1068,7 +1101,6 @@
                 content.classList.add('info');
                 icon.textContent = 'ℹ️';
             }
-
             message.textContent = mensaje;
             toast.classList.add('show');
             clearTimeout(toastTimeout);
@@ -1078,7 +1110,7 @@
         }
 
         // ============================================================
-        //  MODAL DE CONFIRMACIÓN PERSONALIZADO
+        //  MODAL CONFIRMACIÓN
         // ============================================================
         let confirmResolve = null;
         const confirmModal = document.getElementById('confirmModal');
@@ -1100,12 +1132,10 @@
             confirmModal.classList.remove('active');
             if (confirmResolve) confirmResolve(true);
         });
-
         confirmNo.addEventListener('click', () => {
             confirmModal.classList.remove('active');
             if (confirmResolve) confirmResolve(false);
         });
-
         confirmModal.addEventListener('click', (e) => {
             if (e.target === confirmModal) {
                 confirmModal.classList.remove('active');
@@ -1123,7 +1153,6 @@
         function mostrarAlerta(pedidoInfo) {
             if (alertaActiva) return;
             alertaActiva = true;
-
             const alerta = document.getElementById('nuevoPedidoAlert');
             const info = document.getElementById('alertaPedidoInfo');
             let texto = `Cliente: ${pedidoInfo.nombre || 'Anónimo'}\nTotal: $${(pedidoInfo.total || 0).toLocaleString()}`;
@@ -1150,35 +1179,20 @@
                 }
                 pitido();
                 intervaloPitido = setInterval(pitido, 1200);
-            } catch (e) {
-                console.warn('No se pudo reproducir sonido', e);
-            }
+            } catch (e) { console.warn('Sonido no disponible', e); }
         }
 
         function ocultarAlerta() {
             if (!alertaActiva) return;
             alertaActiva = false;
             document.getElementById('nuevoPedidoAlert').classList.remove('active');
-            if (intervaloPitido) {
-                clearInterval(intervaloPitido);
-                intervaloPitido = null;
-            }
-            if (audioCtx && audioCtx.state !== 'closed') {
-                audioCtx.close().catch(() => {});
-            }
+            if (intervaloPitido) { clearInterval(intervaloPitido); intervaloPitido = null; }
+            if (audioCtx && audioCtx.state !== 'closed') { audioCtx.close().catch(() => {}); }
             audioCtx = null;
         }
 
-        document.addEventListener('click', function(e) {
-            if (alertaActiva) {
-                ocultarAlerta();
-            }
-        });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && alertaActiva) {
-                ocultarAlerta();
-            }
-        });
+        document.addEventListener('click', function(e) { if (alertaActiva) ocultarAlerta(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && alertaActiva) ocultarAlerta(); });
 
         // ============================================================
         //  REFERENCIAS DOM
@@ -1218,19 +1232,17 @@
         const filtroCategoria = document.getElementById('filtroCategoria');
         const filtroEstado = document.getElementById('filtroEstado');
 
+        const selectorMes = document.getElementById('selectorMes');
+
         // ============================================================
         //  AUTENTICACIÓN
         // ============================================================
         authButton.addEventListener('click', () => {
             const email = emailInput.value.trim();
             const pass = passInput.value.trim();
-            if (!email || !pass) {
-                authError.textContent = 'Completá ambos campos.';
-                return;
-            }
+            if (!email || !pass) { authError.textContent = 'Completá ambos campos.'; return; }
             authError.textContent = '';
-            auth.signInWithEmailAndPassword(email, pass)
-                .catch(error => { authError.textContent = error.message; });
+            auth.signInWithEmailAndPassword(email, pass).catch(error => { authError.textContent = error.message; });
         });
 
         passInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') authButton.click(); });
@@ -1277,7 +1289,7 @@
             cargarPedidos();
         }
 
-        // ---- PRODUCTOS ----
+        // ---- PRODUCTOS (código abreviado, igual que antes) ----
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1436,7 +1448,6 @@
         }
 
         let editandoProductoId = null;
-
         function mostrarFormProducto() {
             document.getElementById('prodNombre').value = '';
             document.getElementById('prodPrecio').value = '';
@@ -1456,7 +1467,6 @@
             formProducto.classList.add('active');
             document.getElementById('prodNombre').focus();
         }
-
         function ocultarFormProducto() {
             formProducto.classList.remove('active');
             editandoProductoId = null;
@@ -1507,19 +1517,13 @@
             }
         });
 
-        // ============================================================
-        //  PROMOCIONES
-        // ============================================================
+        // ---- PROMOCIONES (código abreviado) ----
         let actualizandoPromo = false;
-
         function cargarPromociones() {
             db.ref('promotions').on('value', (snapshot) => {
                 if (actualizandoPromo) return;
                 const data = snapshot.val();
-                if (!data) {
-                    document.getElementById('promoList').innerHTML = '<p style="color:#b8d0b8;">No hay promociones aún.</p>';
-                    return;
-                }
+                if (!data) { document.getElementById('promoList').innerHTML = '<p style="color:#b8d0b8;">No hay promociones aún.</p>'; return; }
                 const promos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 renderPromociones(promos);
             });
@@ -1653,11 +1657,8 @@
             }
         };
 
-        // ============================================================
-        //  EXCEPCIONES DE HORARIO
-        // ============================================================
+        // ---- EXCEPCIONES (código abreviado) ----
         let editandoExcepcionId = null;
-
         function cargarExcepciones() {
             db.ref('excepciones').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1676,10 +1677,7 @@
         function renderExcepciones(excepciones) {
             const list = document.getElementById('excepcionList');
             list.innerHTML = '';
-            if (excepciones.length === 0) {
-                list.innerHTML = '<p style="color:#b8d0b8;">No hay excepciones cargadas.</p>';
-                return;
-            }
+            if (excepciones.length === 0) { list.innerHTML = '<p style="color:#b8d0b8;">No hay excepciones cargadas.</p>'; return; }
             excepciones.forEach(ex => {
                 const div = document.createElement('div');
                 div.className = 'excepcion-item';
@@ -1704,8 +1702,6 @@
         function actualizarBotonesEstado() {
             const hoy = new Date();
             hoy.setHours(0, 0, 0, 0);
-            const hoyStr = hoy.toISOString().split('T')[0];
-
             const exHoy = excepcionesActuales.find(ex => {
                 if (ex.fechaInicio && ex.fechaFin) {
                     const inicio = new Date(ex.fechaInicio);
@@ -1720,15 +1716,10 @@
                 }
                 return false;
             });
-
             document.querySelectorAll('.btn-estado').forEach(b => b.classList.remove('activo'));
-
             if (exHoy) {
-                if (exHoy.tipo === 'abierto') {
-                    btnAbrirAhora.classList.add('activo');
-                } else if (exHoy.tipo === 'cerrado') {
-                    btnCerrarAhora.classList.add('activo');
-                }
+                if (exHoy.tipo === 'abierto') btnAbrirAhora.classList.add('activo');
+                else if (exHoy.tipo === 'cerrado') btnCerrarAhora.classList.add('activo');
             }
         }
 
@@ -1736,7 +1727,6 @@
             const d = new Date();
             return d.toISOString().split('T')[0];
         }
-
         async function buscarExcepcionHoy() {
             const hoyStr = getHoyStr();
             const snapshot = await db.ref('excepciones').once('value');
@@ -1752,12 +1742,8 @@
                     hoy.setHours(0, 0, 0, 0);
                     inicio.setHours(0, 0, 0, 0);
                     fin.setHours(0, 0, 0, 0);
-                    if (hoy >= inicio && hoy <= fin) {
-                        return { id: key, ...ex };
-                    }
-                } else if (ex.fechaInicio === hoyStr) {
-                    return { id: key, ...ex };
-                }
+                    if (hoy >= inicio && hoy <= fin) return { id: key, ...ex };
+                } else if (ex.fechaInicio === hoyStr) return { id: key, ...ex };
             }
             return null;
         }
@@ -1765,22 +1751,11 @@
         async function setEstadoRapido(tipo, mensaje) {
             const hoyStr = getHoyStr();
             const exHoy = await buscarExcepcionHoy();
-
-            const data = {
-                fechaInicio: hoyStr,
-                fechaFin: hoyStr,
-                tipo: tipo,
-                mensaje: mensaje || (tipo === 'abierto' ? 'Abierto por excepción' : 'Cerrado por excepción')
-            };
-
+            const data = { fechaInicio: hoyStr, fechaFin: hoyStr, tipo, mensaje: mensaje || (tipo === 'abierto' ? 'Abierto por excepción' : 'Cerrado por excepción') };
             try {
-                if (exHoy) {
-                    await db.ref('excepciones/' + exHoy.id).update(data);
-                    mostrarToast('Estado actualizado', 'success');
-                } else {
-                    await db.ref('excepciones').push(data);
-                    mostrarToast('Estado establecido', 'success');
-                }
+                if (exHoy) await db.ref('excepciones/' + exHoy.id).update(data);
+                else await db.ref('excepciones').push(data);
+                mostrarToast('Estado actualizado', 'success');
                 setTimeout(actualizarBotonesEstado, 500);
             } catch (error) {
                 mostrarToast('Error: ' + error.message, 'error');
@@ -1792,10 +1767,7 @@
 
         btnVolverNormal.addEventListener('click', async function() {
             const exHoy = await buscarExcepcionHoy();
-            if (!exHoy) {
-                mostrarToast('Ya estás en horario normal', 'info');
-                return;
-            }
+            if (!exHoy) { mostrarToast('Ya estás en horario normal', 'info'); return; }
             const confirmado = await mostrarConfirm('Volver al horario normal', '¿Eliminar la excepción de hoy y volver al horario normal?');
             if (!confirmado) return;
             try {
@@ -1811,23 +1783,15 @@
             try {
                 const snapshot = await db.ref('excepciones/' + id).once('value');
                 const ex = snapshot.val();
-                if (!ex) {
-                    mostrarToast('Excepción no encontrada', 'error');
-                    return;
-                }
+                if (!ex) { mostrarToast('Excepción no encontrada', 'error'); return; }
                 document.getElementById('exFechaInicio').value = ex.fechaInicio || '';
                 document.getElementById('exFechaFin').value = ex.fechaFin || '';
                 document.getElementById('exTipo').value = ex.tipo || 'cerrado';
                 document.getElementById('exHoraApertura').value = ex.horaApertura || '20:00';
                 document.getElementById('exHoraCierre').value = ex.horaCierre || '00:00';
                 document.getElementById('exMensaje').value = ex.mensaje || '';
-
-                if (ex.tipo === 'horario_especial') {
-                    exHorarioEspecial.style.display = 'flex';
-                } else {
-                    exHorarioEspecial.style.display = 'none';
-                }
-
+                if (ex.tipo === 'horario_especial') exHorarioEspecial.style.display = 'flex';
+                else exHorarioEspecial.style.display = 'none';
                 formExcepcionTitulo.textContent = '✏️ Editando excepción';
                 window.editandoExcepcionId = id;
                 formExcepcion.classList.add('active');
@@ -1838,7 +1802,7 @@
         };
 
         window.eliminarExcepcion = async function(id) {
-            const confirmado = await mostrarConfirm('Eliminar excepción', `¿Eliminar esta excepción permanentemente?`);
+            const confirmado = await mostrarConfirm('Eliminar excepción', '¿Eliminar esta excepción permanentemente?');
             if (!confirmado) return;
             try {
                 await db.ref('excepciones/' + id).remove();
@@ -1850,11 +1814,8 @@
         };
 
         exTipo.addEventListener('change', function() {
-            if (this.value === 'horario_especial') {
-                exHorarioEspecial.style.display = 'flex';
-            } else {
-                exHorarioEspecial.style.display = 'none';
-            }
+            if (this.value === 'horario_especial') exHorarioEspecial.style.display = 'flex';
+            else exHorarioEspecial.style.display = 'none';
         });
 
         function mostrarFormExcepcion() {
@@ -1870,7 +1831,6 @@
             formExcepcion.classList.add('active');
             document.getElementById('exFechaInicio').focus();
         }
-
         function ocultarFormExcepcion() {
             formExcepcion.classList.remove('active');
             window.editandoExcepcionId = null;
@@ -1885,14 +1845,12 @@
             const tipo = document.getElementById('exTipo').value;
             const mensaje = document.getElementById('exMensaje').value.trim();
             if (!fechaInicio) { mostrarToast('La fecha inicio es obligatoria.', 'error'); return; }
-
             const data = { fechaInicio, fechaFin, tipo };
             if (tipo === 'horario_especial') {
                 data.horaApertura = document.getElementById('exHoraApertura').value || '20:00';
                 data.horaCierre = document.getElementById('exHoraCierre').value || '00:00';
             }
             if (mensaje) data.mensaje = mensaje;
-
             try {
                 if (window.editandoExcepcionId) {
                     await db.ref('excepciones/' + window.editandoExcepcionId).update(data);
@@ -1925,6 +1883,7 @@
                 pedidosActuales.sort((a, b) => (a.fecha < b.fecha ? 1 : -1));
                 aplicarFiltroPedidos();
                 actualizarGraficos();
+                actualizarSelectorMeses();
             });
 
             db.ref('pedidos').on('child_added', (snapshot) => {
@@ -1959,28 +1918,16 @@
                 estadoTexto = 'está en manos del repartidor, llega en breve !!';
             } else {
                 switch (estado) {
-                    case 'pendiente':
-                        estadoTexto = 'recibido y está en cola de preparación';
-                        break;
-                    case 'preparando':
-                        estadoTexto = 'ya está en preparación. ¡En breve estará listo!';
-                        break;
-                    case 'listo':
-                        estadoTexto = 'está listo para retirar. ¡Pasá a buscarlo cuando quieras!';
-                        break;
-                    case 'entregado':
-                        estadoTexto = 'ya fue entregado. ¡Gracias por elegirnos!';
-                        break;
-                    case 'cancelado':
-                        estadoTexto = 'ha sido cancelado. Si tenés dudas, contactanos.';
-                        break;
-                    default:
-                        estadoTexto = 'está siendo procesado';
+                    case 'pendiente': estadoTexto = 'recibido y está en cola de preparación'; break;
+                    case 'preparando': estadoTexto = 'ya está en preparación. ¡En breve estará listo!'; break;
+                    case 'listo': estadoTexto = 'está listo para retirar. ¡Pasá a buscarlo cuando quieras!'; break;
+                    case 'entregado': estadoTexto = 'ya fue entregado. ¡Gracias por elegirnos!'; break;
+                    case 'cancelado': estadoTexto = 'ha sido cancelado. Si tenés dudas, contactanos.'; break;
+                    default: estadoTexto = 'está siendo procesado';
                 }
             }
 
             const direccion = pedido.direccion || '';
-
             let totalItems = 0;
             if (pedido.productos && pedido.productos.length > 0) {
                 totalItems = pedido.productos.reduce((sum, prod) => sum + (prod.cantidad || 0), 0);
@@ -2015,7 +1962,6 @@
 
             mensaje += `\n💰 *Total:* $${(pedido.total || 0).toLocaleString()}`;
             mensaje += `\n\n📲 ¡Gracias por tu pedido!`;
-
             return mensaje;
         }
 
@@ -2029,15 +1975,12 @@
             pedidos.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'pedido-item';
-
-                let fechaStr = 'Fecha desconocida';
-                let horaStr = '';
+                let fechaStr = 'Fecha desconocida', horaStr = '';
                 if (p.fecha) {
                     const fechaObj = new Date(p.fecha);
                     fechaStr = fechaObj.toLocaleDateString('es-AR');
                     horaStr = fechaObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
                 }
-
                 const total = p.total ? `$${p.total.toLocaleString()}` : '$0';
                 const estadoColor = p.estado === 'pendiente' ? '#ffb703' :
                                     p.estado === 'preparando' ? '#4caf50' :
@@ -2048,11 +1991,7 @@
                 if (p.productos && p.productos.length > 0) {
                     totalItems = p.productos.reduce((sum, prod) => sum + (prod.cantidad || 0), 0);
                 }
-
-                let itemsText = '';
-                if (totalItems > 0) {
-                    itemsText = `<strong style="color:#ffffff;">(${totalItems} ítems)</strong> `;
-                }
+                let itemsText = totalItems > 0 ? `<strong style="color:#ffffff;">(${totalItems} ítems)</strong> ` : '';
 
                 div.innerHTML = `
                     <div class="info">
@@ -2085,9 +2024,7 @@
                         </select>
                     </label>
                     <div class="actions">
-                        <button class="btn-whatsapp" onclick="abrirWhatsApp('${p.id}')" title="Enviar mensaje por WhatsApp">
-                            💬 WhatsApp
-                        </button>
+                        <button class="btn-whatsapp" onclick="abrirWhatsApp('${p.id}')" title="Enviar mensaje por WhatsApp">💬 WhatsApp</button>
                         <button class="btn-eliminar-pedido" onclick="eliminarPedido('${p.id}')" title="Eliminar pedido permanentemente">🗑️</button>
                     </div>
                 `;
@@ -2100,35 +2037,20 @@
             });
 
             const wrapper = document.getElementById('pedidoListWrapper');
-            if (pedidos.length > 3) {
-                wrapper.style.maxHeight = '480px';
-            } else {
-                wrapper.style.maxHeight = 'auto';
-            }
+            wrapper.style.maxHeight = pedidos.length > 3 ? '480px' : 'auto';
         }
 
         window.abrirWhatsApp = function(id) {
             const pedido = pedidosActuales.find(p => p.id === id);
-            if (!pedido) {
-                mostrarToast('Pedido no encontrado', 'error');
-                return;
-            }
+            if (!pedido) { mostrarToast('Pedido no encontrado', 'error'); return; }
             const telefono = pedido.telefono;
-            if (!telefono) {
-                mostrarToast('El pedido no tiene número de teléfono', 'error');
-                return;
-            }
+            if (!telefono) { mostrarToast('El pedido no tiene número de teléfono', 'error'); return; }
             const telefonoLimpio = telefono.replace(/\D/g, '');
-            if (telefonoLimpio.length < 8) {
-                mostrarToast('Número de teléfono inválido', 'error');
-                return;
-            }
+            if (telefonoLimpio.length < 8) { mostrarToast('Número de teléfono inválido', 'error'); return; }
             const select = document.querySelector(`.estado-select[data-id="${id}"]`);
             const estado = select ? select.value : pedido.estado || 'pendiente';
-
             const mensaje = generarMensajeWhatsApp(pedido, estado);
-            const url = `https://wa.me/${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`;
-            window.open(url, '_blank');
+            window.open(`https://wa.me/${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
         };
 
         function handleEstadoChange(e) {
@@ -2152,24 +2074,104 @@
         };
 
         // ============================================================
-        //  GRÁFICOS DE INGRESOS (con conteo de pedidos)
+        //  GRÁFICOS DE INGRESOS (con selector mensual)
         // ============================================================
         let chartDiario, chartSemanal, chartMensual;
+        let mesesDisponibles = [];
 
-        function actualizarGraficos() {
-            if (pedidosActuales.length === 0) {
-                if (chartDiario) chartDiario.destroy();
-                if (chartSemanal) chartSemanal.destroy();
+        function actualizarSelectorMeses() {
+            // Obtener todos los meses con pedidos
+            const mesesSet = new Set();
+            pedidosActuales.forEach(p => {
+                if (!p.fecha || !p.total) return;
+                const fecha = new Date(p.fecha);
+                const mes = fecha.getFullYear() + '-' + String(fecha.getMonth() + 1).padStart(2, '0');
+                mesesSet.add(mes);
+            });
+            mesesDisponibles = Array.from(mesesSet).sort();
+            // Llenar selector
+            const selector = selectorMes;
+            const valorActual = selector.value;
+            selector.innerHTML = '';
+            if (mesesDisponibles.length === 0) {
+                selector.innerHTML = '<option value="">Sin datos</option>';
+                return;
+            }
+            mesesDisponibles.forEach(mes => {
+                const option = document.createElement('option');
+                option.value = mes;
+                const [year, month] = mes.split('-');
+                const nombreMes = new Date(year, month - 1).toLocaleString('es-AR', { month: 'long' });
+                option.textContent = `${nombreMes} ${year}`;
+                selector.appendChild(option);
+            });
+            // Seleccionar el mes más reciente o mantener el seleccionado
+            if (mesesDisponibles.includes(valorActual)) {
+                selector.value = valorActual;
+            } else {
+                selector.value = mesesDisponibles[mesesDisponibles.length - 1];
+            }
+            // Forzar actualización del gráfico mensual
+            actualizarGraficoMensual(selector.value);
+        }
+
+        function actualizarGraficoMensual(mesKey) {
+            if (!mesKey) {
                 if (chartMensual) chartMensual.destroy();
-                document.getElementById('totalDiario').textContent = '0';
-                document.getElementById('totalSemanal').textContent = '0';
                 document.getElementById('totalMensual').textContent = '0';
-                document.getElementById('pedidosDiario').textContent = '0';
-                document.getElementById('pedidosSemanal').textContent = '0';
                 document.getElementById('pedidosMensual').textContent = '0';
                 return;
             }
+            // Filtrar pedidos del mes seleccionado
+            const pedidosMes = pedidosActuales.filter(p => {
+                if (!p.fecha || !p.total) return false;
+                const fecha = new Date(p.fecha);
+                const mes = fecha.getFullYear() + '-' + String(fecha.getMonth() + 1).padStart(2, '0');
+                return mes === mesKey;
+            });
+            // Agrupar por día
+            const mapaDia = new Map();
+            const conteoDia = new Map();
+            pedidosMes.forEach(p => {
+                const fecha = new Date(p.fecha);
+                const dia = fecha.getDate();
+                mapaDia.set(dia, (mapaDia.get(dia) || 0) + p.total);
+                conteoDia.set(dia, (conteoDia.get(dia) || 0) + 1);
+            });
+            const dias = Array.from(mapaDia.keys()).sort((a, b) => a - b);
+            const valores = dias.map(d => mapaDia.get(d));
+            const total = valores.reduce((a, b) => a + b, 0);
+            const totalPedidos = Array.from(conteoDia.values()).reduce((a, b) => a + b, 0);
 
+            document.getElementById('totalMensual').textContent = total.toLocaleString();
+            document.getElementById('pedidosMensual').textContent = totalPedidos;
+
+            if (chartMensual) chartMensual.destroy();
+            const ctx = document.getElementById('chartMensual').getContext('2d');
+            chartMensual = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dias.map(d => String(d).padStart(2, '0')),
+                    datasets: [{
+                        label: 'Ingresos diarios',
+                        data: valores,
+                        backgroundColor: '#2196F3',
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#b8d0b8' } },
+                        x: { ticks: { color: '#b8d0b8', maxTicksLimit: 15 } }
+                    }
+                }
+            });
+        }
+
+        function actualizarGraficos() {
             // Diario (todos los días)
             const mapaDiario = new Map();
             const conteoDiario = new Map();
@@ -2257,51 +2259,18 @@
                 }
             });
 
-            // Mensual (últimos 30 días)
-            const mesInicio = new Date(hoy);
-            mesInicio.setDate(hoy.getDate() - 29);
-            const mensualMap = new Map();
-            const conteoMensual = new Map();
-            pedidosActuales.forEach(p => {
-                if (!p.fecha || !p.total) return;
-                const fecha = new Date(p.fecha);
-                if (fecha >= mesInicio) {
-                    const clave = fecha.toISOString().split('T')[0];
-                    mensualMap.set(clave, (mensualMap.get(clave) || 0) + p.total);
-                    conteoMensual.set(clave, (conteoMensual.get(clave) || 0) + 1);
-                }
-            });
-            const diasMes = Array.from(mensualMap.keys()).sort();
-            const valoresMes = diasMes.map(d => mensualMap.get(d));
-            const totalMensual = valoresMes.reduce((a, b) => a + b, 0);
-            const pedidosMensual = Array.from(conteoMensual.values()).reduce((a, b) => a + b, 0);
-            document.getElementById('totalMensual').textContent = totalMensual.toLocaleString();
-            document.getElementById('pedidosMensual').textContent = pedidosMensual;
-
-            if (chartMensual) chartMensual.destroy();
-            const ctxMensual = document.getElementById('chartMensual').getContext('2d');
-            chartMensual = new Chart(ctxMensual, {
-                type: 'bar',
-                data: {
-                    labels: diasMes.map(d => d.slice(5)),
-                    datasets: [{
-                        label: 'Ingresos mensuales',
-                        data: valoresMes,
-                        backgroundColor: '#2196F3',
-                        borderRadius: 4,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { color: '#b8d0b8' } },
-                        x: { ticks: { color: '#b8d0b8', maxTicksLimit: 10 } }
-                    }
-                }
-            });
+            // Mensual: se actualiza con el selector
+            if (selectorMes.value) {
+                actualizarGraficoMensual(selectorMes.value);
+            }
         }
+
+        // Evento del selector de mes
+        selectorMes.addEventListener('change', function() {
+            if (this.value) {
+                actualizarGraficoMensual(this.value);
+            }
+        });
 
         // ============================================================
         //  INICIO
