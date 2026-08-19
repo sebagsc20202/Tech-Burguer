@@ -10,10 +10,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
-    <!-- Chart.js y librerías para PDF -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
         /* ===== RESET ===== */
@@ -715,23 +713,17 @@
         .grafico-container .total-periodo {
             text-align: center;
             margin-top: 10px;
-            font-size: 1.2rem;
-            color: #fff;
+            font-size: 1.1rem;
+            color: #e8f0e8;
         }
-        .grafico-container .btn-export {
-            background: #2196F3;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 40px;
-            color: #fff;
+        .grafico-container .total-periodo span {
             font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 8px;
-            width: 100%;
         }
-        .grafico-container .btn-export:hover {
-            background: #1976D2;
+        .grafico-container .total-periodo .monto {
+            color: #ffb703;
+        }
+        .grafico-container .total-periodo .pedidos {
+            color: #4caf50;
         }
 
         @media (max-width: 600px) {
@@ -994,27 +986,33 @@
             </div>
             <div id="productList"></div>
 
-            <!-- ===== 5️⃣ INGRESOS (NUEVA SECCIÓN) ===== -->
+            <!-- ===== 5️⃣ INGRESOS ===== -->
             <hr style="border-color:#2f4a2f; margin:20px 0;">
             <h2>💰 Ingresos</h2>
             <div style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-bottom:20px;">
                 <div class="grafico-container">
                     <h3>📅 Diario</h3>
                     <canvas id="chartDiario" height="150"></canvas>
-                    <div class="total-periodo">Total: <span id="totalDiario">$0</span></div>
-                    <button class="btn-export" onclick="exportarPDF('chartDiario', 'Ingresos_Diarios')">📄 Exportar PDF</button>
+                    <div class="total-periodo">
+                        <span class="monto">Total: $<span id="totalDiario">0</span></span> &nbsp;|&nbsp;
+                        <span class="pedidos">Pedidos: <span id="pedidosDiario">0</span></span>
+                    </div>
                 </div>
                 <div class="grafico-container">
                     <h3>📅 Semanal</h3>
                     <canvas id="chartSemanal" height="150"></canvas>
-                    <div class="total-periodo">Total: <span id="totalSemanal">$0</span></div>
-                    <button class="btn-export" onclick="exportarPDF('chartSemanal', 'Ingresos_Semanales')">📄 Exportar PDF</button>
+                    <div class="total-periodo">
+                        <span class="monto">Total: $<span id="totalSemanal">0</span></span> &nbsp;|&nbsp;
+                        <span class="pedidos">Pedidos: <span id="pedidosSemanal">0</span></span>
+                    </div>
                 </div>
                 <div class="grafico-container">
                     <h3>📅 Mensual</h3>
                     <canvas id="chartMensual" height="150"></canvas>
-                    <div class="total-periodo">Total: <span id="totalMensual">$0</span></div>
-                    <button class="btn-export" onclick="exportarPDF('chartMensual', 'Ingresos_Mensuales')">📄 Exportar PDF</button>
+                    <div class="total-periodo">
+                        <span class="monto">Total: $<span id="totalMensual">0</span></span> &nbsp;|&nbsp;
+                        <span class="pedidos">Pedidos: <span id="pedidosMensual">0</span></span>
+                    </div>
                 </div>
             </div>
 
@@ -1120,7 +1118,6 @@
         // ============================================================
         let alertaActiva = false;
         let audioCtx = null;
-        let oscilador = null;
         let intervaloPitido = null;
 
         function mostrarAlerta(pedidoInfo) {
@@ -1129,7 +1126,6 @@
 
             const alerta = document.getElementById('nuevoPedidoAlert');
             const info = document.getElementById('alertaPedidoInfo');
-            // Mostrar información resumida del pedido
             let texto = `Cliente: ${pedidoInfo.nombre || 'Anónimo'}\nTotal: $${(pedidoInfo.total || 0).toLocaleString()}`;
             if (pedidoInfo.productos && pedidoInfo.productos.length > 0) {
                 const items = pedidoInfo.productos.map(p => `${p.cantidad}x ${p.nombre}`).join(', ');
@@ -1138,10 +1134,8 @@
             info.textContent = texto + '  \n(Haz clic en cualquier parte para cerrar)';
             alerta.classList.add('active');
 
-            // Reproducir sonido intermitente
             try {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                // Crear un oscilador para cada pitido
                 function pitido() {
                     if (!alertaActiva) return;
                     const osc = audioCtx.createOscillator();
@@ -1154,9 +1148,7 @@
                     osc.start();
                     osc.stop(audioCtx.currentTime + 0.2);
                 }
-                // Primer pitido inmediato
                 pitido();
-                // Luego cada 1.2 segundos
                 intervaloPitido = setInterval(pitido, 1200);
             } catch (e) {
                 console.warn('No se pudo reproducir sonido', e);
@@ -1167,7 +1159,6 @@
             if (!alertaActiva) return;
             alertaActiva = false;
             document.getElementById('nuevoPedidoAlert').classList.remove('active');
-            // Detener sonido
             if (intervaloPitido) {
                 clearInterval(intervaloPitido);
                 intervaloPitido = null;
@@ -1178,14 +1169,11 @@
             audioCtx = null;
         }
 
-        // Clic en cualquier parte cierra la alerta
         document.addEventListener('click', function(e) {
             if (alertaActiva) {
                 ocultarAlerta();
             }
         });
-
-        // También al presionar Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && alertaActiva) {
                 ocultarAlerta();
@@ -1204,20 +1192,17 @@
         const userEmail = document.getElementById('userEmail');
         const logoutBtn = document.getElementById('logoutBtn');
 
-        // Productos
         const addProductBtn = document.getElementById('addProductBtn');
         const formProducto = document.getElementById('formProducto');
         const saveProductBtn = document.getElementById('saveProductBtn');
         const cancelProductBtn = document.getElementById('cancelProductBtn');
         const formProductoTitulo = document.getElementById('formProductoTitulo');
 
-        // Promociones
         const addPromoBtn = document.getElementById('addPromoBtn');
         const formPromo = document.getElementById('formPromo');
         const savePromoBtn = document.getElementById('savePromoBtn');
         const cancelPromoBtn = document.getElementById('cancelPromoBtn');
 
-        // Excepciones
         const addExcepcionBtn = document.getElementById('addExcepcionBtn');
         const formExcepcion = document.getElementById('formExcepcion');
         const saveExcepcionBtn = document.getElementById('saveExcepcionBtn');
@@ -1226,12 +1211,10 @@
         const exTipo = document.getElementById('exTipo');
         const exHorarioEspecial = document.getElementById('exHorarioEspecial');
 
-        // Botones de estado rápido
         const btnAbrirAhora = document.getElementById('btnAbrirAhora');
         const btnCerrarAhora = document.getElementById('btnCerrarAhora');
         const btnVolverNormal = document.getElementById('btnVolverNormal');
 
-        // Filtros
         const filtroCategoria = document.getElementById('filtroCategoria');
         const filtroEstado = document.getElementById('filtroEstado');
 
@@ -1273,7 +1256,6 @@
                 db.ref('promotions').off();
                 db.ref('excepciones').off();
                 db.ref('pedidos').off();
-                // Cerrar alerta si estaba abierta
                 ocultarAlerta();
             }
         });
@@ -1295,7 +1277,7 @@
             cargarPedidos();
         }
 
-        // ---- PRODUCTOS (código abreviado, pero completo) ----
+        // ---- PRODUCTOS ----
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1719,7 +1701,6 @@
             });
         }
 
-        // ===== BOTONES DE ESTADO RÁPIDO =====
         function actualizarBotonesEstado() {
             const hoy = new Date();
             hoy.setHours(0, 0, 0, 0);
@@ -1927,7 +1908,7 @@
         });
 
         // ============================================================
-        //  PEDIDOS (con total y hora en negrita + mensaje personalizado)
+        //  PEDIDOS
         // ============================================================
         let pedidosLoaded = false;
 
@@ -1937,27 +1918,24 @@
                 if (!data) {
                     pedidosActuales = [];
                     document.getElementById('pedidoList').innerHTML = '<p style="color:#b8d0b8;">No hay pedidos aún.</p>';
-                    actualizarGraficos(); // Actualizar gráficos aunque no haya pedidos
+                    actualizarGraficos();
                     return;
                 }
                 pedidosActuales = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 pedidosActuales.sort((a, b) => (a.fecha < b.fecha ? 1 : -1));
                 aplicarFiltroPedidos();
-                actualizarGraficos(); // Actualizar gráficos
+                actualizarGraficos();
             });
 
-            // Escuchar nuevos pedidos (child_added) para alerta
             db.ref('pedidos').on('child_added', (snapshot) => {
                 const nuevoPedido = snapshot.val();
                 if (nuevoPedido && auth.currentUser) {
-                    // Solo mostrar alerta si no es la carga inicial (pedidosLoaded)
                     if (pedidosLoaded) {
                         mostrarAlerta(nuevoPedido);
                     }
                 }
             });
 
-            // Marcar como cargados después de la primera carga
             setTimeout(() => { pedidosLoaded = true; }, 2000);
         }
 
@@ -1971,7 +1949,6 @@
 
         filtroEstado.addEventListener('change', aplicarFiltroPedidos);
 
-        // ===== FUNCIÓN PARA GENERAR MENSAJE DE WHATSAPP =====
         function generarMensajeWhatsApp(pedido, estado) {
             const nombreCliente = pedido.nombre || 'Cliente';
             let estadoTexto = '';
@@ -2020,7 +1997,6 @@
                     mensaje += `🔗 ${mapsLink}\n`;
                 }
             } else {
-                // RETIRO EN LOCAL: solo mostramos el enlace acortado
                 mensaje += `📍 Retiro en local\n`;
                 mensaje += `📍 ${ENLACE_LOCAL}\n`;
             }
@@ -2176,36 +2152,41 @@
         };
 
         // ============================================================
-        //  GRÁFICOS DE INGRESOS
+        //  GRÁFICOS DE INGRESOS (con conteo de pedidos)
         // ============================================================
         let chartDiario, chartSemanal, chartMensual;
 
         function actualizarGraficos() {
             if (pedidosActuales.length === 0) {
-                // Mostrar gráficos vacíos
                 if (chartDiario) chartDiario.destroy();
                 if (chartSemanal) chartSemanal.destroy();
                 if (chartMensual) chartMensual.destroy();
-                document.getElementById('totalDiario').textContent = '$0';
-                document.getElementById('totalSemanal').textContent = '$0';
-                document.getElementById('totalMensual').textContent = '$0';
+                document.getElementById('totalDiario').textContent = '0';
+                document.getElementById('totalSemanal').textContent = '0';
+                document.getElementById('totalMensual').textContent = '0';
+                document.getElementById('pedidosDiario').textContent = '0';
+                document.getElementById('pedidosSemanal').textContent = '0';
+                document.getElementById('pedidosMensual').textContent = '0';
                 return;
             }
 
-            // Agrupar por día
+            // Diario (todos los días)
             const mapaDiario = new Map();
+            const conteoDiario = new Map();
             pedidosActuales.forEach(p => {
                 if (!p.fecha || !p.total) return;
                 const fecha = new Date(p.fecha);
                 const clave = fecha.toISOString().split('T')[0];
                 mapaDiario.set(clave, (mapaDiario.get(clave) || 0) + p.total);
+                conteoDiario.set(clave, (conteoDiario.get(clave) || 0) + 1);
             });
             const diasOrdenados = Array.from(mapaDiario.keys()).sort();
             const valoresDiarios = diasOrdenados.map(d => mapaDiario.get(d));
             const totalDiario = valoresDiarios.reduce((a, b) => a + b, 0);
-            document.getElementById('totalDiario').textContent = `$${totalDiario.toLocaleString()}`;
+            const pedidosDiario = Array.from(conteoDiario.values()).reduce((a, b) => a + b, 0);
+            document.getElementById('totalDiario').textContent = totalDiario.toLocaleString();
+            document.getElementById('pedidosDiario').textContent = pedidosDiario;
 
-            // Gráfico Diario
             if (chartDiario) chartDiario.destroy();
             const ctxDiario = document.getElementById('chartDiario').getContext('2d');
             chartDiario = new Chart(ctxDiario, {
@@ -2230,23 +2211,27 @@
                 }
             });
 
-            // Semanal: sumar por semana (últimos 7 días)
+            // Semanal (últimos 7 días)
             const hoy = new Date();
             const semanaInicio = new Date(hoy);
-            semanaInicio.setDate(hoy.getDate() - 6); // últimos 7 días
+            semanaInicio.setDate(hoy.getDate() - 6);
             const semanalMap = new Map();
+            const conteoSemanal = new Map();
             pedidosActuales.forEach(p => {
                 if (!p.fecha || !p.total) return;
                 const fecha = new Date(p.fecha);
                 if (fecha >= semanaInicio) {
                     const clave = fecha.toISOString().split('T')[0];
                     semanalMap.set(clave, (semanalMap.get(clave) || 0) + p.total);
+                    conteoSemanal.set(clave, (conteoSemanal.get(clave) || 0) + 1);
                 }
             });
             const diasSemana = Array.from(semanalMap.keys()).sort();
             const valoresSemana = diasSemana.map(d => semanalMap.get(d));
             const totalSemanal = valoresSemana.reduce((a, b) => a + b, 0);
-            document.getElementById('totalSemanal').textContent = `$${totalSemanal.toLocaleString()}`;
+            const pedidosSemanal = Array.from(conteoSemanal.values()).reduce((a, b) => a + b, 0);
+            document.getElementById('totalSemanal').textContent = totalSemanal.toLocaleString();
+            document.getElementById('pedidosSemanal').textContent = pedidosSemanal;
 
             if (chartSemanal) chartSemanal.destroy();
             const ctxSemanal = document.getElementById('chartSemanal').getContext('2d');
@@ -2272,22 +2257,26 @@
                 }
             });
 
-            // Mensual: últimos 30 días
+            // Mensual (últimos 30 días)
             const mesInicio = new Date(hoy);
             mesInicio.setDate(hoy.getDate() - 29);
             const mensualMap = new Map();
+            const conteoMensual = new Map();
             pedidosActuales.forEach(p => {
                 if (!p.fecha || !p.total) return;
                 const fecha = new Date(p.fecha);
                 if (fecha >= mesInicio) {
                     const clave = fecha.toISOString().split('T')[0];
                     mensualMap.set(clave, (mensualMap.get(clave) || 0) + p.total);
+                    conteoMensual.set(clave, (conteoMensual.get(clave) || 0) + 1);
                 }
             });
             const diasMes = Array.from(mensualMap.keys()).sort();
             const valoresMes = diasMes.map(d => mensualMap.get(d));
             const totalMensual = valoresMes.reduce((a, b) => a + b, 0);
-            document.getElementById('totalMensual').textContent = `$${totalMensual.toLocaleString()}`;
+            const pedidosMensual = Array.from(conteoMensual.values()).reduce((a, b) => a + b, 0);
+            document.getElementById('totalMensual').textContent = totalMensual.toLocaleString();
+            document.getElementById('pedidosMensual').textContent = pedidosMensual;
 
             if (chartMensual) chartMensual.destroy();
             const ctxMensual = document.getElementById('chartMensual').getContext('2d');
@@ -2313,45 +2302,6 @@
                 }
             });
         }
-
-        // ============================================================
-        //  EXPORTAR A PDF
-        // ============================================================
-        async function exportarPDF(canvasId, nombreArchivo) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-
-            // Usamos html2canvas para capturar el contenedor del gráfico completo
-            const contenedor = canvas.closest('.grafico-container');
-            if (!contenedor) {
-                mostrarToast('No se pudo exportar el gráfico', 'error');
-                return;
-            }
-
-            try {
-                const captura = await html2canvas(contenedor, {
-                    scale: 2,
-                    backgroundColor: '#1f331f',
-                    allowTaint: false,
-                    useCORS: true
-                });
-                const imgData = captura.toDataURL('image/png');
-
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('portrait', 'mm', 'a4');
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (captura.height * pdfWidth) / captura.width;
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                pdf.save(`${nombreArchivo}.pdf`);
-                mostrarToast('PDF exportado correctamente', 'success');
-            } catch (error) {
-                console.error(error);
-                mostrarToast('Error al exportar PDF', 'error');
-            }
-        }
-
-        // Exponer función globalmente
-        window.exportarPDF = exportarPDF;
 
         // ============================================================
         //  INICIO
