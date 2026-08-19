@@ -256,62 +256,6 @@
             100% { transform: scale(1.02); box-shadow: 0 0 40px rgba(255,183,3,0.9); }
         }
 
-        /* ===== TOGGLE SWITCH ===== */
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: #1f331f;
-            padding: 8px 16px;
-            border-radius: 40px;
-            border: 1px solid #3a5a3a;
-        }
-        .toggle-container .estado-label {
-            font-weight: 700;
-            font-size: 1rem;
-        }
-        .toggle-container .estado-label.abierto { color: #4caf50; }
-        .toggle-container .estado-label.cerrado { color: #f44336; }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #3a5a3a;
-            transition: 0.3s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: #fff;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-        .switch input:checked + .slider {
-            background-color: #4caf50;
-        }
-        .switch input:checked + .slider:before {
-            transform: translateX(24px);
-        }
-
         /* ===== FORMULARIOS ===== */
         .form-producto {
             background: #1f331f;
@@ -902,7 +846,6 @@
             }
             .container { padding-top: 6px; }
             h1 { font-size: 1.6rem; margin-bottom: 10px; }
-            .toggle-container { flex-wrap: wrap; justify-content: center; }
         }
     </style>
 </head>
@@ -955,18 +898,6 @@
             <div class="panel-header">
                 <span class="user-info">👤 <strong id="userEmail">admin@techburgers.com</strong></span>
                 <button class="btn-logout" id="logoutBtn">🚪 Cerrar sesión</button>
-            </div>
-
-            <!-- ===== 0️⃣ ESTADO DEL LOCAL (TOGGLE) ===== -->
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
-                <h2 style="margin:0;">🏪 Estado del local</h2>
-                <div class="toggle-container">
-                    <span class="estado-label abierto" id="estadoTextoLocal">🟢 Abierto</span>
-                    <label class="switch">
-                        <input type="checkbox" id="toggleEstadoLocal">
-                        <span class="slider"></span>
-                    </label>
-                </div>
             </div>
 
             <!-- ===== 1️⃣ PEDIDOS ===== -->
@@ -1332,121 +1263,6 @@
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && alertaActiva) ocultarAlerta(); });
 
         // ============================================================
-        //  TOGGLE ESTADO LOCAL (SINCRONIZADO CON EXCEPCIONES Y ESTADO NORMAL)
-        // ============================================================
-        const toggleEstado = document.getElementById('toggleEstadoLocal');
-        const estadoTexto = document.getElementById('estadoTextoLocal');
-
-        let estadoNormalGlobal = 'abierto';
-        let excepcionesActuales = [];
-
-        // Función para actualizar el toggle con el estado real
-        function actualizarToggle(estado) {
-            if (estado === 'abierto') {
-                toggleEstado.checked = true;
-                estadoTexto.textContent = '🟢 Abierto';
-                estadoTexto.className = 'estado-label abierto';
-            } else {
-                toggleEstado.checked = false;
-                estadoTexto.textContent = '🔴 Cerrado';
-                estadoTexto.className = 'estado-label cerrado';
-            }
-        }
-
-        // Función que calcula el estado real combinando normal y excepciones
-        function calcularEstadoReal() {
-            const hoy = new Date();
-            hoy.setHours(0, 0, 0, 0);
-            const hoyStr = hoy.toISOString().split('T')[0];
-
-            // Buscar excepción activa
-            const excepcionActiva = excepcionesActuales.find(ex => {
-                if (ex.fechaInicio && ex.fechaFin) {
-                    const inicio = new Date(ex.fechaInicio);
-                    const fin = new Date(ex.fechaFin);
-                    inicio.setHours(0, 0, 0, 0);
-                    fin.setHours(0, 0, 0, 0);
-                    return hoy >= inicio && hoy <= fin;
-                } else if (ex.fechaInicio === hoyStr) {
-                    return true;
-                }
-                return false;
-            });
-
-            return excepcionActiva ? excepcionActiva.tipo : estadoNormalGlobal;
-        }
-
-        // Actualiza el toggle con el estado real
-        function actualizarEstadoReal() {
-            const estado = calcularEstadoReal();
-            actualizarToggle(estado);
-        }
-
-        // Cargar estado normal desde Firebase
-        function cargarEstadoNormal() {
-            db.ref('estado_local').on('value', (snapshot) => {
-                estadoNormalGlobal = snapshot.val() || 'abierto';
-                actualizarEstadoReal();
-            });
-        }
-
-        // Evento del toggle: al cambiar, eliminar excepción activa y guardar nuevo estado normal
-        toggleEstado.addEventListener('change', function() {
-            const nuevoEstado = this.checked ? 'abierto' : 'cerrado';
-
-            // Primero eliminar cualquier excepción activa
-            const hoyStr = getHoyStr();
-            const exHoy = excepcionesActuales.find(ex => {
-                if (ex.fechaInicio && ex.fechaFin) {
-                    const inicio = new Date(ex.fechaInicio);
-                    const fin = new Date(ex.fechaFin);
-                    const hoy = new Date();
-                    hoy.setHours(0, 0, 0, 0);
-                    inicio.setHours(0, 0, 0, 0);
-                    fin.setHours(0, 0, 0, 0);
-                    return hoy >= inicio && hoy <= fin;
-                } else if (ex.fechaInicio === hoyStr) {
-                    return true;
-                }
-                return false;
-            });
-
-            if (exHoy) {
-                db.ref('excepciones/' + exHoy.id).remove()
-                    .then(() => {
-                        // Después de eliminar, guardar estado normal
-                        db.ref('estado_local').set(nuevoEstado)
-                            .then(() => {
-                                mostrarToast(`Local ${nuevoEstado === 'abierto' ? 'abierto' : 'cerrado'}`, 'success');
-                            })
-                            .catch(err => {
-                                mostrarToast('Error al guardar estado: ' + err.message, 'error');
-                            });
-                    })
-                    .catch(err => {
-                        mostrarToast('Error al eliminar excepción: ' + err.message, 'error');
-                    });
-            } else {
-                // Si no hay excepción, guardar directamente
-                db.ref('estado_local').set(nuevoEstado)
-                    .then(() => {
-                        mostrarToast(`Local ${nuevoEstado === 'abierto' ? 'abierto' : 'cerrado'}`, 'success');
-                    })
-                    .catch(err => {
-                        mostrarToast('Error al guardar estado: ' + err.message, 'error');
-                        // Revertir visualmente
-                        actualizarEstadoReal();
-                    });
-            }
-        });
-
-        // Función auxiliar para obtener string de hoy
-        function getHoyStr() {
-            const d = new Date();
-            return d.toISOString().split('T')[0];
-        }
-
-        // ============================================================
         //  REFERENCIAS DOM
         // ============================================================
         const authSection = document.getElementById('authSection');
@@ -1509,7 +1325,6 @@
                 adminPanel.classList.add('active');
                 userEmail.textContent = user.email;
                 cargarDatos();
-                cargarEstadoNormal();
                 ocultarFormProducto();
                 ocultarFormPromo();
                 ocultarFormExcepcion();
@@ -1524,7 +1339,6 @@
                 db.ref('promotions').off();
                 db.ref('excepciones').off();
                 db.ref('pedidos').off();
-                db.ref('estado_local').off();
                 ocultarAlerta();
             }
         });
@@ -1536,6 +1350,8 @@
         // ============================================================
         let productosCompletos = [];
         let categoriasUnicas = [];
+        let excepcionesActuales = [];
+        let pedidosActuales = [];
 
         function cargarDatos() {
             cargarProductos();
@@ -1921,13 +1737,11 @@
                     excepcionesActuales = [];
                     document.getElementById('excepcionList').innerHTML = '<p style="color:#b8d0b8; padding:6px 0;">No hay excepciones.</p>';
                     actualizarBotonesEstado();
-                    actualizarEstadoReal();
                     return;
                 }
                 excepcionesActuales = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 renderExcepciones(excepcionesActuales);
                 actualizarBotonesEstado();
-                actualizarEstadoReal();
             });
         }
 
@@ -1980,6 +1794,10 @@
             }
         }
 
+        function getHoyStr() {
+            const d = new Date();
+            return d.toISOString().split('T')[0];
+        }
         async function buscarExcepcionHoy() {
             const hoyStr = getHoyStr();
             const snapshot = await db.ref('excepciones').once('value');
@@ -2009,10 +1827,7 @@
                 if (exHoy) await db.ref('excepciones/' + exHoy.id).update(data);
                 else await db.ref('excepciones').push(data);
                 mostrarToast('Estado actualizado', 'success');
-                setTimeout(() => {
-                    actualizarBotonesEstado();
-                    actualizarEstadoReal();
-                }, 500);
+                setTimeout(actualizarBotonesEstado, 500);
             } catch (error) {
                 mostrarToast('Error: ' + error.message, 'error');
             }
@@ -2029,10 +1844,7 @@
             try {
                 await db.ref('excepciones/' + exHoy.id).remove();
                 mostrarToast('Horario normal restaurado', 'success');
-                setTimeout(() => {
-                    actualizarBotonesEstado();
-                    actualizarEstadoReal();
-                }, 500);
+                setTimeout(actualizarBotonesEstado, 500);
             } catch (error) {
                 mostrarToast('Error: ' + error.message, 'error');
             }
@@ -2067,7 +1879,6 @@
                 await db.ref('excepciones/' + id).remove();
                 mostrarToast('Excepción eliminada', 'success');
                 actualizarBotonesEstado();
-                actualizarEstadoReal();
             } catch (error) {
                 mostrarToast('Error: ' + error.message, 'error');
             }
@@ -2129,7 +1940,6 @@
         //  PEDIDOS
         // ============================================================
         let pedidosLoaded = false;
-        let pedidosActuales = [];
 
         function cargarPedidos() {
             db.ref('pedidos').on('value', (snapshot) => {
