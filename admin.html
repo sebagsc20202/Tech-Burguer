@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* ===== RESET & BASE ===== */
+        /* ===== RESET ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
@@ -278,7 +278,7 @@
             background: #444;
         }
 
-        /* ===== MODALES DE DETALLE (popup) ===== */
+        /* ===== MODALES DE DETALLE ===== */
         .detalle-modal {
             display: none;
             position: fixed;
@@ -363,7 +363,7 @@
             background: #e6a500;
         }
 
-        /* ===== ALERTA DE NUEVO PEDIDO ===== */
+        /* ===== ALERTA NUEVO PEDIDO ===== */
         #nuevoPedidoAlert {
             display: none;
             position: fixed;
@@ -516,6 +516,27 @@
         }
         .btn-add:hover { background: #388e3c; }
         .form-divider { border: none; border-top: 1px solid #2f4a2f; margin: 6px 0 8px; }
+
+        /* ===== BOTÓN PROMO!! ===== */
+        .btn-promo {
+            background: #ffb703;
+            color: #1a1a1a;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .btn-promo:hover {
+            background: #e6a500;
+        }
+        .btn-promo:active {
+            transform: scale(0.95);
+        }
 
         /* ===== FILTRO ===== */
         .filtro-container {
@@ -687,7 +708,6 @@
             transition: background 0.2s;
         }
         .product-item .actions .btn-guardar:hover { background: #e6a500; }
-
         .product-item .actions .btn-duplicar {
             background: #9c27b0;
             color: #fff;
@@ -702,7 +722,6 @@
         .product-item .actions .btn-duplicar:hover {
             background: #7b1fa2;
         }
-
         .product-item .badge-preview {
             background: #e63946;
             color: #fff;
@@ -711,7 +730,6 @@
             font-size: 0.65rem;
             font-weight: 600;
         }
-        /* Badge de descuento */
         .product-item .discount-badge {
             background: #f44336;
             color: #fff;
@@ -727,8 +745,6 @@
             0% { transform: scale(1); }
             100% { transform: scale(1.05); }
         }
-
-        /* Precio con descuento en lista */
         .product-item .price-with-discount {
             display: flex;
             align-items: center;
@@ -1121,7 +1137,7 @@
             </div>
         </div>
 
-        <!-- ===== MODALES DE DETALLE (popups) ===== -->
+        <!-- ===== MODALES DE DETALLE ===== -->
         <div id="detalleProductoModal" class="detalle-modal">
             <div class="detalle-modal-content">
                 <h3 id="detalleProductoTitulo">Detalle del producto</h3>
@@ -1138,7 +1154,7 @@
             </div>
         </div>
 
-        <!-- ===== ALERTA DE NUEVO PEDIDO ===== -->
+        <!-- ===== ALERTA NUEVO PEDIDO ===== -->
         <div id="nuevoPedidoAlert">
             <div class="alerta-contenido">
                 <div class="icono">📦</div>
@@ -1275,7 +1291,7 @@
 
             <hr>
 
-            <!-- ===== 4️⃣ PRODUCTOS ===== -->
+            <!-- ===== 4️⃣ PRODUCTOS (con botón PROMO!!) ===== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
                 <h2>📋 Productos</h2>
                 <button class="btn-add" id="addProductBtn">➕ Nuevo</button>
@@ -1307,8 +1323,14 @@
                     </div>
                     <div class="form-group"><label for="prodTiempo">Tiempo (min)</label><input type="number" id="prodTiempo" value="15" min="1" /><span class="hint-text">Tiempo estimado</span></div>
                 </div>
+                <!-- ===== CAMPO BADGE CON BOTÓN PROMO!! ===== -->
                 <div class="form-row">
-                    <div class="form-group"><label for="prodBadge">Badge</label><input type="text" id="prodBadge" placeholder="Ej: NUEVO, BASE, PROMO" /><span class="hint-text">Etiqueta destacada</span></div>
+                    <div class="form-group" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                        <label for="prodBadge" style="flex:1; min-width:60px;">Badge</label>
+                        <input type="text" id="prodBadge" placeholder="Ej: NUEVO, BASE, PROMO" style="flex:2; min-width:120px;" />
+                        <button type="button" class="btn-promo" onclick="document.getElementById('prodBadge').value='PROMO!!';">🎯 PROMO!!</button>
+                        <span class="hint-text" style="width:100%;">Etiqueta destacada (PROMO!! se muestra en amarillo en la web)</span>
+                    </div>
                     <div class="form-group"><label for="prodId">ID <span class="required">*</span></label><input type="text" id="prodId" placeholder="Ej: doble-cheddar" /><span class="hint-text">🔑 Único, sin espacios. <strong>No editable.</strong></span></div>
                 </div>
                 <hr class="form-divider" />
@@ -1556,7 +1578,6 @@
             document.getElementById('detallePedidoModal').classList.remove('active');
         }
 
-        // Cerrar modales al hacer clic en el fondo
         document.querySelectorAll('.detalle-modal').forEach(modal => {
             modal.addEventListener('click', function(e) {
                 if (e.target === this) {
@@ -1699,7 +1720,6 @@
             if (desc > 0 && desc <= 100) {
                 final = original * (1 - desc / 100);
             }
-            // Redondear a 2 decimales y mostrar
             prodPrecioFinal.value = '$' + Math.round(final).toLocaleString();
             return Math.round(final);
         }
@@ -1819,7 +1839,6 @@
                 const badgeHtml = p.badge ? `<span class="badge-preview">${p.badge}</span>` : '';
                 const metaHtml = `<div class="meta">${p.categoria ? `<span>📂 ${p.categoria}</span>` : ''}${p.tiempoPreparacion ? `<span>⏱️ ${p.tiempoPreparacion} min</span>` : ''}</div>`;
 
-                // Precio con descuento
                 let precioHtml = `<div class="price-with-discount">`;
                 if (p.discount && p.discount > 0 && p.originalPrice) {
                     precioHtml += `<span class="original-price">$${p.originalPrice.toLocaleString()}</span>`;
@@ -1851,13 +1870,11 @@
                     </div>
                 `;
 
-                // Evento de clic para abrir detalle (excepto en botones)
                 div.addEventListener('click', function(e) {
                     if (e.target.closest('button') || e.target.closest('input') || e.target.closest('label')) return;
                     mostrarDetalleProducto(p);
                 });
 
-                // Drag & Drop
                 div.addEventListener('dragstart', handleDragStart);
                 div.addEventListener('dragend', handleDragEnd);
                 div.addEventListener('dragover', handleDragOver);
@@ -2096,7 +2113,7 @@
                 mostrarToast('Nombre y precio original son obligatorios y deben ser números válidos.', 'error');
                 return;
             }
-            const price = calcularPrecioFinal(); // ya redondeado
+            const price = calcularPrecioFinal();
             const desc = document.getElementById('prodDesc').value.trim();
             const imagen = document.getElementById('prodImagen').value.trim();
             const popupImg = document.getElementById('prodPopupImg').value.trim();
@@ -2329,7 +2346,6 @@
             });
         }
 
-        // ===== FUNCIÓN ACTUALIZAR BOTONES DE ESTADO Y BADGE =====
         function actualizarBotonesEstado() {
             const hoy = new Date();
             hoy.setHours(0, 0, 0, 0);
@@ -2800,7 +2816,6 @@
                     </div>
                 `;
 
-                // Evento de clic para abrir detalle
                 div.addEventListener('click', function(e) {
                     if (e.target.closest('button') || e.target.closest('select') || e.target.closest('label')) return;
                     mostrarDetallePedido(p);
@@ -3089,7 +3104,6 @@
                 });
             }
 
-            // Mensual (con selector)
             if (selectorMes.value) {
                 actualizarGraficoMensual(selectorMes.value);
             }
@@ -3110,7 +3124,6 @@
         function actualizarEstadisticasAvanzadas() {
             const pedidosValidos = pedidosActuales.filter(p => p.estado !== 'cancelado' && p.productos && p.total);
 
-            // Top 5 productos
             const productCount = {};
             pedidosValidos.forEach(p => {
                 p.productos.forEach(prod => {
@@ -3151,7 +3164,6 @@
                 ctxTop.canvas.parentNode.innerHTML = '<p style="text-align:center; color:#6a8a6a; padding:12px;">Sin datos de ventas</p>';
             }
 
-            // Ventas por categoría
             const productCategoryMap = {};
             productosCompletos.forEach(p => {
                 productCategoryMap[p.name] = p.categoria || 'Sin categoría';
@@ -3211,7 +3223,6 @@
                 ctxCat.canvas.parentNode.innerHTML = '<p style="text-align:center; color:#6a8a6a; padding:12px;">Sin datos de categorías</p>';
             }
 
-            // Clientes frecuentes
             const clientesMap = {};
             pedidosValidos.forEach(p => {
                 const key = p.telefono || p.nombre || 'Anónimo';
@@ -3233,7 +3244,6 @@
                 listContainer.innerHTML = '<p style="text-align:center; color:#6a8a6a; padding:6px 0;">Sin clientes registrados</p>';
             }
 
-            // Promedio ticket
             const pedidosConTotal = pedidosValidos.filter(p => p.total > 0);
             const totalGeneral = pedidosConTotal.reduce((sum, p) => sum + p.total, 0);
             const countGeneral = pedidosConTotal.length;
