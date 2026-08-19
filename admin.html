@@ -2281,10 +2281,18 @@
         }
 
         function actualizarGraficos() {
-            // Diario
+            // ----- GRÁFICO DIARIO (SOLO HOY) -----
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            // Filtrar pedidos de hoy (incluyendo cancelados para el contador, pero no para el monto)
+            const pedidosHoy = pedidosActuales.filter(p => esFechaHoy(p.fecha));
+
+            // Agrupar por día (solo será hoy)
             const mapaDiario = new Map();
             const conteoDiario = new Map();
-            pedidosActuales.forEach(p => {
+
+            pedidosHoy.forEach(p => {
                 if (!p.fecha || !p.total) return;
                 const fecha = new Date(p.fecha);
                 const clave = fecha.toISOString().split('T')[0];
@@ -2293,43 +2301,71 @@
                 }
                 conteoDiario.set(clave, (conteoDiario.get(clave) || 0) + 1);
             });
+
             const diasOrdenados = Array.from(mapaDiario.keys()).sort();
             const valoresDiarios = diasOrdenados.map(d => mapaDiario.get(d));
             const totalDiario = valoresDiarios.reduce((a, b) => a + b, 0);
             const pedidosDiario = Array.from(conteoDiario.values()).reduce((a, b) => a + b, 0);
+
             document.getElementById('totalDiario').textContent = totalDiario.toLocaleString();
             document.getElementById('pedidosDiario').textContent = pedidosDiario;
 
             if (chartDiario) chartDiario.destroy();
             const ctxDiario = document.getElementById('chartDiario').getContext('2d');
-            chartDiario = new Chart(ctxDiario, {
-                type: 'bar',
-                data: {
-                    labels: diasOrdenados.map(d => d.slice(5)),
-                    datasets: [{
-                        label: 'Ingresos diarios',
-                        data: valoresDiarios,
-                        backgroundColor: '#ffb703',
-                        borderRadius: 4,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { color: '#b8d0b8' } },
-                        x: { ticks: { color: '#b8d0b8', maxTicksLimit: 10 } }
+            if (diasOrdenados.length === 0) {
+                // Si no hay pedidos hoy, mostramos un gráfico vacío con un mensaje o una barra en cero.
+                // Para evitar error, creamos un dataset vacío.
+                chartDiario = new Chart(ctxDiario, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Hoy'],
+                        datasets: [{
+                            label: 'Ingresos',
+                            data: [0],
+                            backgroundColor: '#ffb703',
+                            borderRadius: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { color: '#b8d0b8' } },
+                            x: { ticks: { color: '#b8d0b8' } }
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                chartDiario = new Chart(ctxDiario, {
+                    type: 'bar',
+                    data: {
+                        labels: diasOrdenados.map(d => d.slice(5)),
+                        datasets: [{
+                            label: 'Ingresos diarios',
+                            data: valoresDiarios,
+                            backgroundColor: '#ffb703',
+                            borderRadius: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { color: '#b8d0b8' } },
+                            x: { ticks: { color: '#b8d0b8', maxTicksLimit: 10 } }
+                        }
+                    }
+                });
+            }
 
-            // Semanal
-            const hoy = new Date();
+            // ----- GRÁFICO SEMANAL (ÚLTIMOS 7 DÍAS) -----
             const semanaInicio = new Date(hoy);
             semanaInicio.setDate(hoy.getDate() - 6);
             const semanalMap = new Map();
             const conteoSemanal = new Map();
+
             pedidosActuales.forEach(p => {
                 if (!p.fecha || !p.total) return;
                 const fecha = new Date(p.fecha);
@@ -2341,38 +2377,64 @@
                     conteoSemanal.set(clave, (conteoSemanal.get(clave) || 0) + 1);
                 }
             });
+
             const diasSemana = Array.from(semanalMap.keys()).sort();
             const valoresSemana = diasSemana.map(d => semanalMap.get(d));
             const totalSemanal = valoresSemana.reduce((a, b) => a + b, 0);
             const pedidosSemanal = Array.from(conteoSemanal.values()).reduce((a, b) => a + b, 0);
+
             document.getElementById('totalSemanal').textContent = totalSemanal.toLocaleString();
             document.getElementById('pedidosSemanal').textContent = pedidosSemanal;
 
             if (chartSemanal) chartSemanal.destroy();
             const ctxSemanal = document.getElementById('chartSemanal').getContext('2d');
-            chartSemanal = new Chart(ctxSemanal, {
-                type: 'bar',
-                data: {
-                    labels: diasSemana.map(d => d.slice(5)),
-                    datasets: [{
-                        label: 'Ingresos semanales',
-                        data: valoresSemana,
-                        backgroundColor: '#4caf50',
-                        borderRadius: 4,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { color: '#b8d0b8' } },
-                        x: { ticks: { color: '#b8d0b8', maxTicksLimit: 10 } }
+            if (diasSemana.length === 0) {
+                chartSemanal = new Chart(ctxSemanal, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Sin datos'],
+                        datasets: [{
+                            label: 'Ingresos semanales',
+                            data: [0],
+                            backgroundColor: '#4caf50',
+                            borderRadius: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { color: '#b8d0b8' } },
+                            x: { ticks: { color: '#b8d0b8' } }
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                chartSemanal = new Chart(ctxSemanal, {
+                    type: 'bar',
+                    data: {
+                        labels: diasSemana.map(d => d.slice(5)),
+                        datasets: [{
+                            label: 'Ingresos semanales',
+                            data: valoresSemana,
+                            backgroundColor: '#4caf50',
+                            borderRadius: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { color: '#b8d0b8' } },
+                            x: { ticks: { color: '#b8d0b8', maxTicksLimit: 10 } }
+                        }
+                    }
+                });
+            }
 
-            // Mensual
+            // ----- GRÁFICO MENSUAL (con selector) -----
             if (selectorMes.value) {
                 actualizarGraficoMensual(selectorMes.value);
             }
