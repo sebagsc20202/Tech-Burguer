@@ -635,7 +635,7 @@
             display: flex;
         }
 
-        /* ===== FORM SECTION (se oculta/muestra según estado del local) ===== */
+        /* ===== FORM SECTION ===== */
         .form-section {
             background: #1f331f;
             border-radius: 18px;
@@ -649,9 +649,9 @@
         }
 
         .form-section.cerrado {
-            opacity: 0.4;
+            opacity: 0.6;
             pointer-events: none;
-            max-height: 100px;
+            max-height: 280px;
             padding: 20px 18px 10px;
             margin-top: 10px;
         }
@@ -667,21 +667,38 @@
             display: none;
             text-align: center;
             padding: 20px 10px;
-            color: #ff6b6b;
-            font-size: 1.3rem;
-            font-weight: 700;
+            color: #ffb703;
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.6;
         }
 
         .form-section.cerrado .mensaje-cerrado {
             display: block;
         }
 
-        .form-section.cerrado .mensaje-cerrado span {
+        .form-section.cerrado .mensaje-cerrado .emoji {
+            font-size: 2.8rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .form-section.cerrado .mensaje-cerrado .sub {
             display: block;
             font-size: 0.9rem;
             color: #b8d0b8;
             font-weight: 400;
             margin-top: 6px;
+        }
+
+        .form-section.cerrado .mensaje-cerrado .horario-info {
+            display: block;
+            font-size: 0.85rem;
+            color: #8aaa8a;
+            font-weight: 300;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #2f4a2f;
         }
 
         .form-section h2 {
@@ -1124,12 +1141,21 @@
                 right: 8px;
             }
             .form-section.cerrado {
-                max-height: 80px;
+                max-height: 260px;
                 padding: 12px 18px 6px;
             }
             .form-section.cerrado .mensaje-cerrado {
                 font-size: 1rem;
                 padding: 10px 0;
+            }
+            .form-section.cerrado .mensaje-cerrado .emoji {
+                font-size: 2.2rem;
+            }
+            .form-section.cerrado .mensaje-cerrado .sub {
+                font-size: 0.8rem;
+            }
+            .form-section.cerrado .mensaje-cerrado .horario-info {
+                font-size: 0.75rem;
             }
         }
 
@@ -1378,8 +1404,11 @@
 
             <!-- Mensaje cuando el local está cerrado -->
             <div class="mensaje-cerrado">
-                🔒 El local está cerrado
-                <span>Vuelve más tarde para realizar tu pedido.</span>
+                <span class="emoji">⏰</span>
+                <span>¡Ups! La cocina está descansando</span>
+                <span class="sub">Los pedidos online están disponibles en horario comercial</span>
+                <span class="horario-info">🕒 Mar–Dom · 20:00 a 00:00</span>
+                <span class="horario-info" style="font-size:0.75rem; color:#6a8a6a; border-top:none; padding-top:4px;">¡Volvé más tarde para disfrutar la mejor Tech!</span>
             </div>
 
             <div class="form-group">
@@ -1544,7 +1573,7 @@
         // ============================================================
         let productos = [];
         window.excepciones = [];
-        let localAbierto = true; // Estado actual del local
+        let localAbierto = true;
         const TOPPINGS = [
             'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
             'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
@@ -1669,18 +1698,15 @@
                 text.textContent = '🔴 CERRADO' + mensajeFinal;
             }
 
-            // Actualizar formulario según estado
             actualizarFormularioSegunEstado(estado);
         }
 
         // ============================================================
-        //  ESCUCHAR ESTADO DEL LOCAL DESDE FIREBASE (para sincronizar con admin)
+        //  ESCUCHAR ESTADO DEL LOCAL DESDE FIREBASE
         // ============================================================
         function escucharEstadoLocal() {
             db.ref('estado_local').on('value', (snapshot) => {
                 const estado = snapshot.val() || 'abierto';
-                // Si Firebase dice que está cerrado, forzamos el estado a cerrado
-                // Esto sobrescribe el cálculo automático cuando el admin cambia el toggle
                 if (estado === 'cerrado') {
                     const card = document.getElementById('statusCard');
                     const text = document.getElementById('statusText');
@@ -1689,14 +1715,13 @@
                     text.textContent = '🔴 CERRADO · El local está cerrado';
                     actualizarFormularioSegunEstado('cerrado');
                 } else {
-                    // Si está abierto, volvemos a calcular con el horario normal
                     actualizarEstado();
                 }
             });
         }
 
         // ============================================================
-        //  CARGAR EXCEPCIONES (EN TIEMPO REAL)
+        //  CARGAR EXCEPCIONES
         // ============================================================
         function cargarExcepciones() {
             db.ref('excepciones').on('value', (snapshot) => {
@@ -1714,7 +1739,7 @@
         }
 
         // ============================================================
-        //  CARGAR PRODUCTOS (DESDE FIREBASE)
+        //  CARGAR PRODUCTOS
         // ============================================================
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
@@ -2183,7 +2208,7 @@
 
         document.getElementById('sendBtn').addEventListener('click', function() {
             if (!localAbierto) {
-                alert('🔒 El local está cerrado. No se pueden realizar pedidos.');
+                alert('⏰ El local está cerrado. Los pedidos online están disponibles en horario comercial.');
                 return;
             }
             const nombre = document.getElementById('nombre').value.trim();
@@ -2273,7 +2298,6 @@
             const nombre = document.getElementById('nombre').value.trim();
             const telefono = document.getElementById('telefono').value.trim();
 
-            // Construir mensaje de WhatsApp
             let mensaje = '🍔 *NUEVO PEDIDO - TECH CLASSIC BURGERS* 🍔\n\n';
             mensaje += `👤 *Nombre:* ${nombre}\n`;
             mensaje += `📱 *Teléfono:* ${telefono}\n`;
@@ -2357,7 +2381,6 @@
             mensaje += `\n\n💰 *TOTAL:* $${totalPedido.toLocaleString()}`;
             mensaje += '\n\n📲 ¡Gracias por tu pedido!';
 
-            // ===== GUARDAR EN FIREBASE =====
             const datosPedido = {
                 nombre: nombre,
                 telefono: telefono,
@@ -2370,7 +2393,6 @@
             };
             guardarPedidoEnFirebase(datosPedido);
 
-            // Abrir WhatsApp
             window.open(`https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(mensaje)}`, '_blank');
             limpiarPedido();
         }
@@ -2510,7 +2532,7 @@
         cargarProductos();
         cargarPromociones();
         cargarExcepciones();
-        escucharEstadoLocal(); // Escuchar cambios desde el admin
+        escucharEstadoLocal();
         setTimeout(actualizarVisibilidadCancelar, 100);
         generarTrack();
     </script>
