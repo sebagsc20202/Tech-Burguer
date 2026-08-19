@@ -763,6 +763,15 @@
         .selector-mes select:focus {
             border-color: #ffb703;
         }
+        .cliente-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #2a4a2a;
+            color: #b8d0b8;
+        }
+        .cliente-item .cliente-nombre { font-weight: 600; color: #e8f0e8; }
+        .cliente-item .cliente-pedidos { color: #ffb703; }
 
         @media (max-width: 600px) {
             .product-item, .promo-item, .excepcion-item, .pedido-item {
@@ -1069,6 +1078,42 @@
                 </div>
             </div>
 
+            <!-- ===== 6️⃣ ESTADÍSTICAS AVANZADAS ===== -->
+            <hr style="border-color:#2f4a2f; margin:20px 0;">
+            <h2>📊 Estadísticas Avanzadas</h2>
+            <div style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-bottom:20px;">
+                <!-- Top Productos -->
+                <div class="grafico-container" style="flex:1; min-width:280px;">
+                    <h3>🏆 Top 5 Productos más vendidos</h3>
+                    <canvas id="chartTopProductos" height="150"></canvas>
+                </div>
+                <!-- Ventas por categoría -->
+                <div class="grafico-container" style="flex:1; min-width:280px;">
+                    <h3>📂 Ventas por categoría</h3>
+                    <canvas id="chartCategorias" height="150"></canvas>
+                </div>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-bottom:20px;">
+                <!-- Clientes frecuentes -->
+                <div class="grafico-container" style="flex:1; min-width:280px; max-width:400px;">
+                    <h3>👥 Clientes frecuentes</h3>
+                    <div id="clientesFrecuentesList" style="text-align:left; padding:10px; color:#b8d0b8;">
+                        <p style="text-align:center; color:#6a8a6a;">Cargando datos...</p>
+                    </div>
+                </div>
+                <!-- Promedio Ticket -->
+                <div class="grafico-container" style="flex:1; min-width:280px; max-width:400px;">
+                    <h3>🧾 Promedio de ticket</h3>
+                    <div style="text-align:center; padding:20px;">
+                        <div style="font-size:2.5rem; color:#ffb703;" id="promedioTicketGeneral">$0</div>
+                        <div style="font-size:0.9rem; color:#b8d0b8;">Promedio general</div>
+                        <hr style="border-color:#2f4a2f; margin:15px 0;">
+                        <div style="font-size:1.8rem; color:#4caf50;" id="promedioTicketHoy">$0</div>
+                        <div style="font-size:0.9rem; color:#b8d0b8;">Promedio de hoy</div>
+                    </div>
+                </div>
+            </div>
+
             <hr style="border-color:#2f4a2f; margin:20px 0;">
             <div style="font-size:0.8rem; color:#6a8a6a; text-align:center;">
                 Los cambios se guardan automáticamente en Firebase.
@@ -1308,7 +1353,7 @@
             cargarPedidos();
         }
 
-        // ---- PRODUCTOS (código abreviado) ----
+        // ---- PRODUCTOS ----
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1536,7 +1581,7 @@
             }
         });
 
-        // ---- PROMOCIONES (código abreviado) ----
+        // ---- PROMOCIONES ----
         let actualizandoPromo = false;
         function cargarPromociones() {
             db.ref('promotions').on('value', (snapshot) => {
@@ -1676,7 +1721,7 @@
             }
         };
 
-        // ---- EXCEPCIONES (código abreviado) ----
+        // ---- EXCEPCIONES ----
         let editandoExcepcionId = null;
         function cargarExcepciones() {
             db.ref('excepciones').on('value', (snapshot) => {
@@ -1896,6 +1941,7 @@
                     pedidosActuales = [];
                     document.getElementById('pedidoList').innerHTML = '<p style="color:#b8d0b8;">No hay pedidos aún.</p>';
                     actualizarGraficos();
+                    actualizarEstadisticasAvanzadas();
                     return;
                 }
                 pedidosActuales = Object.keys(data).map(key => ({ id: key, ...data[key] }));
@@ -1903,6 +1949,7 @@
                 aplicarFiltroPedidos();
                 actualizarGraficos();
                 actualizarSelectorMeses();
+                actualizarEstadisticasAvanzadas();
             });
 
             db.ref('pedidos').on('child_added', (snapshot) => {
@@ -2112,7 +2159,7 @@
         };
 
         // ============================================================
-        //  GRÁFICOS DE INGRESOS (excluyendo cancelados del monto)
+        //  GRÁFICOS DE INGRESOS
         // ============================================================
         let chartDiario, chartSemanal, chartMensual;
         let mesesDisponibles = [];
@@ -2310,6 +2357,155 @@
                 actualizarGraficoMensual(this.value);
             }
         });
+
+        // ============================================================
+        //  ESTADÍSTICAS AVANZADAS (NUEVO)
+        // ============================================================
+        let chartTopProductos = null;
+        let chartCategorias = null;
+
+        function actualizarEstadisticasAvanzadas() {
+            const pedidosValidos = pedidosActuales.filter(p => p.estado !== 'cancelado' && p.productos && p.total);
+
+            // 1. Top 5 productos más vendidos
+            const productCount = {};
+            pedidosValidos.forEach(p => {
+                p.productos.forEach(prod => {
+                    const nombre = prod.nombre || 'Producto sin nombre';
+                    productCount[nombre] = (productCount[nombre] || 0) + (prod.cantidad || 0);
+                });
+            });
+            const sortedProducts = Object.entries(productCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const topLabels = sortedProducts.map(item => item[0]);
+            const topData = sortedProducts.map(item => item[1]);
+
+            if (chartTopProductos) chartTopProductos.destroy();
+            const ctxTop = document.getElementById('chartTopProductos').getContext('2d');
+            if (topLabels.length > 0) {
+                chartTopProductos = new Chart(ctxTop, {
+                    type: 'bar',
+                    data: {
+                        labels: topLabels,
+                        datasets: [{
+                            label: 'Unidades vendidas',
+                            data: topData,
+                            backgroundColor: ['#ffb703', '#4caf50', '#2196F3', '#f44336', '#9c27b0'],
+                            borderRadius: 4,
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { beginAtZero: true, ticks: { color: '#b8d0b8' } },
+                            y: { ticks: { color: '#b8d0b8' } }
+                        }
+                    }
+                });
+            } else {
+                // Mostrar mensaje de sin datos
+                ctxTop.canvas.parentNode.innerHTML = '<p style="text-align:center; color:#6a8a6a; padding:20px;">Sin datos de ventas</p>';
+            }
+
+            // 2. Ventas por categoría
+            // Crear mapa de producto -> categoría usando productosCompletos
+            const productCategoryMap = {};
+            productosCompletos.forEach(p => {
+                productCategoryMap[p.name] = p.categoria || 'Sin categoría';
+                if (p.id) productCategoryMap[p.id] = p.categoria || 'Sin categoría';
+            });
+
+            const categoryCount = {};
+            pedidosValidos.forEach(p => {
+                p.productos.forEach(prod => {
+                    let categoria = 'Sin categoría';
+                    if (prod.nombre && productCategoryMap[prod.nombre]) {
+                        categoria = productCategoryMap[prod.nombre];
+                    } else if (prod.id && productCategoryMap[prod.id]) {
+                        categoria = productCategoryMap[prod.id];
+                    }
+                    // Si no se encuentra, intentar buscar por coincidencia parcial en nombre
+                    if (categoria === 'Sin categoría' && prod.nombre) {
+                        for (const key of Object.keys(productCategoryMap)) {
+                            if (prod.nombre.includes(key) || key.includes(prod.nombre)) {
+                                categoria = productCategoryMap[key];
+                                break;
+                            }
+                        }
+                    }
+                    categoryCount[categoria] = (categoryCount[categoria] || 0) + (prod.cantidad || 0);
+                });
+            });
+
+            const catLabels = Object.keys(categoryCount);
+            const catData = Object.values(categoryCount);
+
+            if (chartCategorias) chartCategorias.destroy();
+            const ctxCat = document.getElementById('chartCategorias').getContext('2d');
+            if (catLabels.length > 0) {
+                const colores = ['#ffb703', '#4caf50', '#2196F3', '#f44336', '#9c27b0', '#ff5722', '#8bc34a', '#00bcd4'];
+                chartCategorias = new Chart(ctxCat, {
+                    type: 'doughnut',
+                    data: {
+                        labels: catLabels,
+                        datasets: [{
+                            data: catData,
+                            backgroundColor: colores.slice(0, catLabels.length),
+                            borderColor: '#1f331f',
+                            borderWidth: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#b8d0b8', font: { size: 10 } }
+                            }
+                        }
+                    }
+                });
+            } else {
+                ctxCat.canvas.parentNode.innerHTML = '<p style="text-align:center; color:#6a8a6a; padding:20px;">Sin datos de categorías</p>';
+            }
+
+            // 3. Clientes frecuentes
+            const clientesMap = {};
+            pedidosValidos.forEach(p => {
+                const key = p.telefono || p.nombre || 'Anónimo';
+                if (!clientesMap[key]) {
+                    clientesMap[key] = { nombre: p.nombre || key, telefono: p.telefono || '', pedidos: 0 };
+                }
+                clientesMap[key].pedidos += 1;
+            });
+            const clientesSorted = Object.values(clientesMap).sort((a, b) => b.pedidos - a.pedidos).slice(0, 5);
+            const listContainer = document.getElementById('clientesFrecuentesList');
+            if (clientesSorted.length > 0) {
+                listContainer.innerHTML = clientesSorted.map(c => `
+                    <div class="cliente-item">
+                        <span class="cliente-nombre">${c.nombre}</span>
+                        <span class="cliente-pedidos">${c.pedidos} pedido${c.pedidos > 1 ? 's' : ''}</span>
+                    </div>
+                `).join('');
+            } else {
+                listContainer.innerHTML = '<p style="text-align:center; color:#6a8a6a;">Sin clientes registrados</p>';
+            }
+
+            // 4. Promedio de ticket
+            const pedidosConTotal = pedidosValidos.filter(p => p.total > 0);
+            const totalGeneral = pedidosConTotal.reduce((sum, p) => sum + p.total, 0);
+            const countGeneral = pedidosConTotal.length;
+            const avgGeneral = countGeneral > 0 ? totalGeneral / countGeneral : 0;
+            document.getElementById('promedioTicketGeneral').textContent = `$${avgGeneral.toLocaleString()}`;
+
+            const pedidosHoy = pedidosConTotal.filter(p => esFechaHoy(p.fecha));
+            const totalHoy = pedidosHoy.reduce((sum, p) => sum + p.total, 0);
+            const countHoy = pedidosHoy.length;
+            const avgHoy = countHoy > 0 ? totalHoy / countHoy : 0;
+            document.getElementById('promedioTicketHoy').textContent = `$${avgHoy.toLocaleString()}`;
+        }
 
         // ============================================================
         //  INICIO
