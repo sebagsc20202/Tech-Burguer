@@ -211,7 +211,7 @@
             }
         }
 
-        /* ===== BOTONES DE CATEGORÍA ===== */
+        /* ===== BOTONES DE CATEGORÍA (sin "Todas" y con orden fijo) ===== */
         .categoria-buttons {
             display: flex;
             flex-wrap: wrap;
@@ -1437,7 +1437,7 @@
         <!-- ===== BANNER DE PROMOCIONES ===== -->
         <div id="promoBanner"></div>
 
-        <!-- ===== BOTONES DE CATEGORÍA ===== -->
+        <!-- ===== BOTONES DE CATEGORÍA (YA SIN "TODAS") ===== -->
         <div id="categoriaButtons" class="categoria-buttons"></div>
 
         <!-- ===== PRODUCTOS ===== -->
@@ -1626,7 +1626,7 @@
         ];
 
         // ===== CARRITO GLOBAL =====
-        let carrito = {}; // key: productId, value: { cantidad: 0, medallones: 0, toppings: [] }
+        let carrito = {};
 
         // ===== CATEGORÍA SELECCIONADA =====
         let categoriaSeleccionada = null;
@@ -1894,9 +1894,9 @@
                         carrito[p.id] = { cantidad: 0, medallones: 0, toppings: [] };
                     }
                 });
-                // Crear botones de categoría
+                // Crear botones de categoría (sin "Todas")
                 crearBotonesCategoria();
-                // Seleccionar categoría por defecto y renderizar
+                // Seleccionar categoría por defecto
                 seleccionarCategoriaPorDefecto();
                 renderProducts(categoriaSeleccionada);
                 generarTrack();
@@ -1904,9 +1904,8 @@
         }
 
         // ============================================================
-        //  FUNCIONES DE CATEGORÍAS (ACTUALIZADAS)
+        //  FUNCIONES DE CATEGORÍAS (sin "Todas", con orden fijo)
         // ============================================================
-        // Orden fijo para los botones
         const CATEGORIAS_ORDEN = ['Hamburguesas', 'Papas', 'Bebidas', 'Postres', 'Otros'];
 
         function obtenerCategoriasActivas() {
@@ -1929,9 +1928,9 @@
             }
             container.style.display = 'flex';
 
-            // Filtrar y ordenar según CATEGORIAS_ORDEN
+            // Filtrar y ordenar según CATEGORIAS_ORDEN (solo las activas)
             const categoriasOrdenadas = CATEGORIAS_ORDEN.filter(cat => categoriasActivas.includes(cat));
-            // Si hay categorías activas que no están en el orden, agregarlas al final
+            // Agregar al final las que no estén en el orden predefinido
             const extra = categoriasActivas.filter(cat => !CATEGORIAS_ORDEN.includes(cat)).sort();
             const todasCategorias = [...categoriasOrdenadas, ...extra];
 
@@ -1947,6 +1946,9 @@
                 });
                 container.appendChild(btn);
             });
+
+            // Activar el botón correspondiente a la categoría seleccionada actualmente
+            actualizarBotonesActivos();
         }
 
         function actualizarBotonesActivos() {
@@ -2132,7 +2134,6 @@
                 carrito[productId].medallones = 0;
                 carrito[productId].toppings = [];
             }
-            // Actualizar inputs visuales
             const qtyInput = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
             if (qtyInput) {
                 qtyInput.value = 0;
@@ -2363,7 +2364,6 @@
             actualizarVisibilidadCancelar();
         }
 
-        // Escuchar cambios en el carrito a través de eventos de input
         document.addEventListener('input', function(e) {
             if (e.target.matches('.qty-input, .med-extra-input, .topping-check')) {
                 const productId = e.target.dataset.productId;
@@ -2493,11 +2493,9 @@
         //  LIMPIAR PEDIDO DESPUÉS DE ENVIAR
         // ============================================================
         function limpiarPedido() {
-            // Resetear carrito
             for (const pId in carrito) {
                 carrito[pId] = { cantidad: 0, medallones: 0, toppings: [] };
             }
-            // Actualizar inputs visuales
             document.querySelectorAll('.qty-input').forEach(input => input.value = 0);
             document.querySelectorAll('.med-extra-input').forEach(input => input.value = 0);
             document.querySelectorAll('.topping-check').forEach(cb => cb.checked = false);
