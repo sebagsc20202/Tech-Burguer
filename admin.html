@@ -1332,17 +1332,16 @@
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && alertaActiva) ocultarAlerta(); });
 
         // ============================================================
-        //  TOGGLE ESTADO LOCAL (sincronizado con excepciones)
+        //  TOGGLE ESTADO LOCAL (SINCRONIZADO CON EXCEPCIONES Y ESTADO NORMAL)
         // ============================================================
         const toggleEstado = document.getElementById('toggleEstadoLocal');
         const estadoTexto = document.getElementById('estadoTextoLocal');
 
-        // Estado actual combinado (normal + excepción)
-        let estadoActualReal = 'abierto';
+        let estadoNormalGlobal = 'abierto';
+        let excepcionesActuales = [];
 
-        // Función para actualizar el toggle según el estado real
+        // Función para actualizar el toggle con el estado real
         function actualizarToggle(estado) {
-            estadoActualReal = estado;
             if (estado === 'abierto') {
                 toggleEstado.checked = true;
                 estadoTexto.textContent = '🟢 Abierto';
@@ -1354,17 +1353,14 @@
             }
         }
 
-        // Estado normal guardado (se actualiza desde Firebase)
-        let estadoNormalGlobal = 'abierto';
-
-        // Función para determinar el estado real considerando excepciones
+        // Función que calcula el estado real combinando normal y excepciones
         function calcularEstadoReal() {
             const hoy = new Date();
             hoy.setHours(0, 0, 0, 0);
             const hoyStr = hoy.toISOString().split('T')[0];
 
-            // Buscar excepción activa en excepcionesActuales
-            let excepcionActiva = excepcionesActuales.find(ex => {
+            // Buscar excepción activa
+            const excepcionActiva = excepcionesActuales.find(ex => {
                 if (ex.fechaInicio && ex.fechaFin) {
                     const inicio = new Date(ex.fechaInicio);
                     const fin = new Date(ex.fechaFin);
@@ -1377,14 +1373,10 @@
                 return false;
             });
 
-            if (excepcionActiva) {
-                return excepcionActiva.tipo;
-            } else {
-                return estadoNormalGlobal;
-            }
+            return excepcionActiva ? excepcionActiva.tipo : estadoNormalGlobal;
         }
 
-        // Actualiza el toggle con el estado real calculado
+        // Actualiza el toggle con el estado real
         function actualizarEstadoReal() {
             const estado = calcularEstadoReal();
             actualizarToggle(estado);
@@ -1398,9 +1390,61 @@
             });
         }
 
-        // Escuchar cambios en excepciones (ya lo hace cargarExcepciones, pero también necesitamos actualizar el toggle)
-        // Para no duplicar listeners, usaremos el mismo listener de excepciones que ya está en cargarExcepciones
-        // y llamaremos a actualizarEstadoReal() después de actualizar excepcionesActuales.
+        // Evento del toggle: al cambiar, eliminar excepción activa y guardar nuevo estado normal
+        toggleEstado.addEventListener('change', function() {
+            const nuevoEstado = this.checked ? 'abierto' : 'cerrado';
+
+            // Primero eliminar cualquier excepción activa
+            const hoyStr = getHoyStr();
+            const exHoy = excepcionesActuales.find(ex => {
+                if (ex.fechaInicio && ex.fechaFin) {
+                    const inicio = new Date(ex.fechaInicio);
+                    const fin = new Date(ex.fechaFin);
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    inicio.setHours(0, 0, 0, 0);
+                    fin.setHours(0, 0, 0, 0);
+                    return hoy >= inicio && hoy <= fin;
+                } else if (ex.fechaInicio === hoyStr) {
+                    return true;
+                }
+                return false;
+            });
+
+            if (exHoy) {
+                db.ref('excepciones/' + exHoy.id).remove()
+                    .then(() => {
+                        // Después de eliminar, guardar estado normal
+                        db.ref('estado_local').set(nuevoEstado)
+                            .then(() => {
+                                mostrarToast(`Local ${nuevoEstado === 'abierto' ? 'abierto' : 'cerrado'}`, 'success');
+                            })
+                            .catch(err => {
+                                mostrarToast('Error al guardar estado: ' + err.message, 'error');
+                            });
+                    })
+                    .catch(err => {
+                        mostrarToast('Error al eliminar excepción: ' + err.message, 'error');
+                    });
+            } else {
+                // Si no hay excepción, guardar directamente
+                db.ref('estado_local').set(nuevoEstado)
+                    .then(() => {
+                        mostrarToast(`Local ${nuevoEstado === 'abierto' ? 'abierto' : 'cerrado'}`, 'success');
+                    })
+                    .catch(err => {
+                        mostrarToast('Error al guardar estado: ' + err.message, 'error');
+                        // Revertir visualmente
+                        actualizarEstadoReal();
+                    });
+            }
+        });
+
+        // Función auxiliar para obtener string de hoy
+        function getHoyStr() {
+            const d = new Date();
+            return d.toISOString().split('T')[0];
+        }
 
         // ============================================================
         //  REFERENCIAS DOM
@@ -1492,8 +1536,6 @@
         // ============================================================
         let productosCompletos = [];
         let categoriasUnicas = [];
-        let excepcionesActuales = [];
-        let pedidosActuales = [];
 
         function cargarDatos() {
             cargarProductos();
@@ -1879,13 +1921,13 @@
                     excepcionesActuales = [];
                     document.getElementById('excepcionList').innerHTML = '<p style="color:#b8d0b8; padding:6px 0;">No hay excepciones.</p>';
                     actualizarBotonesEstado();
-                    actualizarEstadoReal(); // Actualizar toggle al cargar excepciones
+                    actualizarEstadoReal();
                     return;
                 }
                 excepcionesActuales = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 renderExcepciones(excepcionesActuales);
                 actualizarBotonesEstado();
-                actualizarEstadoReal(); // Actualizar toggle al cambiar excepciones
+                actualizarEstadoReal();
             });
         }
 
@@ -1938,10 +1980,6 @@
             }
         }
 
-        function getHoyStr() {
-            const d = new Date();
-            return d.toISOString().split('T')[0];
-        }
         async function buscarExcepcionHoy() {
             const hoyStr = getHoyStr();
             const snapshot = await db.ref('excepciones').once('value');
@@ -2091,6 +2129,7 @@
         //  PEDIDOS
         // ============================================================
         let pedidosLoaded = false;
+        let pedidosActuales = [];
 
         function cargarPedidos() {
             db.ref('pedidos').on('value', (snapshot) => {
