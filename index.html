@@ -1574,6 +1574,7 @@
         let productos = [];
         window.excepciones = [];
         let localAbierto = true;
+        let promocionesCargadas = false;
         const TOPPINGS = [
             'Lechuga', 'Tomate', 'Bacon', 'Cebolla morada',
             'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
@@ -1735,6 +1736,95 @@
                 actualizarEstado();
             }, (error) => {
                 console.error('❌ Error en listener de excepciones:', error);
+            });
+        }
+
+        // ============================================================
+        //  CARGAR PROMOCIONES (FUNCIÓN CORREGIDA)
+        // ============================================================
+        function cargarPromociones() {
+            db.ref('promotions').on('value', (snapshot) => {
+                const data = snapshot.val();
+                const container = document.getElementById('promoBanner');
+                if (!container) return;
+
+                if (!data) {
+                    container.classList.remove('active');
+                    promocionesCargadas = true;
+                    return;
+                }
+
+                const promos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                const now = new Date();
+                const activas = promos.filter(p => {
+                    if (!p.active) return false;
+                    if (p.startDate && new Date(p.startDate) > now) return false;
+                    if (p.endDate && new Date(p.endDate) < now) return false;
+                    return true;
+                });
+
+                if (activas.length === 0) {
+                    container.classList.remove('active');
+                    promocionesCargadas = true;
+                    return;
+                }
+
+                container.classList.add('active');
+                container.innerHTML = '';
+
+                activas.forEach((promo, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'promo-item';
+                    if (index > 0) {
+                        div.style.borderTop = '1px solid #2f4a2f';
+                        div.style.paddingTop = '12px';
+                        div.style.marginTop = '8px';
+                    }
+
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'promo-img-container';
+
+                    const img = document.createElement('img');
+                    img.alt = promo.title || 'Promoción';
+                    if (promo.image && promo.image.trim() !== '') {
+                        img.src = promo.image;
+                        img.onerror = function() {
+                            this.style.display = 'none';
+                            const emoji = document.createElement('span');
+                            emoji.className = 'emoji';
+                            emoji.textContent = '🍔';
+                            imgContainer.appendChild(emoji);
+                        };
+                    } else {
+                        img.style.display = 'none';
+                        const emoji = document.createElement('span');
+                        emoji.className = 'emoji';
+                        emoji.textContent = '🍔';
+                        imgContainer.appendChild(emoji);
+                    }
+                    imgContainer.appendChild(img);
+                    div.appendChild(imgContainer);
+
+                    const info = document.createElement('div');
+                    info.className = 'promo-info';
+                    info.innerHTML = `
+                        <h3>${promo.title || 'Promoción'}</h3>
+                        <p>${promo.description || ''}</p>
+                        ${promo.startDate && promo.endDate ? `<div class="fechas">📅 ${new Date(promo.startDate).toLocaleDateString('es-AR')} → ${new Date(promo.endDate).toLocaleDateString('es-AR')}</div>` : ''}
+                    `;
+                    div.appendChild(info);
+
+                    const tag = document.createElement('span');
+                    tag.className = 'promo-tag';
+                    tag.textContent = '🔥 Promo';
+                    div.appendChild(tag);
+
+                    container.appendChild(div);
+                });
+                promocionesCargadas = true;
+            }, (error) => {
+                console.error('❌ Error en listener de promociones:', error);
+                promocionesCargadas = true;
             });
         }
 
@@ -2530,7 +2620,7 @@
         //  INICIALIZAR
         // ============================================================
         cargarProductos();
-        cargarPromociones();
+        cargarPromociones(); // Ahora está definida correctamente
         cargarExcepciones();
         escucharEstadoLocal();
         setTimeout(actualizarVisibilidadCancelar, 100);
