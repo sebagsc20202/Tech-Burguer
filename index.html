@@ -211,6 +211,40 @@
             }
         }
 
+        /* ===== BOTONES DE CATEGORÍA ===== */
+        .categoria-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 6px 0 14px;
+            justify-content: center;
+        }
+        .categoria-buttons .btn-categoria {
+            padding: 8px 16px;
+            border: 2px solid #3a5a3a;
+            border-radius: 10px;
+            background: #1f331f;
+            color: #b8d0b8;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            user-select: none;
+            text-transform: capitalize;
+            min-width: 60px;
+            text-align: center;
+        }
+        .categoria-buttons .btn-categoria:hover {
+            border-color: #6a8a6a;
+            background: #2a4a2a;
+        }
+        .categoria-buttons .btn-categoria.active {
+            border-color: #ffb703;
+            background: #2a4a2a;
+            color: #ffb703;
+            box-shadow: 0 0 12px rgba(255, 183, 3, 0.2);
+        }
+
         /* ===== TOAST ===== */
         .toast-confirm {
             position: fixed;
@@ -1157,6 +1191,14 @@
             .form-section.cerrado .mensaje-cerrado .horario-info {
                 font-size: 0.75rem;
             }
+            .categoria-buttons {
+                gap: 6px;
+            }
+            .categoria-buttons .btn-categoria {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+                min-width: 50px;
+            }
         }
 
         /* ===== BOTONES FLOTANTES ===== */
@@ -1395,6 +1437,9 @@
         <!-- ===== BANNER DE PROMOCIONES ===== -->
         <div id="promoBanner"></div>
 
+        <!-- ===== BOTONES DE CATEGORÍA ===== -->
+        <div id="categoriaButtons" class="categoria-buttons"></div>
+
         <!-- ===== PRODUCTOS ===== -->
         <div class="product-grid" id="productGrid"></div>
 
@@ -1580,6 +1625,12 @@
             'Cebolla caramelizada', 'Mayonesa', 'Ketchup', 'Mostaza'
         ];
 
+        // ===== CARRITO GLOBAL =====
+        let carrito = {}; // key: productId, value: { cantidad: 0, medallones: 0, toppings: [] }
+
+        // ===== CATEGORÍA SELECCIONADA =====
+        let categoriaSeleccionada = null;
+
         // ============================================================
         //  FUNCIÓN PARA OBTENER FECHA LOCAL EN FORMATO YYYY-MM-DD
         // ============================================================
@@ -1740,7 +1791,7 @@
         }
 
         // ============================================================
-        //  CARGAR PROMOCIONES (FUNCIÓN CORREGIDA)
+        //  CARGAR PROMOCIONES
         // ============================================================
         function cargarPromociones() {
             db.ref('promotions').on('value', (snapshot) => {
@@ -1829,7 +1880,7 @@
         }
 
         // ============================================================
-        //  CARGAR PRODUCTOS
+        //  CARGAR PRODUCTOS Y CREAR BOTONES DE CATEGORÍA
         // ============================================================
         function cargarProductos() {
             db.ref('products').on('value', (snapshot) => {
@@ -1837,22 +1888,105 @@
                 if (!data) return;
                 productos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 productos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
-                renderProducts();
+                // Inicializar carrito para todos los productos
+                productos.forEach(p => {
+                    if (!carrito[p.id]) {
+                        carrito[p.id] = { cantidad: 0, medallones: 0, toppings: [] };
+                    }
+                });
+                // Crear botones de categoría
+                crearBotonesCategoria();
+                // Seleccionar categoría por defecto y renderizar
+                seleccionarCategoriaPorDefecto();
+                renderProducts(categoriaSeleccionada);
                 generarTrack();
             });
         }
 
         // ============================================================
-        //  RENDER PRODUCTOS
+        //  FUNCIONES DE CATEGORÍAS
         // ============================================================
-        function renderProducts() {
+        function obtenerCategoriasActivas() {
+            const cats = new Set();
+            productos.forEach(p => {
+                if (p.available !== false && p.categoria) {
+                    cats.add(p.categoria);
+                }
+            });
+            return Array.from(cats).sort();
+        }
+
+        function crearBotonesCategoria() {
+            const container = document.getElementById('categoriaButtons');
+            container.innerHTML = '';
+            const categorias = obtenerCategoriasActivas();
+            if (categorias.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+            container.style.display = 'flex';
+
+            // Botón "Todas"
+            const btnTodas = document.createElement('button');
+            btnTodas.className = 'btn-categoria';
+            btnTodas.textContent = 'Todas';
+            btnTodas.dataset.categoria = 'todas';
+            btnTodas.addEventListener('click', function() {
+                categoriaSeleccionada = 'todas';
+                actualizarBotonesActivos();
+                renderProducts('todas');
+            });
+            container.appendChild(btnTodas);
+
+            categorias.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-categoria';
+                btn.textContent = cat;
+                btn.dataset.categoria = cat;
+                btn.addEventListener('click', function() {
+                    categoriaSeleccionada = cat;
+                    actualizarBotonesActivos();
+                    renderProducts(cat);
+                });
+                container.appendChild(btn);
+            });
+        }
+
+        function actualizarBotonesActivos() {
+            document.querySelectorAll('.btn-categoria').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.categoria === categoriaSeleccionada);
+            });
+        }
+
+        function seleccionarCategoriaPorDefecto() {
+            const categorias = obtenerCategoriasActivas();
+            if (categorias.length === 0) {
+                categoriaSeleccionada = 'todas';
+                return;
+            }
+            // Si existe "Hamburguesas" y tiene productos activos, seleccionarla
+            if (categorias.includes('Hamburguesas') && productos.some(p => p.categoria === 'Hamburguesas' && p.available !== false)) {
+                categoriaSeleccionada = 'Hamburguesas';
+            } else {
+                categoriaSeleccionada = categorias[0];
+            }
+            actualizarBotonesActivos();
+        }
+
+        // ============================================================
+        //  RENDER PRODUCTOS CON FILTRO
+        // ============================================================
+        function renderProducts(categoria) {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
 
-            const disponibles = productos.filter(p => p.available !== false);
+            let disponibles = productos.filter(p => p.available !== false);
+            if (categoria && categoria !== 'todas') {
+                disponibles = disponibles.filter(p => p.categoria === categoria);
+            }
 
             if (disponibles.length === 0) {
-                grid.innerHTML = '<p style="color:#b8d0b8; text-align:center;">No hay productos disponibles en este momento.</p>';
+                grid.innerHTML = '<p style="color:#b8d0b8; text-align:center; padding:20px 0;">No hay productos disponibles en esta categoría.</p>';
                 return;
             }
 
@@ -1861,6 +1995,7 @@
                 card.className = 'product-card';
                 card.dataset.id = p.id;
 
+                // Botón cancelar
                 const cancelBtn = document.createElement('button');
                 cancelBtn.className = 'btn-cancelar-item';
                 cancelBtn.dataset.productId = p.id;
@@ -1868,6 +2003,7 @@
                 cancelBtn.title = 'Cancelar esta Tech';
                 card.appendChild(cancelBtn);
 
+                // Imagen
                 const imgDiv = document.createElement('div');
                 imgDiv.className = 'product-img';
                 const img = document.createElement('img');
@@ -1877,6 +2013,7 @@
                 imgDiv.appendChild(img);
                 card.appendChild(imgDiv);
 
+                // Info
                 const info = document.createElement('div');
                 info.className = 'product-info';
 
@@ -1914,6 +2051,7 @@
                 const extras = document.createElement('div');
                 extras.className = 'product-extras';
 
+                // Cantidad
                 const qtyWrap = document.createElement('div');
                 qtyWrap.className = 'qty-wrap';
                 const qtyLabel = document.createElement('label');
@@ -1921,7 +2059,7 @@
                 const qtyInput = document.createElement('input');
                 qtyInput.type = 'number';
                 qtyInput.min = 0;
-                qtyInput.value = 0;
+                qtyInput.value = carrito[p.id]?.cantidad || 0;
                 qtyInput.dataset.productId = p.id;
                 qtyInput.className = 'qty-input';
                 qtyInput.readOnly = true;
@@ -1929,13 +2067,14 @@
                 qtyWrap.appendChild(qtyInput);
                 extras.appendChild(qtyWrap);
 
+                // Medallones y toppings (si tiene extras)
                 if (p.hasExtras) {
                     const extraMed = document.createElement('label');
                     extraMed.innerHTML = '➕ Medallones extra <span style="color:#ffb703;">($4.000 c/u)</span>';
                     const medInput = document.createElement('input');
                     medInput.type = 'number';
                     medInput.min = 0;
-                    medInput.value = 0;
+                    medInput.value = carrito[p.id]?.medallones || 0;
                     medInput.className = 'med-extra-input';
                     medInput.dataset.productId = p.id;
                     medInput.readOnly = true;
@@ -1944,6 +2083,7 @@
 
                     const toppingsDiv = document.createElement('div');
                     toppingsDiv.className = 'toppings-group';
+                    const carritoToppings = carrito[p.id]?.toppings || [];
                     TOPPINGS.forEach(t => {
                         const label = document.createElement('label');
                         const cb = document.createElement('input');
@@ -1951,6 +2091,7 @@
                         cb.className = 'topping-check';
                         cb.dataset.productId = p.id;
                         cb.value = t;
+                        cb.checked = carritoToppings.includes(t);
                         label.appendChild(cb);
                         label.appendChild(document.createTextNode(t));
                         toppingsDiv.appendChild(label);
@@ -1987,6 +2128,12 @@
         //  RESETEAR PRODUCTO
         // ============================================================
         function resetearProducto(productId) {
+            if (carrito[productId]) {
+                carrito[productId].cantidad = 0;
+                carrito[productId].medallones = 0;
+                carrito[productId].toppings = [];
+            }
+            // Actualizar inputs visuales
             const qtyInput = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
             if (qtyInput) {
                 qtyInput.value = 0;
@@ -2084,8 +2231,12 @@
                 e.stopPropagation();
                 const val = parseInt(this.dataset.value, 10);
                 if (!isNaN(val) && val >= 1 && val <= 9 && currentInput) {
+                    const productId = currentInput.dataset.productId;
+                    if (carrito[productId]) {
+                        carrito[productId].cantidad = val;
+                    }
                     currentInput.value = val;
-                    const product = productos.find(p => p.id === currentProductId);
+                    const product = productos.find(p => p.id === productId);
                     if (product) mostrarToast(val + ' ' + product.name);
                     currentInput.dispatchEvent(new Event('input', { bubbles: true }));
                     actualizarVisibilidadCancelar();
@@ -2104,6 +2255,10 @@
                 e.stopPropagation();
                 const val = parseInt(this.dataset.value, 10);
                 if (!isNaN(val) && val >= 1 && val <= 3 && currentMedInput) {
+                    const productId = currentMedInput.dataset.productId;
+                    if (carrito[productId]) {
+                        carrito[productId].medallones = val;
+                    }
                     currentMedInput.value = val;
                     currentMedInput.dispatchEvent(new Event('input', { bubbles: true }));
                     updateTotal();
@@ -2190,14 +2345,16 @@
 
         function calcularTotal() {
             let total = 0;
-            document.querySelectorAll('.qty-input').forEach(input => {
-                const cant = parseInt(input.value) || 0;
-                const product = productos.find(p => p.id === input.dataset.productId);
-                if (product) total += cant * product.price;
-            });
-            document.querySelectorAll('.med-extra-input').forEach(input => {
-                total += (parseInt(input.value) || 0) * 4000;
-            });
+            for (const pId in carrito) {
+                const item = carrito[pId];
+                if (item.cantidad > 0) {
+                    const product = productos.find(p => p.id === pId);
+                    if (product) {
+                        total += item.cantidad * product.price;
+                        total += item.medallones * 4000;
+                    }
+                }
+            }
             if (isEntregaSelected()) total += COSTO_ENVIO;
             return total;
         }
@@ -2207,8 +2364,21 @@
             actualizarVisibilidadCancelar();
         }
 
+        // Escuchar cambios en el carrito a través de eventos de input
         document.addEventListener('input', function(e) {
             if (e.target.matches('.qty-input, .med-extra-input, .topping-check')) {
+                const productId = e.target.dataset.productId;
+                if (productId && carrito[productId]) {
+                    if (e.target.classList.contains('qty-input')) {
+                        carrito[productId].cantidad = parseInt(e.target.value) || 0;
+                    } else if (e.target.classList.contains('med-extra-input')) {
+                        carrito[productId].medallones = parseInt(e.target.value) || 0;
+                    } else if (e.target.classList.contains('topping-check')) {
+                        const tops = [];
+                        document.querySelectorAll(`.topping-check[data-product-id="${productId}"]:checked`).forEach(cb => tops.push(cb.value));
+                        carrito[productId].toppings = tops;
+                    }
+                }
                 updateTotal();
             }
         });
@@ -2229,38 +2399,29 @@
             let total = 0;
             let tieneProductos = false;
 
-            document.querySelectorAll('.qty-input').forEach(input => {
-                const cant = parseInt(input.value) || 0;
-                if (cant > 0) {
-                    const product = productos.find(p => p.id === input.dataset.productId);
+            for (const pId in carrito) {
+                const item = carrito[pId];
+                if (item.cantidad > 0) {
+                    const product = productos.find(p => p.id === pId);
                     if (product) {
-                        const subtotal = cant * product.price;
+                        const subtotal = item.cantidad * product.price;
                         total += subtotal;
                         tieneProductos = true;
                         html += `<div class="resumen-item">`;
-                        html += `<span class="cantidad">${cant}x</span> ${product.name}`;
+                        html += `<span class="cantidad">${item.cantidad}x</span> ${product.name}`;
                         html += `<span class="precio">$${subtotal.toLocaleString()}</span>`;
-
-                        const medInput = document.querySelector(`.med-extra-input[data-product-id="${product.id}"]`);
-                        if (medInput) {
-                            const mc = parseInt(medInput.value) || 0;
-                            if (mc > 0) {
-                                const medSubtotal = mc * 4000;
-                                total += medSubtotal;
-                                html += `<br><span style="font-size:0.8rem;color:#b8d0b8;padding-left:16px;">➕ Medallones extra: ${mc} ($${medSubtotal.toLocaleString()})</span>`;
-                            }
+                        if (item.medallones > 0) {
+                            const medSubtotal = item.medallones * 4000;
+                            total += medSubtotal;
+                            html += `<br><span style="font-size:0.8rem;color:#b8d0b8;padding-left:16px;">➕ Medallones extra: ${item.medallones} ($${medSubtotal.toLocaleString()})</span>`;
                         }
-
-                        const checks = document.querySelectorAll(`.topping-check[data-product-id="${product.id}"]:checked`);
-                        if (checks.length > 0) {
-                            const tops = Array.from(checks).map(cb => cb.value).join(', ');
-                            html += `<br><span style="font-size:0.8rem;color:#b8d0b8;padding-left:16px;">🧂 Toppings: ${tops}</span>`;
+                        if (item.toppings && item.toppings.length > 0) {
+                            html += `<br><span style="font-size:0.8rem;color:#b8d0b8;padding-left:16px;">🧂 Toppings: ${item.toppings.join(', ')}</span>`;
                         }
-
                         html += `</div>`;
                     }
                 }
-            });
+            }
 
             if (!tieneProductos) {
                 alert('Agregá al menos un producto con cantidad > 0.');
@@ -2333,6 +2494,11 @@
         //  LIMPIAR PEDIDO DESPUÉS DE ENVIAR
         // ============================================================
         function limpiarPedido() {
+            // Resetear carrito
+            for (const pId in carrito) {
+                carrito[pId] = { cantidad: 0, medallones: 0, toppings: [] };
+            }
+            // Actualizar inputs visuales
             document.querySelectorAll('.qty-input').forEach(input => input.value = 0);
             document.querySelectorAll('.med-extra-input').forEach(input => input.value = 0);
             document.querySelectorAll('.topping-check').forEach(cb => cb.checked = false);
@@ -2397,44 +2563,35 @@
             const productosPedido = [];
             let totalPedido = 0;
 
-            document.querySelectorAll('.qty-input').forEach(input => {
-                const cant = parseInt(input.value) || 0;
-                totalHamburguesas += cant;
-                if (cant > 0) {
-                    const product = productos.find(p => p.id === input.dataset.productId);
+            for (const pId in carrito) {
+                const item = carrito[pId];
+                if (item.cantidad > 0) {
+                    const product = productos.find(p => p.id === pId);
                     if (product) {
-                        const subtotal = cant * product.price;
+                        const subtotal = item.cantidad * product.price;
                         totalPedido += subtotal;
-                        mensaje += `\n• *${product.name}* x${cant} — $${subtotal.toLocaleString()}`;
+                        totalHamburguesas += item.cantidad;
+                        mensaje += `\n• *${product.name}* x${item.cantidad} — $${subtotal.toLocaleString()}`;
                         tieneProductos = true;
 
-                        const item = {
+                        const prodData = {
                             nombre: product.name,
-                            cantidad: cant,
+                            cantidad: item.cantidad,
                             precio: product.price,
                             subtotal: subtotal
                         };
-
-                        if (product.hasExtras) {
-                            const medInput = document.querySelector(`.med-extra-input[data-product-id="${product.id}"]`);
-                            if (medInput) {
-                                const mc = parseInt(medInput.value) || 0;
-                                if (mc > 0) {
-                                    mensaje += `\n  ➕ Medallones extra: ${mc} ($${(mc * 4000).toLocaleString()})`;
-                                    item.medallonesExtra = mc;
-                                }
-                            }
-                            const checks = document.querySelectorAll(`.topping-check[data-product-id="${product.id}"]:checked`);
-                            if (checks.length > 0) {
-                                const tops = Array.from(checks).map(cb => cb.value).join(', ');
-                                mensaje += `\n  🧂 Toppings: ${tops}`;
-                                item.toppings = tops;
-                            }
+                        if (item.medallones > 0) {
+                            mensaje += `\n  ➕ Medallones extra: ${item.medallones} ($${(item.medallones * 4000).toLocaleString()})`;
+                            prodData.medallonesExtra = item.medallones;
                         }
-                        productosPedido.push(item);
+                        if (item.toppings && item.toppings.length > 0) {
+                            mensaje += `\n  🧂 Toppings: ${item.toppings.join(', ')}`;
+                            prodData.toppings = item.toppings.join(', ');
+                        }
+                        productosPedido.push(prodData);
                     }
                 }
-            });
+            }
 
             if (!tieneProductos) {
                 alert('Agregá al menos un producto con cantidad > 0.');
@@ -2620,7 +2777,7 @@
         //  INICIALIZAR
         // ============================================================
         cargarProductos();
-        cargarPromociones(); // Ahora está definida correctamente
+        cargarPromociones();
         cargarExcepciones();
         escucharEstadoLocal();
         setTimeout(actualizarVisibilidadCancelar, 100);
