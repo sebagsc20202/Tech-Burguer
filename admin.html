@@ -688,6 +688,22 @@
         }
         .product-item .actions .btn-guardar:hover { background: #e6a500; }
 
+        /* Nuevo botón duplicar */
+        .product-item .actions .btn-duplicar {
+            background: #9c27b0;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .product-item .actions .btn-duplicar:hover {
+            background: #7b1fa2;
+        }
+
         .product-item .badge-preview {
             background: #e63946;
             color: #fff;
@@ -993,7 +1009,8 @@
             }
             .product-item .actions .btn-mover,
             .product-item .actions .btn-editar,
-            .product-item .actions .btn-guardar {
+            .product-item .actions .btn-guardar,
+            .product-item .actions .btn-duplicar {
                 flex: 1;
                 text-align: center;
             }
@@ -1752,6 +1769,7 @@
                         <button class="btn-mover" onclick="moverProducto('${p.id}', 1)" ${isLast ? 'disabled' : ''} title="Bajar">⬇</button>
                         <button class="btn-editar" onclick="editarProducto('${p.id}')" title="Editar">✏️</button>
                         <button class="btn-guardar" onclick="actualizarProducto('${p.id}')" title="Guardar">💾</button>
+                        <button class="btn-duplicar" onclick="duplicarProducto('${p.id}')" title="Duplicar producto">📋 Duplicar</button>
                         <span class="separator">|</span>
                         <button class="btn-eliminar" onclick="eliminarProducto('${p.id}')" title="Eliminar">🗑️</button>
                     </div>
@@ -1880,6 +1898,54 @@
                 mostrarToast('Producto eliminado', 'success');
             } catch (error) {
                 mostrarToast('Error al eliminar: ' + error.message, 'error');
+            }
+        };
+
+        // ===== NUEVA FUNCIÓN: Duplicar producto =====
+        window.duplicarProducto = async function(id) {
+            try {
+                const snapshot = await db.ref('products/' + id).once('value');
+                const original = snapshot.val();
+                if (!original) {
+                    mostrarToast('Producto no encontrado', 'error');
+                    return;
+                }
+
+                // Generar nuevo ID
+                let nuevoId = id + '-copia';
+                let contador = 1;
+                // Verificar si ya existe, si es así agregar número
+                while (true) {
+                    const exist = await db.ref('products/' + nuevoId).once('value');
+                    if (!exist.exists()) break;
+                    contador++;
+                    nuevoId = id + '-copia-' + contador;
+                }
+
+                // Crear copia con los mismos datos
+                const copia = {
+                    ...original,
+                    id: nuevoId,
+                    name: original.name + ' (copia)',
+                    orden: null // se asignará al final
+                };
+
+                // Obtener el máximo orden actual para poner la copia al final
+                const snapshotOrden = await db.ref('products').orderByChild('orden').once('value');
+                const data = snapshotOrden.val();
+                let maxOrden = 0;
+                if (data) {
+                    const productos = Object.keys(data).map(key => ({ ...data[key] }));
+                    productos.forEach(p => {
+                        if (p.orden !== undefined && p.orden > maxOrden) maxOrden = p.orden;
+                    });
+                }
+                copia.orden = maxOrden + 1;
+
+                await db.ref('products/' + nuevoId).set(copia);
+                mostrarToast(`Producto duplicado como "${copia.name}"`, 'success');
+            } catch (error) {
+                mostrarToast('Error al duplicar: ' + error.message, 'error');
             }
         };
 
