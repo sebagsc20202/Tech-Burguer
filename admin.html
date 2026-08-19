@@ -688,7 +688,6 @@
         }
         .product-item .actions .btn-guardar:hover { background: #e6a500; }
 
-        /* Nuevo botón duplicar */
         .product-item .actions .btn-duplicar {
             background: #9c27b0;
             color: #fff;
@@ -711,6 +710,40 @@
             border-radius: 8px;
             font-size: 0.65rem;
             font-weight: 600;
+        }
+        /* Badge de descuento */
+        .product-item .discount-badge {
+            background: #f44336;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-left: 6px;
+            animation: pulse-badge 1.5s infinite alternate;
+        }
+        @keyframes pulse-badge {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        /* Precio con descuento en lista */
+        .product-item .price-with-discount {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .product-item .price-with-discount .original-price {
+            text-decoration: line-through;
+            color: #8aaa8a;
+            font-size: 0.8rem;
+        }
+        .product-item .price-with-discount .final-price {
+            font-weight: 700;
+            color: #ffb703;
+            font-size: 1rem;
         }
 
         /* PROMOCIONES */
@@ -1254,7 +1287,9 @@
             <div id="formProducto" class="form-producto">
                 <h3 id="formProductoTitulo">✏️ Nuevo producto</h3>
                 <div class="form-group"><label for="prodNombre">Nombre <span class="required">*</span></label><input type="text" id="prodNombre" placeholder="Ej: Doble Cheddar" /></div>
-                <div class="form-group"><label for="prodPrecio">Precio <span class="required">*</span></label><input type="text" id="prodPrecio" placeholder="Ej: 15000" /></div>
+                <div class="form-group"><label for="prodPrecioOriginal">Precio original <span class="required">*</span></label><input type="number" id="prodPrecioOriginal" placeholder="Ej: 15000" min="0" step="100" /></div>
+                <div class="form-group"><label for="prodDescuento">Descuento (%)</label><input type="number" id="prodDescuento" placeholder="Ej: 15" min="0" max="100" step="1" value="0" /></div>
+                <div class="form-group"><label>Precio final calculado</label><input type="text" id="prodPrecioFinal" disabled style="background:#2a4a2a; color:#ffb703; font-weight:700;" /></div>
                 <div class="form-group"><label for="prodDesc">Descripción</label><textarea id="prodDesc" placeholder="Ej: Doble medallón 120gr · doble cheddar · salsa Tech."></textarea></div>
                 <div class="form-row">
                     <div class="form-group"><label for="prodImagen">URL imagen</label><input type="text" id="prodImagen" placeholder="Ej: images/cheddar.jpg" /><span class="hint-text">Imagen de tarjeta</span></div>
@@ -1454,10 +1489,14 @@
             const titulo = document.getElementById('detalleProductoTitulo');
             const body = document.getElementById('detalleProductoBody');
             titulo.textContent = `📦 ${producto.name}`;
+            let precioInfo = `$${producto.price.toLocaleString()}`;
+            if (producto.discount && producto.discount > 0 && producto.originalPrice) {
+                precioInfo = `<span style="text-decoration:line-through; color:#8aaa8a;">$${producto.originalPrice.toLocaleString()}</span> → <strong style="color:#ffb703;">$${producto.price.toLocaleString()}</strong> <span class="discount-badge" style="background:#f44336; color:#fff; padding:2px 10px; border-radius:30px; font-size:0.8rem;">-${producto.discount}%</span>`;
+            }
             body.innerHTML = `
                 <div class="campo"><span class="etiqueta">ID</span><span class="valor">${producto.id || 'N/A'}</span></div>
                 <div class="campo"><span class="etiqueta">Nombre</span><span class="valor">${producto.name || 'N/A'}</span></div>
-                <div class="campo"><span class="etiqueta">Precio</span><span class="valor">$${(producto.price || 0).toLocaleString()}</span></div>
+                <div class="campo"><span class="etiqueta">Precio</span><span class="valor">${precioInfo}</span></div>
                 <div class="campo"><span class="etiqueta">Descripción</span><span class="valor">${producto.desc || 'Sin descripción'}</span></div>
                 <div class="campo"><span class="etiqueta">Categoría</span><span class="valor">${producto.categoria || 'Sin categoría'}</span></div>
                 <div class="campo"><span class="etiqueta">Tiempo (min)</span><span class="valor">${producto.tiempoPreparacion || 'N/A'}</span></div>
@@ -1647,6 +1686,27 @@
 
         const pedidosTitulo = document.getElementById('pedidosTitulo');
 
+        // ===== REFERENCIAS DE PRECIO Y DESCUENTO =====
+        const prodPrecioOriginal = document.getElementById('prodPrecioOriginal');
+        const prodDescuento = document.getElementById('prodDescuento');
+        const prodPrecioFinal = document.getElementById('prodPrecioFinal');
+
+        // ===== FUNCIÓN PARA CALCULAR PRECIO FINAL =====
+        function calcularPrecioFinal() {
+            const original = parseFloat(prodPrecioOriginal.value) || 0;
+            const desc = parseFloat(prodDescuento.value) || 0;
+            let final = original;
+            if (desc > 0 && desc <= 100) {
+                final = original * (1 - desc / 100);
+            }
+            // Redondear a 2 decimales y mostrar
+            prodPrecioFinal.value = '$' + Math.round(final).toLocaleString();
+            return Math.round(final);
+        }
+
+        prodPrecioOriginal.addEventListener('input', calcularPrecioFinal);
+        prodDescuento.addEventListener('input', calcularPrecioFinal);
+
         // ============================================================
         //  AUTENTICACIÓN
         // ============================================================
@@ -1758,10 +1818,26 @@
                 div.dataset.id = p.id;
                 const badgeHtml = p.badge ? `<span class="badge-preview">${p.badge}</span>` : '';
                 const metaHtml = `<div class="meta">${p.categoria ? `<span>📂 ${p.categoria}</span>` : ''}${p.tiempoPreparacion ? `<span>⏱️ ${p.tiempoPreparacion} min</span>` : ''}</div>`;
+
+                // Precio con descuento
+                let precioHtml = `<div class="price-with-discount">`;
+                if (p.discount && p.discount > 0 && p.originalPrice) {
+                    precioHtml += `<span class="original-price">$${p.originalPrice.toLocaleString()}</span>`;
+                    precioHtml += `<span class="final-price">$${p.price.toLocaleString()}</span>`;
+                    precioHtml += `<span class="discount-badge">-${p.discount}%</span>`;
+                } else {
+                    precioHtml += `<span class="final-price">$${p.price.toLocaleString()}</span>`;
+                }
+                precioHtml += `</div>`;
+
                 const isFirst = index === 0;
                 const isLast = index === productos.length - 1;
                 div.innerHTML = `
-                    <div style="flex:1; min-width:120px;"><div class="name">${p.name} ${badgeHtml}</div>${metaHtml}</div>
+                    <div style="flex:1; min-width:120px;">
+                        <div class="name">${p.name} ${badgeHtml}</div>
+                        ${metaHtml}
+                        ${precioHtml}
+                    </div>
                     <label>💰 <input type="number" value="${p.price}" data-id="${p.id}" class="price-input" style="width:90px;" /></label>
                     <label>📦 <input type="checkbox" ${p.available !== false ? 'checked' : ''} data-id="${p.id}" class="avail-input" /></label>
                     <div class="actions">
@@ -1870,7 +1946,9 @@
                 const producto = snapshot.val();
                 if (!producto) { mostrarToast('Producto no encontrado', 'error'); return; }
                 document.getElementById('prodNombre').value = producto.name || '';
-                document.getElementById('prodPrecio').value = producto.price || '';
+                document.getElementById('prodPrecioOriginal').value = producto.originalPrice || producto.price || '';
+                document.getElementById('prodDescuento').value = producto.discount || 0;
+                calcularPrecioFinal();
                 document.getElementById('prodDesc').value = producto.desc || '';
                 document.getElementById('prodImagen').value = producto.imagen || '';
                 document.getElementById('prodPopupImg').value = producto.popupImg || '';
@@ -1901,7 +1979,6 @@
             }
         };
 
-        // ===== NUEVA FUNCIÓN: Duplicar producto =====
         window.duplicarProducto = async function(id) {
             try {
                 const snapshot = await db.ref('products/' + id).once('value');
@@ -1911,10 +1988,8 @@
                     return;
                 }
 
-                // Generar nuevo ID
                 let nuevoId = id + '-copia';
                 let contador = 1;
-                // Verificar si ya existe, si es así agregar número
                 while (true) {
                     const exist = await db.ref('products/' + nuevoId).once('value');
                     if (!exist.exists()) break;
@@ -1922,15 +1997,13 @@
                     nuevoId = id + '-copia-' + contador;
                 }
 
-                // Crear copia con los mismos datos
                 const copia = {
                     ...original,
                     id: nuevoId,
                     name: original.name + ' (copia)',
-                    orden: null // se asignará al final
+                    orden: null
                 };
 
-                // Obtener el máximo orden actual para poner la copia al final
                 const snapshotOrden = await db.ref('products').orderByChild('orden').once('value');
                 const data = snapshotOrden.val();
                 let maxOrden = 0;
@@ -1965,12 +2038,12 @@
 
         function crearProductosDefault() {
             const defaultProducts = [
-                { id: 'armatuburger', name: 'Armá tu Burger', price: 12000, desc: '1 medallón 120gr · doble cheddar · salsa Tech.', hasExtras: true, badge: 'BASE', imagen: 'images/arm.jpg', popupImg: 'images/bn1.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15, orden: 0 },
-                { id: 'doblep', name: 'Doble Provoleta', price: 18000, desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.', hasExtras: false, badge: null, imagen: 'images/pro.jpg', popupImg: 'images/bn2.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20, orden: 1 },
-                { id: 'intense', name: 'Intense', price: 18000, desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/int.jpg', popupImg: 'images/bn3.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20, orden: 2 },
-                { id: 'techmex', name: 'Tech Mex', price: 18000, desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/mex.jpg', popupImg: 'images/bn4.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20, orden: 3 },
-                { id: 'yankee', name: 'Yankee', price: 16000, desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.', hasExtras: false, badge: null, imagen: 'images/yan.jpg', popupImg: 'images/bn5.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 18, orden: 4 },
-                { id: 'clasica', name: 'Clásica', price: 16000, desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.', hasExtras: false, badge: null, imagen: 'images/cla.jpg', popupImg: 'images/bn6.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15, orden: 5 }
+                { id: 'armatuburger', name: 'Armá tu Burger', price: 12000, originalPrice: 12000, discount: 0, desc: '1 medallón 120gr · doble cheddar · salsa Tech.', hasExtras: true, badge: 'BASE', imagen: 'images/arm.jpg', popupImg: 'images/bn1.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15, orden: 0 },
+                { id: 'doblep', name: 'Doble Provoleta', price: 18000, originalPrice: 18000, discount: 0, desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.', hasExtras: false, badge: null, imagen: 'images/pro.jpg', popupImg: 'images/bn2.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20, orden: 1 },
+                { id: 'intense', name: 'Intense', price: 18000, originalPrice: 18000, discount: 0, desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/int.jpg', popupImg: 'images/bn3.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20, orden: 2 },
+                { id: 'techmex', name: 'Tech Mex', price: 18000, originalPrice: 18000, discount: 0, desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/mex.jpg', popupImg: 'images/bn4.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20, orden: 3 },
+                { id: 'yankee', name: 'Yankee', price: 16000, originalPrice: 16000, discount: 0, desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.', hasExtras: false, badge: null, imagen: 'images/yan.jpg', popupImg: 'images/bn5.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 18, orden: 4 },
+                { id: 'clasica', name: 'Clásica', price: 16000, originalPrice: 16000, discount: 0, desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.', hasExtras: false, badge: null, imagen: 'images/cla.jpg', popupImg: 'images/bn6.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15, orden: 5 }
             ];
             defaultProducts.forEach(p => { db.ref('products/' + p.id).set(p); });
             db.ref('promotions').push({
@@ -1986,7 +2059,9 @@
         let editandoProductoId = null;
         function mostrarFormProducto() {
             document.getElementById('prodNombre').value = '';
-            document.getElementById('prodPrecio').value = '';
+            document.getElementById('prodPrecioOriginal').value = '';
+            document.getElementById('prodDescuento').value = 0;
+            calcularPrecioFinal();
             document.getElementById('prodDesc').value = '';
             document.getElementById('prodImagen').value = '';
             document.getElementById('prodPopupImg').value = '';
@@ -2015,7 +2090,13 @@
 
         saveProductBtn.addEventListener('click', async function() {
             const nombre = document.getElementById('prodNombre').value.trim();
-            const precio = parseInt(document.getElementById('prodPrecio').value.trim());
+            const originalPrice = parseFloat(document.getElementById('prodPrecioOriginal').value);
+            const descuento = parseFloat(document.getElementById('prodDescuento').value) || 0;
+            if (!nombre || isNaN(originalPrice) || originalPrice <= 0) {
+                mostrarToast('Nombre y precio original son obligatorios y deben ser números válidos.', 'error');
+                return;
+            }
+            const price = calcularPrecioFinal(); // ya redondeado
             const desc = document.getElementById('prodDesc').value.trim();
             const imagen = document.getElementById('prodImagen').value.trim();
             const popupImg = document.getElementById('prodPopupImg').value.trim();
@@ -2025,10 +2106,23 @@
             let id = document.getElementById('prodId').value.trim().toLowerCase().replace(/\s+/g, '-');
             const hasExtras = document.getElementById('prodHasExtras').checked;
             const disponible = document.getElementById('prodDisponible').checked;
-            if (!nombre || !precio || !id) { mostrarToast('Nombre, precio e ID son obligatorios.', 'error'); return; }
-            if (isNaN(precio) || precio <= 0) { mostrarToast('Ingresá un precio válido.', 'error'); return; }
+            if (!id) { mostrarToast('El ID es obligatorio.', 'error'); return; }
             if (!/^[a-z0-9\-]+$/.test(id)) { mostrarToast('El ID solo puede contener letras minúsculas, números y guiones. Sin espacios.', 'error'); return; }
-            const nuevoProducto = { id, name: nombre, price: precio, desc: desc || '', imagen: imagen || 'images/placeholder.jpg', popupImg: popupImg || imagen || 'images/placeholder.jpg', categoria, tiempoPreparacion, badge, hasExtras, available: disponible };
+            const nuevoProducto = {
+                id,
+                name: nombre,
+                price: price,
+                originalPrice: originalPrice,
+                discount: descuento,
+                desc: desc || '',
+                imagen: imagen || 'images/placeholder.jpg',
+                popupImg: popupImg || imagen || 'images/placeholder.jpg',
+                categoria,
+                tiempoPreparacion,
+                badge,
+                hasExtras,
+                available: disponible
+            };
             try {
                 if (window.editandoProductoId) {
                     await db.ref('products/' + window.editandoProductoId).update(nuevoProducto);
