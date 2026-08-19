@@ -988,7 +988,7 @@
             </div>
             <div id="promoList"></div>
             <div id="formPromo" class="form-producto">
-                <h3>✏️ Nueva promoción</h3>
+                <h3 id="formPromoTitulo">✏️ Nueva promoción</h3>
                 <div class="form-group"><label for="promoTitulo">Título <span class="required">*</span></label><input type="text" id="promoTitulo" placeholder="Ej: 2x1 en Clásicas" /></div>
                 <div class="form-group"><label for="promoDesc">Descripción <span class="required">*</span></label><input type="text" id="promoDesc" placeholder="Ej: Llevá dos burgers por el precio de una" /></div>
                 <div class="form-group"><label for="promoImagen">URL imagen</label><input type="text" id="promoImagen" placeholder="Ej: images/promo1.jpg" /><span class="hint-text">Imagen del banner</span></div>
@@ -1367,6 +1367,7 @@
         const formPromo = document.getElementById('formPromo');
         const savePromoBtn = document.getElementById('savePromoBtn');
         const cancelPromoBtn = document.getElementById('cancelPromoBtn');
+        const formPromoTitulo = document.getElementById('formPromoTitulo');
 
         const addExcepcionBtn = document.getElementById('addExcepcionBtn');
         const formExcepcion = document.getElementById('formExcepcion');
@@ -1423,7 +1424,6 @@
                 db.ref('excepciones').off();
                 db.ref('pedidos').off();
                 ocultarAlerta();
-                // Si estaba en fullscreen, salir
                 if (document.fullscreenElement) {
                     document.exitFullscreen().catch(() => {});
                 }
@@ -1677,6 +1677,8 @@
 
         // ---- PROMOCIONES ----
         let actualizandoPromo = false;
+        let editandoPromoId = null; // Variable global para controlar edición
+
         function cargarPromociones() {
             db.ref('promotions').on('value', (snapshot) => {
                 if (actualizandoPromo) return;
@@ -1727,23 +1729,37 @@
                 });
         }
 
-        function ocultarFormPromo() { formPromo.classList.remove('active'); }
+        function ocultarFormPromo() {
+            formPromo.classList.remove('active');
+            editandoPromoId = null;
+            formPromoTitulo.textContent = '✏️ Nueva promoción';
+        }
+
         addPromoBtn.addEventListener('click', () => {
-            formPromo.classList.add('active');
+            // Limpiar estado de edición
+            editandoPromoId = null;
+            formPromoTitulo.textContent = '✏️ Nueva promoción';
             document.getElementById('promoTitulo').value = '';
             document.getElementById('promoDesc').value = '';
             document.getElementById('promoImagen').value = '';
             document.getElementById('promoInicio').value = '';
             document.getElementById('promoFin').value = '';
             document.getElementById('promoActiva').checked = true;
+            formPromo.classList.add('active');
             document.getElementById('promoTitulo').focus();
         });
+
         cancelPromoBtn.addEventListener('click', ocultarFormPromo);
 
+        // Listener ÚNICO para guardar promociones
         savePromoBtn.addEventListener('click', async function() {
             const titulo = document.getElementById('promoTitulo').value.trim();
             const desc = document.getElementById('promoDesc').value.trim();
-            if (!titulo || !desc) { mostrarToast('Título y descripción son obligatorios', 'error'); return; }
+            if (!titulo || !desc) {
+                mostrarToast('Título y descripción son obligatorios', 'error');
+                return;
+            }
+
             const data = {
                 title: titulo,
                 description: desc,
@@ -1752,9 +1768,17 @@
                 endDate: document.getElementById('promoFin').value || '',
                 active: document.getElementById('promoActiva').checked
             };
+
             try {
-                await db.ref('promotions').push(data);
-                mostrarToast('Promoción creada', 'success');
+                if (editandoPromoId) {
+                    // Actualizar promoción existente
+                    await db.ref('promotions/' + editandoPromoId).update(data);
+                    mostrarToast('Promoción actualizada', 'success');
+                } else {
+                    // Crear nueva promoción
+                    await db.ref('promotions').push(data);
+                    mostrarToast('Promoción creada', 'success');
+                }
                 ocultarFormPromo();
             } catch (error) {
                 mostrarToast('Error: ' + error.message, 'error');
@@ -1776,39 +1800,22 @@
             try {
                 const snapshot = await db.ref('promotions/' + id).once('value');
                 const promo = snapshot.val();
-                if (!promo) { mostrarToast('Promoción no encontrada', 'error'); return; }
+                if (!promo) {
+                    mostrarToast('Promoción no encontrada', 'error');
+                    return;
+                }
+                // Rellenar formulario
                 document.getElementById('promoTitulo').value = promo.title || '';
                 document.getElementById('promoDesc').value = promo.description || '';
                 document.getElementById('promoImagen').value = promo.image || '';
                 document.getElementById('promoInicio').value = promo.startDate || '';
                 document.getElementById('promoFin').value = promo.endDate || '';
                 document.getElementById('promoActiva').checked = promo.active !== false;
+
+                // Marcar edición
+                editandoPromoId = id;
+                formPromoTitulo.textContent = '✏️ Editando: ' + promo.title;
                 formPromo.classList.add('active');
-                document.getElementById('promoTitulo').focus();
-                window.editandoPromoId = id;
-                formPromo.querySelector('h3').textContent = '✏️ Editando: ' + promo.title;
-                const originalClick = savePromoBtn.onclick;
-                savePromoBtn.onclick = async function() {
-                    const titulo = document.getElementById('promoTitulo').value.trim();
-                    const desc = document.getElementById('promoDesc').value.trim();
-                    if (!titulo || !desc) { mostrarToast('Título y descripción son obligatorios', 'error'); return; }
-                    const data = {
-                        title: titulo,
-                        description: desc,
-                        image: document.getElementById('promoImagen').value.trim() || '',
-                        startDate: document.getElementById('promoInicio').value || '',
-                        endDate: document.getElementById('promoFin').value || '',
-                        active: document.getElementById('promoActiva').checked
-                    };
-                    try {
-                        await db.ref('promotions/' + id).update(data);
-                        mostrarToast('Promoción actualizada', 'success');
-                        ocultarFormPromo();
-                        savePromoBtn.onclick = originalClick;
-                    } catch (error) {
-                        mostrarToast('Error: ' + error.message, 'error');
-                    }
-                };
                 formPromo.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } catch (error) {
                 mostrarToast('Error al cargar promoción: ' + error.message, 'error');
@@ -2079,7 +2086,6 @@
 
             let pedidosFiltrados = [...pedidosActuales];
 
-            // Si se seleccionó un estado (no vacío), filtrar
             if (filtroEstadoValue && filtroEstadoValue !== '') {
                 pedidosFiltrados = pedidosFiltrados.filter(p => p.estado === filtroEstadoValue);
             }
@@ -2089,8 +2095,6 @@
             }
 
             renderPedidos(pedidosFiltrados);
-
-            // Actualizar título con el contador (sin paréntesis)
             pedidosTitulo.textContent = `📦 Pedidos ${pedidosFiltrados.length}`;
         }
 
@@ -2364,10 +2368,8 @@
             const hoy = new Date();
             hoy.setHours(0, 0, 0, 0);
 
-            // Filtrar pedidos de hoy (incluyendo cancelados para el contador, pero no para el monto)
             const pedidosHoy = pedidosActuales.filter(p => esFechaHoy(p.fecha));
 
-            // Agrupar por día (solo será hoy)
             const mapaDiario = new Map();
             const conteoDiario = new Map();
 
@@ -2392,7 +2394,6 @@
             if (chartDiario) chartDiario.destroy();
             const ctxDiario = document.getElementById('chartDiario').getContext('2d');
             if (diasOrdenados.length === 0) {
-                // Si no hay pedidos hoy, mostramos un gráfico vacío con una barra en cero.
                 chartDiario = new Chart(ctxDiario, {
                     type: 'bar',
                     data: {
