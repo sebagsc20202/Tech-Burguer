@@ -1747,7 +1747,7 @@
 
         filtroEstado.addEventListener('change', aplicarFiltroPedidos);
 
-        // ===== NUEVA FUNCIÓN PARA GENERAR MENSAJE DE WHATSAPP =====
+        // ===== FUNCIÓN PARA GENERAR MENSAJE DE WHATSAPP (con total de ítems) =====
         function generarMensajeWhatsApp(pedido, estado) {
             const nombreCliente = pedido.nombre || 'Cliente';
             let estadoTexto = '';
@@ -1775,6 +1775,12 @@
             const direccion = pedido.direccion || '';
             const esEnvio = envio.includes('Entrega') || envio.includes('domicilio') || envio.includes('envío');
 
+            // Calcular total de ítems
+            let totalItems = 0;
+            if (pedido.productos && pedido.productos.length > 0) {
+                totalItems = pedido.productos.reduce((sum, prod) => sum + (prod.cantidad || 0), 0);
+            }
+
             let mensaje = `🍔 *Tech Classic Burgers* 🍔\n\n`;
             mensaje += `Hola ${nombreCliente}, tu pedido ${estadoTexto}\n\n`;
 
@@ -1782,7 +1788,6 @@
                 mensaje += `🚚 *Envío a domicilio*\n`;
                 mensaje += `📍 Dirección: ${direccion || 'No especificada'}\n`;
                 if (direccion) {
-                    // Enlace de Google Maps con ruta iniciada (desde la ubicación actual)
                     const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(direccion)}`;
                     mensaje += `🔗 ${mapsLink}\n`;
                 }
@@ -1792,7 +1797,7 @@
                 mensaje += `🔗 ${ENLACE_LOCAL}\n`;
             }
 
-            mensaje += `\n📦 *Detalle del pedido:*\n`;
+            mensaje += `\n📦 *Detalle del pedido (${totalItems} ítems):*\n`;
             if (pedido.productos && pedido.productos.length > 0) {
                 pedido.productos.forEach(prod => {
                     mensaje += `* ${prod.cantidad}x ${prod.nombre}`;
@@ -1821,7 +1826,6 @@
                 const div = document.createElement('div');
                 div.className = 'pedido-item';
 
-                // Formatear fecha y hora separadas
                 let fechaStr = 'Fecha desconocida';
                 let horaStr = '';
                 if (p.fecha) {
@@ -1836,6 +1840,15 @@
                                     p.estado === 'listo' ? '#2196F3' :
                                     p.estado === 'entregado' ? '#8aaa8a' : '#f44336';
 
+                // Calcular total de ítems
+                let totalItems = 0;
+                if (p.productos && p.productos.length > 0) {
+                    totalItems = p.productos.reduce((sum, prod) => sum + (prod.cantidad || 0), 0);
+                }
+
+                // Mostrar total de items en la descripción
+                const itemsText = totalItems > 0 ? ` (${totalItems} ítems)` : '';
+
                 div.innerHTML = `
                     <div class="info">
                         <div><strong>${p.nombre || 'Sin nombre'}</strong> (${p.telefono || 'Sin teléfono'})</div>
@@ -1846,7 +1859,7 @@
                             <strong style="color:#ffb703;">${total}</strong>
                         </div>
                         <div style="font-size:0.8rem; color:#b8d0b8;">
-                            📦 ${p.productos ? p.productos.map(prod => `${prod.cantidad}x ${prod.nombre}`).join(', ') : 'Sin productos'}
+                            📦 ${itemsText} ${p.productos ? p.productos.map(prod => `${prod.cantidad}x ${prod.nombre}`).join(', ') : 'Sin productos'}
                         </div>
                         <div style="font-size:0.8rem; color:#b8d0b8;">
                             💳 ${p.metodoPago || 'N/E'} · 🚚 ${p.envio || 'N/E'}
@@ -1889,7 +1902,6 @@
             }
         }
 
-        // Función para abrir WhatsApp con mensaje personalizado
         window.abrirWhatsApp = function(id) {
             const pedido = pedidosActuales.find(p => p.id === id);
             if (!pedido) {
