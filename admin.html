@@ -388,6 +388,20 @@
             background-position: right 12px center;
         }
         .filtro-container select:focus { border-color: #ffb703; }
+        .filtro-container .filtro-hoy {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #b8d0b8;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .filtro-container .filtro-hoy input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #ffb703;
+            cursor: pointer;
+        }
 
         /* ===== BOTONES DE ESTADO RÁPIDO ===== */
         .estado-rapido {
@@ -878,6 +892,10 @@
                         <option value="entregado">🚚 Entregado</option>
                         <option value="cancelado">❌ Cancelado</option>
                     </select>
+                    <label class="filtro-hoy">
+                        <input type="checkbox" id="filtroHoy" />
+                        📅 Solo pedidos de hoy
+                    </label>
                 </div>
             </div>
             <div class="pedido-list-wrapper" id="pedidoListWrapper">
@@ -1231,6 +1249,7 @@
 
         const filtroCategoria = document.getElementById('filtroCategoria');
         const filtroEstado = document.getElementById('filtroEstado');
+        const filtroHoy = document.getElementById('filtroHoy');
 
         const selectorMes = document.getElementById('selectorMes');
 
@@ -1898,15 +1917,34 @@
             setTimeout(() => { pedidosLoaded = true; }, 2000);
         }
 
+        function esFechaHoy(fechaStr) {
+            if (!fechaStr) return false;
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            const fecha = new Date(fechaStr);
+            fecha.setHours(0, 0, 0, 0);
+            return fecha.getTime() === hoy.getTime();
+        }
+
         function aplicarFiltroPedidos() {
-            const filtro = filtroEstado.value;
-            const pedidosFiltrados = filtro === 'todos'
-                ? pedidosActuales
-                : pedidosActuales.filter(p => p.estado === filtro);
+            const filtroEstadoValue = filtroEstado.value;
+            const soloHoy = filtroHoy.checked;
+
+            let pedidosFiltrados = [...pedidosActuales];
+
+            if (filtroEstadoValue !== 'todos') {
+                pedidosFiltrados = pedidosFiltrados.filter(p => p.estado === filtroEstadoValue);
+            }
+
+            if (soloHoy) {
+                pedidosFiltrados = pedidosFiltrados.filter(p => esFechaHoy(p.fecha));
+            }
+
             renderPedidos(pedidosFiltrados);
         }
 
         filtroEstado.addEventListener('change', aplicarFiltroPedidos);
+        filtroHoy.addEventListener('change', aplicarFiltroPedidos);
 
         function generarMensajeWhatsApp(pedido, estado) {
             const nombreCliente = pedido.nombre || 'Cliente';
@@ -2120,24 +2158,20 @@
                 document.getElementById('pedidosMensual').textContent = '0';
                 return;
             }
-            // Filtrar pedidos del mes seleccionado
             const pedidosMes = pedidosActuales.filter(p => {
                 if (!p.fecha || !p.total) return false;
                 const fecha = new Date(p.fecha);
                 const mes = fecha.getFullYear() + '-' + String(fecha.getMonth() + 1).padStart(2, '0');
                 return mes === mesKey;
             });
-            // Agrupar por día: montos excluyendo cancelados, conteo incluyendo todos
             const mapaDia = new Map();
             const conteoDia = new Map();
             pedidosMes.forEach(p => {
                 const fecha = new Date(p.fecha);
                 const dia = fecha.getDate();
-                // Sumar al total solo si NO está cancelado
                 if (p.estado !== 'cancelado') {
                     mapaDia.set(dia, (mapaDia.get(dia) || 0) + p.total);
                 }
-                // Conteo de pedidos (todos)
                 conteoDia.set(dia, (conteoDia.get(dia) || 0) + 1);
             });
             const dias = Array.from(mapaDia.keys()).sort((a, b) => a - b);
@@ -2174,18 +2208,16 @@
         }
 
         function actualizarGraficos() {
-            // Diario: montos excluyendo cancelados, conteo incluyendo todos
+            // Diario
             const mapaDiario = new Map();
             const conteoDiario = new Map();
             pedidosActuales.forEach(p => {
                 if (!p.fecha || !p.total) return;
                 const fecha = new Date(p.fecha);
                 const clave = fecha.toISOString().split('T')[0];
-                // Monto: solo si NO está cancelado
                 if (p.estado !== 'cancelado') {
                     mapaDiario.set(clave, (mapaDiario.get(clave) || 0) + p.total);
                 }
-                // Conteo: todos los pedidos
                 conteoDiario.set(clave, (conteoDiario.get(clave) || 0) + 1);
             });
             const diasOrdenados = Array.from(mapaDiario.keys()).sort();
@@ -2219,7 +2251,7 @@
                 }
             });
 
-            // Semanal: últimos 7 días, excluyendo cancelados del monto
+            // Semanal
             const hoy = new Date();
             const semanaInicio = new Date(hoy);
             semanaInicio.setDate(hoy.getDate() - 6);
@@ -2267,13 +2299,12 @@
                 }
             });
 
-            // Mensual: se actualiza con el selector
+            // Mensual
             if (selectorMes.value) {
                 actualizarGraficoMensual(selectorMes.value);
             }
         }
 
-        // Evento del selector de mes
         selectorMes.addEventListener('change', function() {
             if (this.value) {
                 actualizarGraficoMensual(this.value);
