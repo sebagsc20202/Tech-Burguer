@@ -1904,8 +1904,11 @@
         }
 
         // ============================================================
-        //  FUNCIONES DE CATEGORÍAS
+        //  FUNCIONES DE CATEGORÍAS (ACTUALIZADAS)
         // ============================================================
+        // Orden fijo para los botones
+        const CATEGORIAS_ORDEN = ['Hamburguesas', 'Papas', 'Bebidas', 'Postres', 'Otros'];
+
         function obtenerCategoriasActivas() {
             const cats = new Set();
             productos.forEach(p => {
@@ -1919,26 +1922,20 @@
         function crearBotonesCategoria() {
             const container = document.getElementById('categoriaButtons');
             container.innerHTML = '';
-            const categorias = obtenerCategoriasActivas();
-            if (categorias.length === 0) {
+            const categoriasActivas = obtenerCategoriasActivas();
+            if (categoriasActivas.length === 0) {
                 container.style.display = 'none';
                 return;
             }
             container.style.display = 'flex';
 
-            // Botón "Todas"
-            const btnTodas = document.createElement('button');
-            btnTodas.className = 'btn-categoria';
-            btnTodas.textContent = 'Todas';
-            btnTodas.dataset.categoria = 'todas';
-            btnTodas.addEventListener('click', function() {
-                categoriaSeleccionada = 'todas';
-                actualizarBotonesActivos();
-                renderProducts('todas');
-            });
-            container.appendChild(btnTodas);
+            // Filtrar y ordenar según CATEGORIAS_ORDEN
+            const categoriasOrdenadas = CATEGORIAS_ORDEN.filter(cat => categoriasActivas.includes(cat));
+            // Si hay categorías activas que no están en el orden, agregarlas al final
+            const extra = categoriasActivas.filter(cat => !CATEGORIAS_ORDEN.includes(cat)).sort();
+            const todasCategorias = [...categoriasOrdenadas, ...extra];
 
-            categorias.forEach(cat => {
+            todasCategorias.forEach(cat => {
                 const btn = document.createElement('button');
                 btn.className = 'btn-categoria';
                 btn.textContent = cat;
@@ -1959,16 +1956,18 @@
         }
 
         function seleccionarCategoriaPorDefecto() {
-            const categorias = obtenerCategoriasActivas();
-            if (categorias.length === 0) {
-                categoriaSeleccionada = 'todas';
+            const categoriasActivas = obtenerCategoriasActivas();
+            if (categoriasActivas.length === 0) {
+                categoriaSeleccionada = null;
                 return;
             }
-            // Si existe "Hamburguesas" y tiene productos activos, seleccionarla
-            if (categorias.includes('Hamburguesas') && productos.some(p => p.categoria === 'Hamburguesas' && p.available !== false)) {
+            // Prioridad: Hamburguesas si está activa
+            if (categoriasActivas.includes('Hamburguesas')) {
                 categoriaSeleccionada = 'Hamburguesas';
             } else {
-                categoriaSeleccionada = categorias[0];
+                // Si no, tomar la primera del orden fijo que esté activa
+                const primera = CATEGORIAS_ORDEN.find(cat => categoriasActivas.includes(cat));
+                categoriaSeleccionada = primera || categoriasActivas[0];
             }
             actualizarBotonesActivos();
         }
