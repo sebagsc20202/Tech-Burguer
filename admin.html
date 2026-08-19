@@ -2270,6 +2270,7 @@
             return mensaje;
         }
 
+        // ===== FUNCIÓN RENDER PEDIDOS (MODIFICADA PARA MOSTRAR ID) =====
         function renderPedidos(pedidos) {
             const list = document.getElementById('pedidoList');
             list.innerHTML = '';
@@ -2298,9 +2299,15 @@
                 }
                 let itemsText = totalItems > 0 ? `<strong style="color:#ffffff;">(${totalItems} ítems)</strong> ` : '';
 
+                // ===== ID DEL PEDIDO =====
+                const idPedido = p.idPedido || 'N/A';
+
                 div.innerHTML = `
                     <div class="info">
-                        <div><strong>${p.nombre || 'Sin nombre'}</strong> (${p.telefono || 'Sin teléfono'})</div>
+                        <div>
+                            <strong>${p.nombre || 'Sin nombre'}</strong> (${p.telefono || 'Sin teléfono'})
+                            <span style="font-size:0.75rem; color:#ffb703; margin-left:8px;">🆔 ${idPedido}</span>
+                        </div>
                         <div style="font-size:0.75rem;">
                             <strong style="color:#ffb703;">${fechaStr}</strong> 
                             <span style="color:#e8f0e8; font-weight:700;">${horaStr}</span> 
