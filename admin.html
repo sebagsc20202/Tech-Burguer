@@ -643,6 +643,7 @@
         }
         .product-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: #ffb703; cursor: pointer; }
 
+        /* ===== BOTONES DE ACCIÓN MÁS GRANDES ===== */
         .product-item .actions {
             display: flex;
             flex-wrap: wrap;
@@ -660,11 +661,11 @@
         .product-item .actions .btn-eliminar {
             background: #f44336;
             color: #fff;
-            padding: 4px 10px;
+            padding: 6px 14px;
             border-radius: 8px;
             border: none;
             font-weight: 700;
-            font-size: 0.7rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: background 0.2s;
             margin-left: 2px;
@@ -673,9 +674,9 @@
         .product-item .actions .btn-mover {
             background: #3a5a3a;
             color: #e8f0e8;
-            font-size: 1rem;
+            font-size: 1.2rem;
             line-height: 1;
-            padding: 2px 8px;
+            padding: 4px 12px;
             border-radius: 8px;
             border: none;
             font-weight: 700;
@@ -687,11 +688,11 @@
         .product-item .actions .btn-editar {
             background: #2196F3;
             color: #fff;
-            padding: 4px 10px;
+            padding: 6px 14px;
             border-radius: 8px;
             border: none;
             font-weight: 700;
-            font-size: 0.7rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: background 0.2s;
         }
@@ -699,29 +700,34 @@
         .product-item .actions .btn-guardar {
             background: #ffb703;
             color: #1a1a1a;
-            padding: 4px 10px;
+            padding: 6px 14px;
             border-radius: 8px;
             border: none;
             font-weight: 700;
-            font-size: 0.7rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: background 0.2s;
         }
         .product-item .actions .btn-guardar:hover { background: #e6a500; }
+
+        /* Botón duplicar: solo "X2", mantiene color morado */
         .product-item .actions .btn-duplicar {
             background: #9c27b0;
             color: #fff;
-            padding: 4px 10px;
+            padding: 6px 14px;
             border-radius: 8px;
             border: none;
             font-weight: 700;
-            font-size: 0.7rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: background 0.2s;
+            min-width: 40px;
+            text-align: center;
         }
         .product-item .actions .btn-duplicar:hover {
             background: #7b1fa2;
         }
+
         .product-item .badge-preview {
             background: #e63946;
             color: #fff;
@@ -1291,7 +1297,7 @@
 
             <hr>
 
-            <!-- ===== 4️⃣ PRODUCTOS (con botón PROMO!!) ===== -->
+            <!-- ===== 4️⃣ PRODUCTOS ===== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
                 <h2>📋 Productos</h2>
                 <button class="btn-add" id="addProductBtn">➕ Nuevo</button>
@@ -1864,7 +1870,7 @@
                         <button class="btn-mover" onclick="moverProducto('${p.id}', 1)" ${isLast ? 'disabled' : ''} title="Bajar">⬇</button>
                         <button class="btn-editar" onclick="editarProducto('${p.id}')" title="Editar">✏️</button>
                         <button class="btn-guardar" onclick="actualizarProducto('${p.id}')" title="Guardar">💾</button>
-                        <button class="btn-duplicar" onclick="duplicarProducto('${p.id}')" title="Duplicar producto">📋 Duplicar</button>
+                        <button class="btn-duplicar" onclick="duplicarProducto('${p.id}')" title="Duplicar">X2</button>
                         <span class="separator">|</span>
                         <button class="btn-eliminar" onclick="eliminarProducto('${p.id}')" title="Eliminar">🗑️</button>
                     </div>
