@@ -562,7 +562,6 @@
             transition: background 0.2s;
         }
         .product-item .actions .btn-guardar:hover { background: #e6a500; }
-        /* Botones de mover ya no se necesitan con drag & drop, pero los mantengo por si acaso */
         .product-item .actions .btn-mover {
             background: #3a5a3a;
             color: #e8f0e8;
@@ -587,14 +586,43 @@
             font-weight: 600;
         }
 
-        /* PROMOCIONES */
-        .promo-item .info { flex: 1; min-width: 120px; }
-        .promo-item .dates { font-size: 0.75rem; color: #b8d0b8; }
-        .promo-item label { display: flex; align-items: center; gap: 4px; font-size: 0.85rem; }
-        .promo-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: #ffb703; cursor: pointer; }
-        .promo-item .actions {
+        /* ===== PROMOCIONES (CORREGIDO) ===== */
+        .promo-item {
             display: flex;
             flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 12px;
+            background: #1f331f;
+            border: 1px solid #3a5a3a;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 6px 0;
+        }
+        .promo-item .info {
+            flex: 2 1 180px;
+            min-width: 120px;
+        }
+        .promo-item .dates {
+            font-size: 0.75rem;
+            color: #b8d0b8;
+            flex: 1 1 auto;
+            white-space: nowrap;
+        }
+        .promo-item label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        .promo-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #ffb703;
+            cursor: pointer;
+        }
+        .promo-item .actions {
+            display: flex;
             align-items: center;
             gap: 6px;
             margin-left: auto;
@@ -1572,12 +1600,11 @@
         function handleDragEnd(e) {
             const el = e.currentTarget;
             el.classList.remove('dragging');
-            // Remover clase drag-over de todos
             document.querySelectorAll('.product-item.drag-over').forEach(item => item.classList.remove('drag-over'));
         }
 
         function handleDragOver(e) {
-            e.preventDefault(); // Necesario para permitir drop
+            e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
         }
 
@@ -1604,7 +1631,6 @@
 
             if (!origenId || !destinoId || origenId === destinoId) return;
 
-            // Intercambiar órdenes
             intercambiarOrden(origenId, destinoId);
         }
 
@@ -1746,7 +1772,7 @@
         }
 
         addProductBtn.addEventListener('click', () => {
-            ocultarFormProducto(); // limpiar
+            ocultarFormProducto();
             formProductoTitulo.textContent = '✏️ Nuevo producto';
             formProducto.classList.add('active');
             document.getElementById('prodNombre').focus();
@@ -1787,11 +1813,9 @@
 
             try {
                 if (editandoProductoId) {
-                    // Actualizar
                     await db.ref('products/' + editandoProductoId).update(nuevoProducto);
                     mostrarToast('Producto actualizado', 'success');
                 } else {
-                    // Crear
                     const snapshot = await db.ref('products').orderByChild('orden').once('value');
                     const data = snapshot.val();
                     let maxOrden = 0;
