@@ -464,13 +464,13 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             margin-left: auto;
         }
         .product-item .actions .separator {
             color: #4a6a4a;
             font-weight: 300;
-            margin: 0 2px 0 6px;
+            margin: 0 4px 0 8px;
             font-size: 1rem;
             user-select: none;
         }
@@ -544,13 +544,13 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             margin-left: auto;
         }
         .promo-item .actions .separator {
             color: #4a6a4a;
             font-weight: 300;
-            margin: 0 2px 0 6px;
+            margin: 0 4px 0 8px;
             font-size: 1rem;
             user-select: none;
         }
@@ -587,13 +587,13 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             margin-left: auto;
         }
         .excepcion-item .actions .separator {
             color: #4a6a4a;
             font-weight: 300;
-            margin: 0 2px 0 6px;
+            margin: 0 4px 0 8px;
             font-size: 1rem;
             user-select: none;
         }
@@ -661,8 +661,15 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             margin-left: auto;
+        }
+        .pedido-item .actions .separator {
+            color: #4a6a4a;
+            font-weight: 300;
+            margin: 0 4px 0 8px;
+            font-size: 1rem;
+            user-select: none;
         }
         .pedido-item .actions .btn-whatsapp {
             background: #25D366;
@@ -671,7 +678,7 @@
             border-radius: 8px;
             padding: 4px 10px;
             font-weight: 700;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             cursor: pointer;
             transition: background 0.2s;
             display: flex;
@@ -692,6 +699,7 @@
             font-size: 0.7rem;
             cursor: pointer;
             transition: background 0.2s;
+            margin-left: 2px;
         }
         .pedido-item .actions .btn-eliminar-pedido:hover { background: #d32f2f; }
         .pedido-item select {
@@ -2127,6 +2135,7 @@
                     </label>
                     <div class="actions">
                         <button class="btn-whatsapp" onclick="abrirWhatsApp('${p.id}')" title="WhatsApp">💬</button>
+                        <span class="separator">|</span>
                         <button class="btn-eliminar-pedido" onclick="eliminarPedido('${p.id}')" title="Eliminar">🗑️</button>
                     </div>
                 `;
