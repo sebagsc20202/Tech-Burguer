@@ -1,0 +1,2320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin · Tech Burgers</title>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ===== RESET ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #1a2e1a;
+            color: #e8f0e8;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .container { max-width: 1100px; width: 100%; padding-top: 20px; }
+        h1 { color: #ffb703; text-align: center; margin-bottom: 30px; font-size: 2rem; }
+        h2 { color: #ffb703; margin: 20px 0 10px; border-bottom: 1px solid #2f4a2f; padding-bottom: 6px; }
+
+        .card {
+            background: #1f331f;
+            border: 2px solid #3a5a3a;
+            border-radius: 16px;
+            padding: 30px 24px;
+            max-width: 400px;
+            margin: 0 auto 30px;
+        }
+        .card h2 { border-bottom: none; text-align: center; margin-top: 0; }
+        .card input {
+            width: 100%;
+            padding: 12px 16px;
+            margin: 8px 0 12px;
+            background: #1a2e1a;
+            border: 1px solid #3a5a3a;
+            border-radius: 40px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+        .card input:focus { border-color: #ffb703; }
+        .card button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 40px;
+            background: #ffb703;
+            color: #1a1a1a;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .card button:hover { background: #e6a500; }
+        .card .error { color: #ef9a9a; font-size: 0.9rem; margin-top: 8px; text-align: center; }
+        .card .hint { color: #8aaa8a; font-size: 0.8rem; text-align: center; margin-top: 8px; }
+
+        #adminPanel { display: none; }
+        #adminPanel.active { display: block; }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .panel-header .user-info { color: #b8d0b8; }
+        .panel-header .user-info strong { color: #ffb703; }
+        .btn-logout {
+            background: #3a1a1a;
+            color: #ef9a9a;
+            border: 2px solid #f44336;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-logout:hover { background: #5a2a2a; }
+
+        /* ===== TOAST ===== */
+        #toastAdmin {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            max-width: 380px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        }
+        #toastAdmin.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .toast-admin-content {
+            background: #1f331f;
+            border-radius: 12px;
+            padding: 16px 20px;
+            border-left: 5px solid #ffb703;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .toast-admin-content .toast-icon {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+        .toast-admin-content .toast-message {
+            flex: 1;
+            font-size: 0.95rem;
+            color: #e8f0e8;
+        }
+        .toast-admin-content.success { border-color: #4caf50; }
+        .toast-admin-content.error { border-color: #f44336; }
+        .toast-admin-content.info { border-color: #2196F3; }
+
+        /* ===== MODAL DE CONFIRMACIÓN ===== */
+        #confirmModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(6px);
+            padding: 20px;
+        }
+        #confirmModal.active {
+            display: flex;
+        }
+        .confirm-modal-content {
+            background: #3a1e1e;
+            border: 3px solid #f44336;
+            border-radius: 20px;
+            padding: 30px 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+        }
+        .confirm-modal-content .icon {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 12px;
+        }
+        .confirm-modal-content .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ff6b6b;
+            margin-bottom: 8px;
+        }
+        .confirm-modal-content .message {
+            font-size: 1rem;
+            color: #f0d0d0;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .confirm-modal-content .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .confirm-modal-content .actions button {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            flex: 1;
+        }
+        .confirm-modal-content .actions button:active { transform: scale(0.97); }
+        .confirm-modal-content .btn-confirm-yes {
+            background: #f44336;
+            color: #fff;
+        }
+        .confirm-modal-content .btn-confirm-yes:hover {
+            background: #d32f2f;
+        }
+        .confirm-modal-content .btn-confirm-no {
+            background: #555;
+            color: #fff;
+        }
+        .confirm-modal-content .btn-confirm-no:hover {
+            background: #444;
+        }
+
+        /* ===== ALERTA DE NUEVO PEDIDO ===== */
+        #nuevoPedidoAlert {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 999999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            cursor: pointer;
+        }
+        #nuevoPedidoAlert.active {
+            display: flex;
+        }
+        .alerta-contenido {
+            background: #1f331f;
+            border: 3px solid #ffb703;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: pulse 1s infinite alternate;
+        }
+        .alerta-contenido .icono {
+            font-size: 4rem;
+        }
+        .alerta-contenido h2 {
+            color: #ffb703;
+            font-size: 2rem;
+            margin: 10px 0;
+            border-bottom: none;
+        }
+        .alerta-contenido p {
+            color: #e8f0e8;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(255,183,3,0.5); }
+            100% { transform: scale(1.02); box-shadow: 0 0 40px rgba(255,183,3,0.9); }
+        }
+
+        /* ===== FORMULARIOS ===== */
+        .form-producto {
+            background: #1f331f;
+            border: 2px solid #ffb703;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 15px 0;
+            display: none;
+        }
+        .form-producto.active { display: block; }
+        .form-producto h3 { color: #ffb703; font-size: 1.3rem; margin-bottom: 16px; text-align: center; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #b8d0b8;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        .form-group label .required { color: #ff6b6b; margin-left: 2px; }
+        .form-group .hint-text {
+            display: block;
+            font-size: 0.7rem;
+            color: #6a8a6a;
+            margin-top: 2px;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 40px;
+            border: 1px solid #3a5a3a;
+            background: #1a2e1a;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            appearance: none;
+            transition: border 0.2s;
+        }
+        .form-group textarea {
+            border-radius: 16px;
+            resize: vertical;
+            min-height: 60px;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus { border-color: #ffb703; }
+        .form-group select option { background: #1a2e1a; color: #fff; }
+
+        .form-row { display: flex; flex-wrap: wrap; gap: 12px; }
+        .form-row .form-group { flex: 1; min-width: 150px; }
+
+        .form-checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 8px 0 4px;
+        }
+        .form-checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #d0e0d0;
+            cursor: pointer;
+        }
+        .form-checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #ffb703;
+            cursor: pointer;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .form-actions button {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .form-actions button:active { transform: scale(0.97); }
+        .btn-save { background: #ffb703; color: #1a1a1a; }
+        .btn-save:hover { background: #e6a500; }
+        .btn-cancel { background: #555; color: #fff; }
+        .btn-cancel:hover { background: #444; }
+        .btn-add {
+            background: #4caf50;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin: 10px 0;
+        }
+        .btn-add:hover { background: #388e3c; }
+        .form-divider { border: none; border-top: 1px solid #2f4a2f; margin: 8px 0 12px; }
+
+        /* ===== FILTRO ===== */
+        .filtro-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 10px 0 16px;
+            flex-wrap: wrap;
+        }
+        .filtro-container label { font-size: 0.9rem; color: #b8d0b8; font-weight: 600; }
+        .filtro-container select {
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: 1px solid #3a5a3a;
+            background: #1a2e1a;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            padding-right: 30px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8d0b8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+        .filtro-container select:focus { border-color: #ffb703; }
+        .filtro-container .filtro-hoy {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #b8d0b8;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .filtro-container .filtro-hoy input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #ffb703;
+            cursor: pointer;
+        }
+
+        /* ===== BOTONES DE ESTADO RÁPIDO ===== */
+        .estado-rapido {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 12px 0 18px;
+        }
+        .estado-rapido .btn-estado {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+        .estado-rapido .btn-estado:active { transform: scale(0.97); }
+        .estado-rapido .btn-abrir { background: #4caf50; color: #fff; }
+        .estado-rapido .btn-abrir:hover { background: #388e3c; }
+        .estado-rapido .btn-cerrar { background: #f44336; color: #fff; }
+        .estado-rapido .btn-cerrar:hover { background: #d32f2f; }
+        .estado-rapido .btn-normal { background: #3a5a3a; color: #e8f0e8; }
+        .estado-rapido .btn-normal:hover { background: #4a6a4a; }
+        .estado-rapido .btn-estado.activo { box-shadow: 0 0 0 2px #fff, 0 0 20px rgba(255,255,255,0.2); }
+
+        /* ===== LISTAS ===== */
+        .product-item, .promo-item, .excepcion-item {
+            background: #1f331f;
+            border: 1px solid #3a5a3a;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+        .product-item .name { flex: 2; font-weight: 600; min-width: 120px; }
+        .product-item .meta { font-size: 0.8rem; color: #b8d0b8; display: flex; flex-wrap: wrap; gap: 8px; }
+        .product-item .meta span { background: #2a4a2a; padding: 2px 10px; border-radius: 30px; }
+        .product-item label { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
+        .product-item input[type="number"] {
+            width: 70px;
+            padding: 6px 8px;
+            border-radius: 30px;
+            border: 1px solid #3a5a3a;
+            background: #1a2e1a;
+            color: #fff;
+            font-weight: 600;
+        }
+        .product-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #ffb703; cursor: pointer; }
+
+        .product-item .actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+        .product-item .actions .separator {
+            color: #4a6a4a;
+            font-weight: 300;
+            margin: 0 4px 0 10px;
+            font-size: 1.2rem;
+            user-select: none;
+        }
+        .product-item .actions .btn-eliminar {
+            background: #f44336;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-left: 4px;
+        }
+        .product-item .actions .btn-eliminar:hover { background: #d32f2f; }
+        .product-item .actions .btn-mover {
+            background: #3a5a3a;
+            color: #e8f0e8;
+            font-size: 1.2rem;
+            line-height: 1;
+            padding: 4px 10px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .product-item .actions .btn-mover:hover { background: #4a6a4a; }
+        .product-item .actions .btn-mover:disabled { opacity: 0.3; cursor: not-allowed; }
+        .product-item .actions .btn-editar {
+            background: #2196F3;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .product-item .actions .btn-editar:hover { background: #1976D2; }
+        .product-item .actions .btn-guardar {
+            background: #ffb703;
+            color: #1a1a1a;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .product-item .actions .btn-guardar:hover { background: #e6a500; }
+
+        .product-item .badge-preview {
+            background: #e63946;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        /* PROMOCIONES */
+        .promo-item .info { flex: 1; min-width: 150px; }
+        .promo-item .dates { font-size: 0.8rem; color: #b8d0b8; }
+        .promo-item label { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
+        .promo-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #ffb703; cursor: pointer; }
+        .promo-item .actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+        .promo-item .actions .separator {
+            color: #4a6a4a;
+            font-weight: 300;
+            margin: 0 4px 0 10px;
+            font-size: 1.2rem;
+            user-select: none;
+        }
+        .promo-item .actions .btn-editar-promo {
+            background: #2196F3;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .promo-item .actions .btn-editar-promo:hover { background: #1976D2; }
+        .promo-item .actions .btn-eliminar-promo {
+            background: #f44336;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-left: 4px;
+        }
+        .promo-item .actions .btn-eliminar-promo:hover { background: #d32f2f; }
+
+        /* EXCEPCIONES */
+        .excepcion-item .info { flex: 2; min-width: 150px; }
+        .excepcion-item .estado { font-weight: 600; }
+        .excepcion-item .actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+        .excepcion-item .actions .separator {
+            color: #4a6a4a;
+            font-weight: 300;
+            margin: 0 4px 0 10px;
+            font-size: 1.2rem;
+            user-select: none;
+        }
+        .excepcion-item .actions .btn-editar-excepcion {
+            background: #2196F3;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .excepcion-item .actions .btn-editar-excepcion:hover { background: #1976D2; }
+        .excepcion-item .actions .btn-eliminar-excepcion {
+            background: #f44336;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-left: 4px;
+        }
+        .excepcion-item .actions .btn-eliminar-excepcion:hover { background: #d32f2f; }
+
+        /* ===== PEDIDOS ===== */
+        .pedido-list-wrapper {
+            max-height: 480px;
+            overflow-y: auto;
+            margin-top: 10px;
+            border-radius: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: #ffb703 #1f331f;
+        }
+        .pedido-list-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+        .pedido-list-wrapper::-webkit-scrollbar-track {
+            background: #1f331f;
+            border-radius: 8px;
+        }
+        .pedido-list-wrapper::-webkit-scrollbar-thumb {
+            background: #ffb703;
+            border-radius: 8px;
+        }
+
+        .pedido-item {
+            background: #1f331f;
+            border: 1px solid #3a5a3a;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+        .pedido-item .info { flex: 2; min-width: 200px; }
+        .pedido-item .estado-label { font-weight: 600; min-width: 80px; }
+        .pedido-item .actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+        .pedido-item .actions .btn-whatsapp {
+            background: #25D366;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 6px 14px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+        }
+        .pedido-item .actions .btn-whatsapp:hover {
+            background: #1ebe5a;
+        }
+        .pedido-item .actions .btn-eliminar-pedido {
+            background: #f44336;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .pedido-item .actions .btn-eliminar-pedido:hover { background: #d32f2f; }
+        .pedido-item select {
+            background: #1a2e1a;
+            color: #fff;
+            border: 1px solid #3a5a3a;
+            border-radius: 30px;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            outline: none;
+            cursor: pointer;
+        }
+        .pedido-item select:focus { border-color: #ffb703; }
+
+        .hidden { display: none !important; }
+
+        /* ===== GRÁFICOS ===== */
+        .grafico-container {
+            background: #1f331f;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #3a5a3a;
+            flex: 1;
+            min-width: 280px;
+        }
+        .grafico-container h3 {
+            color: #ffb703;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .grafico-container canvas {
+            width: 100% !important;
+            max-height: 200px;
+        }
+        .grafico-container .total-periodo {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.1rem;
+            color: #e8f0e8;
+        }
+        .grafico-container .total-periodo span {
+            font-weight: 700;
+        }
+        .grafico-container .total-periodo .monto {
+            color: #ffb703;
+        }
+        .grafico-container .total-periodo .pedidos {
+            color: #4caf50;
+        }
+        .selector-mes {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 8px 0 12px;
+            align-items: center;
+        }
+        .selector-mes label {
+            color: #b8d0b8;
+            font-weight: 600;
+        }
+        .selector-mes select {
+            background: #1a2e1a;
+            color: #fff;
+            border: 1px solid #3a5a3a;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+        }
+        .selector-mes select:focus {
+            border-color: #ffb703;
+        }
+
+        @media (max-width: 600px) {
+            .product-item, .promo-item, .excepcion-item, .pedido-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .product-item label { justify-content: space-between; }
+            .product-item .actions,
+            .promo-item .actions,
+            .excepcion-item .actions,
+            .pedido-item .actions {
+                margin-left: 0;
+                justify-content: flex-end;
+            }
+            .form-row { flex-direction: column; }
+            .form-row .form-group { min-width: auto; }
+            .form-actions { flex-direction: column; }
+            .filtro-container { flex-direction: column; align-items: stretch; }
+            .estado-rapido { flex-direction: column; }
+            .product-item .actions .separator,
+            .promo-item .actions .separator,
+            .excepcion-item .actions .separator {
+                display: none;
+            }
+            .product-item .actions .btn-eliminar,
+            .promo-item .actions .btn-eliminar-promo,
+            .excepcion-item .actions .btn-eliminar-excepcion,
+            .pedido-item .actions .btn-eliminar-pedido {
+                margin-left: 0;
+                width: 100%;
+                text-align: center;
+                margin-top: 4px;
+            }
+            .product-item .actions .btn-mover,
+            .product-item .actions .btn-editar,
+            .product-item .actions .btn-guardar {
+                flex: 1;
+                text-align: center;
+            }
+            .promo-item .actions .btn-editar-promo,
+            .promo-item .actions .btn-eliminar-promo {
+                flex: 1;
+                text-align: center;
+            }
+            .excepcion-item .actions .btn-editar-excepcion,
+            .excepcion-item .actions .btn-eliminar-excepcion {
+                flex: 1;
+                text-align: center;
+            }
+            .pedido-item .actions .btn-whatsapp,
+            .pedido-item .actions .btn-eliminar-pedido {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+            .grafico-container {
+                min-width: auto;
+            }
+            .selector-mes {
+                flex-direction: column;
+                gap: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍔 Admin Tech Burgers</h1>
+
+        <!-- ===== TOAST ===== -->
+        <div id="toastAdmin">
+            <div class="toast-admin-content" id="toastAdminContent">
+                <span class="toast-icon" id="toastIcon">✅</span>
+                <span class="toast-message" id="toastMessage">Mensaje</span>
+            </div>
+        </div>
+
+        <!-- ===== MODAL DE CONFIRMACIÓN ===== -->
+        <div id="confirmModal">
+            <div class="confirm-modal-content">
+                <span class="icon">⚠️</span>
+                <div class="title" id="confirmTitle">Eliminar</div>
+                <div class="message" id="confirmMessage">¿Estás seguro?</div>
+                <div class="actions">
+                    <button class="btn-confirm-yes" id="confirmYes">Sí, eliminar</button>
+                    <button class="btn-confirm-no" id="confirmNo">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ALERTA DE NUEVO PEDIDO ===== -->
+        <div id="nuevoPedidoAlert">
+            <div class="alerta-contenido">
+                <div class="icono">📦</div>
+                <h2>¡Nuevo pedido!</h2>
+                <p id="alertaPedidoInfo">Haz clic en cualquier parte para cerrar.</p>
+            </div>
+        </div>
+
+        <!-- ===== LOGIN ===== -->
+        <div id="authSection" class="card">
+            <h2>🔐 Iniciar sesión</h2>
+            <input type="email" id="emailInput" placeholder="Correo electrónico" />
+            <input type="password" id="passInput" placeholder="Contraseña" />
+            <div id="authError" class="error"></div>
+            <button id="authButton">Ingresar</button>
+            <div class="hint">Usá el correo y contraseña configurados en Firebase.</div>
+        </div>
+
+        <!-- ===== PANEL DE ADMIN ===== -->
+        <div id="adminPanel">
+            <div class="panel-header">
+                <span class="user-info">👤 <strong id="userEmail">admin@techburgers.com</strong></span>
+                <button class="btn-logout" id="logoutBtn">🚪 Cerrar sesión</button>
+            </div>
+
+            <!-- ===== 1️⃣ PEDIDOS ===== -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <h2>📦 Pedidos</h2>
+                <div class="filtro-container" style="margin:0;">
+                    <label for="filtroEstado">Filtrar por estado:</label>
+                    <select id="filtroEstado">
+                        <option value="todos">Todos</option>
+                        <option value="pendiente">⏳ Pendiente</option>
+                        <option value="preparando">👨‍🍳 Preparando</option>
+                        <option value="listo">✅ Listo</option>
+                        <option value="entregado">🚚 Entregado</option>
+                        <option value="cancelado">❌ Cancelado</option>
+                    </select>
+                    <label class="filtro-hoy">
+                        <input type="checkbox" id="filtroHoy" checked />
+                        📅 Solo pedidos de hoy
+                    </label>
+                </div>
+            </div>
+            <div class="pedido-list-wrapper" id="pedidoListWrapper">
+                <div id="pedidoList"></div>
+            </div>
+
+            <hr style="border-color:#2f4a2f; margin:20px 0;">
+
+            <!-- ===== 2️⃣ PROMOCIONES ===== -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <h2>🎯 Promociones</h2>
+                <button class="btn-add" id="addPromoBtn">➕ Agregar promoción</button>
+            </div>
+            <div id="promoList"></div>
+            <div id="formPromo" class="form-producto">
+                <h3>✏️ Nueva promoción</h3>
+                <div class="form-group"><label for="promoTitulo">Título <span class="required">*</span></label><input type="text" id="promoTitulo" placeholder="Ej: 2x1 en Clásicas" /></div>
+                <div class="form-group"><label for="promoDesc">Descripción <span class="required">*</span></label><input type="text" id="promoDesc" placeholder="Ej: Llevá dos burgers por el precio de una" /></div>
+                <div class="form-group"><label for="promoImagen">URL imagen</label><input type="text" id="promoImagen" placeholder="Ej: images/promo1.jpg" /><span class="hint-text">Imagen del banner</span></div>
+                <div class="form-row">
+                    <div class="form-group"><label for="promoInicio">Fecha inicio</label><input type="date" id="promoInicio" /></div>
+                    <div class="form-group"><label for="promoFin">Fecha fin</label><input type="date" id="promoFin" /></div>
+                </div>
+                <div class="form-checkbox-group">
+                    <label><input type="checkbox" id="promoActiva" checked /> Activa</label>
+                </div>
+                <div class="form-actions">
+                    <button class="btn-save" id="savePromoBtn">💾 Guardar</button>
+                    <button class="btn-cancel" id="cancelPromoBtn">Cancelar</button>
+                </div>
+            </div>
+
+            <hr style="border-color:#2f4a2f; margin:20px 0;">
+
+            <!-- ===== 3️⃣ HORARIO EXCEPCIONAL ===== -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <h2>⏰ Horario excepcional</h2>
+                <button class="btn-add" id="addExcepcionBtn">➕ Agregar excepción</button>
+            </div>
+            <div class="estado-rapido">
+                <button class="btn-estado btn-abrir" id="btnAbrirAhora" title="Abrir el local ahora (crea excepción para hoy)">🔓 Abrir ahora</button>
+                <button class="btn-estado btn-cerrar" id="btnCerrarAhora" title="Cerrar el local ahora (crea excepción para hoy)">🔒 Cerrar ahora</button>
+                <button class="btn-estado btn-normal" id="btnVolverNormal" title="Eliminar excepción de hoy y volver al horario normal">⏰ Horario normal</button>
+            </div>
+            <div id="excepcionList"></div>
+            <div id="formExcepcion" class="form-producto">
+                <h3 id="formExcepcionTitulo">✏️ Nueva excepción</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="exFechaInicio">Fecha inicio <span class="required">*</span></label>
+                        <input type="date" id="exFechaInicio" />
+                    </div>
+                    <div class="form-group">
+                        <label for="exFechaFin">Fecha fin</label>
+                        <input type="date" id="exFechaFin" />
+                        <span class="hint-text">Si es un solo día, dejalo igual que la fecha inicio.</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="exTipo">Tipo</label>
+                    <select id="exTipo">
+                        <option value="cerrado">🔴 Cerrado</option>
+                        <option value="abierto">🟢 Abierto</option>
+                        <option value="horario_especial">🟡 Horario especial</option>
+                    </select>
+                </div>
+                <div id="exHorarioEspecial" style="display:none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="exHoraApertura">Hora apertura</label>
+                            <input type="time" id="exHoraApertura" value="20:00" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exHoraCierre">Hora cierre</label>
+                            <input type="time" id="exHoraCierre" value="00:00" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="exMensaje">Mensaje (opcional)</label>
+                    <input type="text" id="exMensaje" placeholder="Ej: Cerrado por feriado" />
+                </div>
+                <div class="form-actions">
+                    <button class="btn-save" id="saveExcepcionBtn">💾 Guardar</button>
+                    <button class="btn-cancel" id="cancelExcepcionBtn">Cancelar</button>
+                </div>
+            </div>
+
+            <hr style="border-color:#2f4a2f; margin:20px 0;">
+
+            <!-- ===== 4️⃣ PRODUCTOS ===== -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <h2>📋 Productos</h2>
+                <button class="btn-add" id="addProductBtn">➕ Nuevo producto</button>
+            </div>
+            <div class="filtro-container">
+                <label for="filtroCategoria">🔍 Filtrar por categoría:</label>
+                <select id="filtroCategoria"><option value="todas">Todas</option></select>
+            </div>
+            <div id="formProducto" class="form-producto">
+                <h3 id="formProductoTitulo">✏️ Nuevo producto</h3>
+                <div class="form-group"><label for="prodNombre">Nombre <span class="required">*</span></label><input type="text" id="prodNombre" placeholder="Ej: Doble Cheddar" /></div>
+                <div class="form-group"><label for="prodPrecio">Precio <span class="required">*</span></label><input type="text" id="prodPrecio" placeholder="Ej: 15000" /></div>
+                <div class="form-group"><label for="prodDesc">Descripción</label><textarea id="prodDesc" placeholder="Ej: Doble medallón 120gr · doble cheddar · salsa Tech."></textarea></div>
+                <div class="form-row">
+                    <div class="form-group"><label for="prodImagen">URL imagen</label><input type="text" id="prodImagen" placeholder="Ej: images/cheddar.jpg" /><span class="hint-text">Imagen que se muestra en la tarjeta</span></div>
+                    <div class="form-group"><label for="prodPopupImg">URL popup</label><input type="text" id="prodPopupImg" placeholder="Ej: images/cheddar-popup.jpg" /><span class="hint-text">Imagen ampliada</span></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="prodCategoria">Categoría</label>
+                        <select id="prodCategoria">
+                            <option value="Hamburguesas">🍔 Hamburguesas</option>
+                            <option value="Papas">🍟 Papas</option>
+                            <option value="Bebidas">🥤 Bebidas</option>
+                            <option value="Postres">🍰 Postres</option>
+                            <option value="Otros">📦 Otros</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="prodTiempo">Tiempo (min)</label><input type="number" id="prodTiempo" value="15" min="1" /><span class="hint-text">Tiempo estimado de preparación</span></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="prodBadge">Badge</label><input type="text" id="prodBadge" placeholder="Ej: NUEVO, BASE, PROMO" /><span class="hint-text">Etiqueta destacada</span></div>
+                    <div class="form-group"><label for="prodId">ID <span class="required">*</span></label><input type="text" id="prodId" placeholder="Ej: doble-cheddar" /><span class="hint-text">🔑 Único, sin espacios. Solo minúsculas y guiones. <strong>No se puede cambiar en edición.</strong></span></div>
+                </div>
+                <hr class="form-divider" />
+                <div class="form-checkbox-group">
+                    <label><input type="checkbox" id="prodHasExtras" /> Tiene medallones extra y toppings</label>
+                    <label><input type="checkbox" id="prodDisponible" checked /> Disponible</label>
+                </div>
+                <div class="form-actions">
+                    <button class="btn-save" id="saveProductBtn">💾 Guardar</button>
+                    <button class="btn-cancel" id="cancelProductBtn">Cancelar</button>
+                </div>
+            </div>
+            <div id="productList"></div>
+
+            <!-- ===== 5️⃣ INGRESOS ===== -->
+            <hr style="border-color:#2f4a2f; margin:20px 0;">
+            <h2>💰 Ingresos</h2>
+            <div style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-bottom:20px;">
+                <!-- Diario -->
+                <div class="grafico-container">
+                    <h3>📅 Diario</h3>
+                    <canvas id="chartDiario" height="150"></canvas>
+                    <div class="total-periodo">
+                        <span class="monto">Total: $<span id="totalDiario">0</span></span> &nbsp;|&nbsp;
+                        <span class="pedidos">Pedidos: <span id="pedidosDiario">0</span></span>
+                    </div>
+                </div>
+                <!-- Semanal -->
+                <div class="grafico-container">
+                    <h3>📅 Semanal</h3>
+                    <canvas id="chartSemanal" height="150"></canvas>
+                    <div class="total-periodo">
+                        <span class="monto">Total: $<span id="totalSemanal">0</span></span> &nbsp;|&nbsp;
+                        <span class="pedidos">Pedidos: <span id="pedidosSemanal">0</span></span>
+                    </div>
+                </div>
+                <!-- Mensual con selector -->
+                <div class="grafico-container">
+                    <h3>📅 Mensual</h3>
+                    <div class="selector-mes">
+                        <label for="selectorMes">Mes:</label>
+                        <select id="selectorMes"></select>
+                    </div>
+                    <canvas id="chartMensual" height="150"></canvas>
+                    <div class="total-periodo">
+                        <span class="monto">Total: $<span id="totalMensual">0</span></span> &nbsp;|&nbsp;
+                        <span class="pedidos">Pedidos: <span id="pedidosMensual">0</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <hr style="border-color:#2f4a2f; margin:20px 0;">
+            <div style="font-size:0.8rem; color:#6a8a6a; text-align:center;">
+                Los cambios se guardan automáticamente en Firebase.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  CONFIGURACIÓN DE FIREBASE
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbS9zdQcpj0HThGqQVKcfsNjMFQ9gjf9U",
+            authDomain: "tech-burgers.firebaseapp.com",
+            databaseURL: "https://tech-burgers-default-rtdb.firebaseio.com",
+            projectId: "tech-burgers",
+            storageBucket: "tech-burgers.firebasestorage.app",
+            messagingSenderId: "795678558305",
+            appId: "1:795678558305:web:5929a7d3789a939d6f4220"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // ============================================================
+        //  CONSTANTES
+        // ============================================================
+        const ENLACE_LOCAL = 'https://bit.ly/4xOCf1o';
+
+        // ============================================================
+        //  TOAST
+        // ============================================================
+        let toastTimeout = null;
+        function mostrarToast(mensaje, tipo = 'success') {
+            const toast = document.getElementById('toastAdmin');
+            const content = document.getElementById('toastAdminContent');
+            const icon = document.getElementById('toastIcon');
+            const message = document.getElementById('toastMessage');
+            content.classList.remove('success', 'error', 'info');
+            if (tipo === 'success') {
+                content.classList.add('success');
+                icon.textContent = '✅';
+            } else if (tipo === 'error') {
+                content.classList.add('error');
+                icon.textContent = '❌';
+            } else {
+                content.classList.add('info');
+                icon.textContent = 'ℹ️';
+            }
+            message.textContent = mensaje;
+            toast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ============================================================
+        //  MODAL CONFIRMACIÓN
+        // ============================================================
+        let confirmResolve = null;
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmTitle = document.getElementById('confirmTitle');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const confirmYes = document.getElementById('confirmYes');
+        const confirmNo = document.getElementById('confirmNo');
+
+        function mostrarConfirm(titulo, mensaje) {
+            return new Promise((resolve) => {
+                confirmTitle.textContent = titulo || 'Eliminar';
+                confirmMessage.textContent = mensaje || '¿Estás seguro de eliminar este registro?';
+                confirmModal.classList.add('active');
+                confirmResolve = resolve;
+            });
+        }
+
+        confirmYes.addEventListener('click', () => {
+            confirmModal.classList.remove('active');
+            if (confirmResolve) confirmResolve(true);
+        });
+        confirmNo.addEventListener('click', () => {
+            confirmModal.classList.remove('active');
+            if (confirmResolve) confirmResolve(false);
+        });
+        confirmModal.addEventListener('click', (e) => {
+            if (e.target === confirmModal) {
+                confirmModal.classList.remove('active');
+                if (confirmResolve) confirmResolve(false);
+            }
+        });
+
+        // ============================================================
+        //  ALERTA DE NUEVO PEDIDO CON SONIDO
+        // ============================================================
+        let alertaActiva = false;
+        let audioCtx = null;
+        let intervaloPitido = null;
+
+        function mostrarAlerta(pedidoInfo) {
+            if (alertaActiva) return;
+            alertaActiva = true;
+            const alerta = document.getElementById('nuevoPedidoAlert');
+            const info = document.getElementById('alertaPedidoInfo');
+            let texto = `Cliente: ${pedidoInfo.nombre || 'Anónimo'}\nTotal: $${(pedidoInfo.total || 0).toLocaleString()}`;
+            if (pedidoInfo.productos && pedidoInfo.productos.length > 0) {
+                const items = pedidoInfo.productos.map(p => `${p.cantidad}x ${p.nombre}`).join(', ');
+                texto += `\nProductos: ${items}`;
+            }
+            info.textContent = texto + '  \n(Haz clic en cualquier parte para cerrar)';
+            alerta.classList.add('active');
+
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                function pitido() {
+                    if (!alertaActiva) return;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = 800;
+                    gain.gain.value = 0.3;
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.2);
+                }
+                pitido();
+                intervaloPitido = setInterval(pitido, 1200);
+            } catch (e) { console.warn('Sonido no disponible', e); }
+        }
+
+        function ocultarAlerta() {
+            if (!alertaActiva) return;
+            alertaActiva = false;
+            document.getElementById('nuevoPedidoAlert').classList.remove('active');
+            if (intervaloPitido) { clearInterval(intervaloPitido); intervaloPitido = null; }
+            if (audioCtx && audioCtx.state !== 'closed') { audioCtx.close().catch(() => {}); }
+            audioCtx = null;
+        }
+
+        document.addEventListener('click', function(e) { if (alertaActiva) ocultarAlerta(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && alertaActiva) ocultarAlerta(); });
+
+        // ============================================================
+        //  REFERENCIAS DOM
+        // ============================================================
+        const authSection = document.getElementById('authSection');
+        const adminPanel = document.getElementById('adminPanel');
+        const authError = document.getElementById('authError');
+        const emailInput = document.getElementById('emailInput');
+        const passInput = document.getElementById('passInput');
+        const authButton = document.getElementById('authButton');
+        const userEmail = document.getElementById('userEmail');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        const addProductBtn = document.getElementById('addProductBtn');
+        const formProducto = document.getElementById('formProducto');
+        const saveProductBtn = document.getElementById('saveProductBtn');
+        const cancelProductBtn = document.getElementById('cancelProductBtn');
+        const formProductoTitulo = document.getElementById('formProductoTitulo');
+
+        const addPromoBtn = document.getElementById('addPromoBtn');
+        const formPromo = document.getElementById('formPromo');
+        const savePromoBtn = document.getElementById('savePromoBtn');
+        const cancelPromoBtn = document.getElementById('cancelPromoBtn');
+
+        const addExcepcionBtn = document.getElementById('addExcepcionBtn');
+        const formExcepcion = document.getElementById('formExcepcion');
+        const saveExcepcionBtn = document.getElementById('saveExcepcionBtn');
+        const cancelExcepcionBtn = document.getElementById('cancelExcepcionBtn');
+        const formExcepcionTitulo = document.getElementById('formExcepcionTitulo');
+        const exTipo = document.getElementById('exTipo');
+        const exHorarioEspecial = document.getElementById('exHorarioEspecial');
+
+        const btnAbrirAhora = document.getElementById('btnAbrirAhora');
+        const btnCerrarAhora = document.getElementById('btnCerrarAhora');
+        const btnVolverNormal = document.getElementById('btnVolverNormal');
+
+        const filtroCategoria = document.getElementById('filtroCategoria');
+        const filtroEstado = document.getElementById('filtroEstado');
+        const filtroHoy = document.getElementById('filtroHoy');
+
+        const selectorMes = document.getElementById('selectorMes');
+
+        // ============================================================
+        //  AUTENTICACIÓN
+        // ============================================================
+        authButton.addEventListener('click', () => {
+            const email = emailInput.value.trim();
+            const pass = passInput.value.trim();
+            if (!email || !pass) { authError.textContent = 'Completá ambos campos.'; return; }
+            authError.textContent = '';
+            auth.signInWithEmailAndPassword(email, pass).catch(error => { authError.textContent = error.message; });
+        });
+
+        passInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') authButton.click(); });
+        emailInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') authButton.click(); });
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                authSection.style.display = 'none';
+                adminPanel.classList.add('active');
+                userEmail.textContent = user.email;
+                cargarDatos();
+                ocultarFormProducto();
+                ocultarFormPromo();
+                ocultarFormExcepcion();
+                actualizarBotonesEstado();
+            } else {
+                authSection.style.display = 'block';
+                adminPanel.classList.remove('active');
+                authError.textContent = '';
+                emailInput.value = '';
+                passInput.value = '';
+                db.ref('products').off();
+                db.ref('promotions').off();
+                db.ref('excepciones').off();
+                db.ref('pedidos').off();
+                ocultarAlerta();
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => { auth.signOut(); });
+
+        // ============================================================
+        //  CARGA DE DATOS
+        // ============================================================
+        let productosCompletos = [];
+        let categoriasUnicas = [];
+        let excepcionesActuales = [];
+        let pedidosActuales = [];
+
+        function cargarDatos() {
+            cargarProductos();
+            cargarPromociones();
+            cargarExcepciones();
+            cargarPedidos();
+        }
+
+        // ---- PRODUCTOS (código abreviado) ----
+        function cargarProductos() {
+            db.ref('products').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) { crearProductosDefault(); return; }
+                productosCompletos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                productosCompletos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
+                const categorias = new Set();
+                productosCompletos.forEach(p => { if (p.categoria) categorias.add(p.categoria); });
+                categoriasUnicas = Array.from(categorias).sort();
+                actualizarOpcionesFiltro();
+                aplicarFiltro();
+            });
+        }
+
+        function actualizarOpcionesFiltro() {
+            const valorActual = filtroCategoria.value;
+            filtroCategoria.innerHTML = '<option value="todas">Todas</option>';
+            categoriasUnicas.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                filtroCategoria.appendChild(opt);
+            });
+            if (categoriasUnicas.includes(valorActual) || valorActual === 'todas') filtroCategoria.value = valorActual;
+            else filtroCategoria.value = 'todas';
+        }
+
+        function aplicarFiltro() {
+            const categoriaSeleccionada = filtroCategoria.value;
+            let productosFiltrados = [...productosCompletos];
+            if (categoriaSeleccionada !== 'todas') {
+                productosFiltrados = productosFiltrados.filter(p => p.categoria === categoriaSeleccionada);
+            }
+            renderProductos(productosFiltrados);
+        }
+
+        filtroCategoria.addEventListener('change', aplicarFiltro);
+
+        function renderProductos(productos) {
+            const list = document.getElementById('productList');
+            list.innerHTML = '';
+            if (productos.length === 0) { list.innerHTML = '<p style="color:#b8d0b8;">No hay productos en esta categoría.</p>'; return; }
+            productos.forEach((p, index) => {
+                const div = document.createElement('div');
+                div.className = 'product-item';
+                const badgeHtml = p.badge ? `<span class="badge-preview">${p.badge}</span>` : '';
+                const metaHtml = `<div class="meta">${p.categoria ? `<span>📂 ${p.categoria}</span>` : ''}${p.tiempoPreparacion ? `<span>⏱️ ${p.tiempoPreparacion} min</span>` : ''}</div>`;
+                const isFirst = index === 0;
+                const isLast = index === productos.length - 1;
+                div.innerHTML = `
+                    <div style="flex:1; min-width:150px;"><div class="name">${p.name} ${badgeHtml}</div>${metaHtml}</div>
+                    <label>💰 Precio: <input type="number" value="${p.price}" data-id="${p.id}" class="price-input" /></label>
+                    <label>📦 Disponible: <input type="checkbox" ${p.available !== false ? 'checked' : ''} data-id="${p.id}" class="avail-input" /></label>
+                    <div class="actions">
+                        <button class="btn-mover" onclick="moverProducto('${p.id}', -1)" ${isFirst ? 'disabled' : ''} title="Subir producto">⬆</button>
+                        <button class="btn-mover" onclick="moverProducto('${p.id}', 1)" ${isLast ? 'disabled' : ''} title="Bajar producto">⬇</button>
+                        <button class="btn-editar" onclick="editarProducto('${p.id}')" title="Editar producto">✏️</button>
+                        <button class="btn-guardar" onclick="actualizarProducto('${p.id}')" title="Guardar cambios de precio/disponibilidad">💾</button>
+                        <span class="separator">|</span>
+                        <button class="btn-eliminar" onclick="eliminarProducto('${p.id}')" title="Eliminar producto permanentemente">🗑️</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        window.moverProducto = async function(id, direccion) {
+            const snapshot = await db.ref('products').once('value');
+            const data = snapshot.val();
+            if (!data) return;
+            const productos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+            productos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
+            const idx = productos.findIndex(p => p.id === id);
+            if (idx === -1) return;
+            const nuevoIdx = idx + direccion;
+            if (nuevoIdx < 0 || nuevoIdx >= productos.length) return;
+            const productoActual = productos[idx];
+            const productoVecino = productos[nuevoIdx];
+            const ordenActual = productoActual.orden !== undefined ? productoActual.orden : idx;
+            const ordenVecino = productoVecino.orden !== undefined ? productoVecino.orden : nuevoIdx;
+            const updates = {};
+            updates['products/' + productoActual.id + '/orden'] = ordenVecino;
+            updates['products/' + productoVecino.id + '/orden'] = ordenActual;
+            await db.ref().update(updates);
+        };
+
+        window.editarProducto = async function(id) {
+            try {
+                const snapshot = await db.ref('products/' + id).once('value');
+                const producto = snapshot.val();
+                if (!producto) { mostrarToast('Producto no encontrado', 'error'); return; }
+                document.getElementById('prodNombre').value = producto.name || '';
+                document.getElementById('prodPrecio').value = producto.price || '';
+                document.getElementById('prodDesc').value = producto.desc || '';
+                document.getElementById('prodImagen').value = producto.imagen || '';
+                document.getElementById('prodPopupImg').value = producto.popupImg || '';
+                document.getElementById('prodCategoria').value = producto.categoria || 'Hamburguesas';
+                document.getElementById('prodTiempo').value = producto.tiempoPreparacion || 15;
+                document.getElementById('prodBadge').value = producto.badge || '';
+                document.getElementById('prodId').value = producto.id || '';
+                document.getElementById('prodId').readOnly = true;
+                document.getElementById('prodHasExtras').checked = producto.hasExtras || false;
+                document.getElementById('prodDisponible').checked = producto.available !== false;
+                window.editandoProductoId = id;
+                formProductoTitulo.textContent = '✏️ Editando: ' + producto.name;
+                formProducto.classList.add('active');
+                formProducto.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (error) {
+                mostrarToast('Error al cargar producto: ' + error.message, 'error');
+            }
+        };
+
+        window.eliminarProducto = async function(id) {
+            const confirmado = await mostrarConfirm('Eliminar producto', `¿Eliminar el producto "${id}" permanentemente?`);
+            if (!confirmado) return;
+            try {
+                await db.ref('products/' + id).remove();
+                mostrarToast('Producto eliminado', 'success');
+            } catch (error) {
+                mostrarToast('Error al eliminar: ' + error.message, 'error');
+            }
+        };
+
+        window.actualizarProducto = async function(id) {
+            const priceInput = document.querySelector(`.price-input[data-id="${id}"]`);
+            const availInput = document.querySelector(`.avail-input[data-id="${id}"]`);
+            if (!priceInput || !availInput) return;
+            const price = parseInt(priceInput.value);
+            const available = availInput.checked;
+            try {
+                await db.ref('products/' + id).update({ price, available });
+                mostrarToast('Producto actualizado', 'success');
+            } catch (error) {
+                mostrarToast('Error: ' + error.message, 'error');
+            }
+        };
+
+        function crearProductosDefault() {
+            const defaultProducts = [
+                { id: 'armatuburger', name: 'Armá tu Burger', price: 12000, desc: '1 medallón 120gr · doble cheddar · salsa Tech.', hasExtras: true, badge: 'BASE', imagen: 'images/arm.jpg', popupImg: 'images/bn1.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15, orden: 0 },
+                { id: 'doblep', name: 'Doble Provoleta', price: 18000, desc: 'Doble medallón 120gr · provoleta · morrones asados · mayo de chimi · pan brioche.', hasExtras: false, badge: null, imagen: 'images/pro.jpg', popupImg: 'images/bn2.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20, orden: 1 },
+                { id: 'intense', name: 'Intense', price: 18000, desc: 'Doble medallón 120gr · roquefort fundido · champis asados · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/int.jpg', popupImg: 'images/bn3.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20, orden: 2 },
+                { id: 'techmex', name: 'Tech Mex', price: 18000, desc: 'Doble medallón 120gr · doble queso dambo · guacamole · crema de cebollín · pan de papa.', hasExtras: false, badge: null, imagen: 'images/mex.jpg', popupImg: 'images/bn4.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 20, orden: 3 },
+                { id: 'yankee', name: 'Yankee', price: 16000, desc: 'Doble medallón 120gr · doble cheddar · panceta ahumada crocante · barbacoa · pan brioche.', hasExtras: false, badge: null, imagen: 'images/yan.jpg', popupImg: 'images/bn5.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 18, orden: 4 },
+                { id: 'clasica', name: 'Clásica', price: 16000, desc: 'Medallón 120gr · doble queso dambo · jamón cocido · huevo · lechuga · tomate · mayonesa · pan de papa.', hasExtras: false, badge: null, imagen: 'images/cla.jpg', popupImg: 'images/bn6.webp', available: true, categoria: 'Hamburguesas', tiempoPreparacion: 15, orden: 5 }
+            ];
+            defaultProducts.forEach(p => { db.ref('products/' + p.id).set(p); });
+            db.ref('promotions').push({
+                title: 'Promo 2x1',
+                description: 'Llevá dos burgers por el precio de una',
+                image: 'images/promo1.jpg',
+                startDate: '2026-08-18',
+                endDate: '2026-08-31',
+                active: true
+            });
+        }
+
+        let editandoProductoId = null;
+        function mostrarFormProducto() {
+            document.getElementById('prodNombre').value = '';
+            document.getElementById('prodPrecio').value = '';
+            document.getElementById('prodDesc').value = '';
+            document.getElementById('prodImagen').value = '';
+            document.getElementById('prodPopupImg').value = '';
+            document.getElementById('prodCategoria').value = 'Hamburguesas';
+            document.getElementById('prodTiempo').value = 15;
+            document.getElementById('prodBadge').value = '';
+            document.getElementById('prodId').value = '';
+            document.getElementById('prodId').readOnly = false;
+            document.getElementById('prodHasExtras').checked = false;
+            document.getElementById('prodDisponible').checked = true;
+            formProductoTitulo.textContent = '✏️ Nuevo producto';
+            editandoProductoId = null;
+            window.editandoProductoId = null;
+            formProducto.classList.add('active');
+            document.getElementById('prodNombre').focus();
+        }
+        function ocultarFormProducto() {
+            formProducto.classList.remove('active');
+            editandoProductoId = null;
+            window.editandoProductoId = null;
+            document.getElementById('prodId').readOnly = false;
+        }
+
+        addProductBtn.addEventListener('click', mostrarFormProducto);
+        cancelProductBtn.addEventListener('click', ocultarFormProducto);
+
+        saveProductBtn.addEventListener('click', async function() {
+            const nombre = document.getElementById('prodNombre').value.trim();
+            const precio = parseInt(document.getElementById('prodPrecio').value.trim());
+            const desc = document.getElementById('prodDesc').value.trim();
+            const imagen = document.getElementById('prodImagen').value.trim();
+            const popupImg = document.getElementById('prodPopupImg').value.trim();
+            const categoria = document.getElementById('prodCategoria').value;
+            const tiempoPreparacion = parseInt(document.getElementById('prodTiempo').value) || 15;
+            const badge = document.getElementById('prodBadge').value.trim() || null;
+            let id = document.getElementById('prodId').value.trim().toLowerCase().replace(/\s+/g, '-');
+            const hasExtras = document.getElementById('prodHasExtras').checked;
+            const disponible = document.getElementById('prodDisponible').checked;
+            if (!nombre || !precio || !id) { mostrarToast('Nombre, precio e ID son obligatorios.', 'error'); return; }
+            if (isNaN(precio) || precio <= 0) { mostrarToast('Ingresá un precio válido.', 'error'); return; }
+            if (!/^[a-z0-9\-]+$/.test(id)) { mostrarToast('El ID solo puede contener letras minúsculas, números y guiones. Sin espacios.', 'error'); return; }
+            const nuevoProducto = { id, name: nombre, price: precio, desc: desc || '', imagen: imagen || 'images/placeholder.jpg', popupImg: popupImg || imagen || 'images/placeholder.jpg', categoria, tiempoPreparacion, badge, hasExtras, available: disponible };
+            try {
+                if (window.editandoProductoId) {
+                    await db.ref('products/' + window.editandoProductoId).update(nuevoProducto);
+                    mostrarToast('Producto actualizado', 'success');
+                } else {
+                    const snapshot = await db.ref('products').orderByChild('orden').once('value');
+                    const data = snapshot.val();
+                    let maxOrden = 0;
+                    if (data) {
+                        const productos = Object.keys(data).map(key => ({ ...data[key] }));
+                        productos.forEach(p => { if (p.orden !== undefined && p.orden > maxOrden) maxOrden = p.orden; });
+                    }
+                    nuevoProducto.orden = maxOrden + 1;
+                    const exist = await db.ref('products/' + id).once('value');
+                    if (exist.exists()) { mostrarToast('Ya existe un producto con ese ID. Usá otro.', 'error'); return; }
+                    await db.ref('products/' + id).set(nuevoProducto);
+                    mostrarToast('Producto creado', 'success');
+                }
+                ocultarFormProducto();
+            } catch (error) {
+                mostrarToast('Error al guardar: ' + error.message, 'error');
+            }
+        });
+
+        // ---- PROMOCIONES (código abreviado) ----
+        let actualizandoPromo = false;
+        function cargarPromociones() {
+            db.ref('promotions').on('value', (snapshot) => {
+                if (actualizandoPromo) return;
+                const data = snapshot.val();
+                if (!data) { document.getElementById('promoList').innerHTML = '<p style="color:#b8d0b8;">No hay promociones aún.</p>'; return; }
+                const promos = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                renderPromociones(promos);
+            });
+        }
+
+        function renderPromociones(promos) {
+            const list = document.getElementById('promoList');
+            list.innerHTML = '';
+            promos.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'promo-item';
+                const fechaInicio = p.startDate ? new Date(p.startDate).toLocaleDateString('es-AR') : '';
+                const fechaFin = p.endDate ? new Date(p.endDate).toLocaleDateString('es-AR') : '';
+                div.innerHTML = `
+                    <div class="info"><strong>${p.title}</strong> — ${p.description}</div>
+                    <div class="dates">${fechaInicio} ${fechaInicio && fechaFin ? '→' : ''} ${fechaFin}</div>
+                    <label><input type="checkbox" ${p.active !== false ? 'checked' : ''} data-id="${p.id}" class="promo-active-check" /> Activa</label>
+                    <div class="actions">
+                        <button class="btn-editar-promo" onclick="editarPromocion('${p.id}')" title="Editar promoción">✏️</button>
+                        <span class="separator">|</span>
+                        <button class="btn-eliminar-promo" onclick="eliminarPromocion('${p.id}')" title="Eliminar promoción permanentemente">🗑️</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+            document.querySelectorAll('.promo-active-check').forEach(cb => {
+                cb.removeEventListener('change', handlePromoChange);
+                cb.addEventListener('change', handlePromoChange);
+            });
+        }
+
+        function handlePromoChange(event) {
+            const cb = event.target;
+            const id = cb.dataset.id;
+            const activa = cb.checked;
+            actualizandoPromo = true;
+            db.ref('promotions/' + id).update({ active: activa })
+                .then(() => { actualizandoPromo = false; })
+                .catch((error) => {
+                    actualizandoPromo = false;
+                    mostrarToast('Error al actualizar: ' + error.message, 'error');
+                    cb.checked = !activa;
+                });
+        }
+
+        function ocultarFormPromo() { formPromo.classList.remove('active'); }
+        addPromoBtn.addEventListener('click', () => {
+            formPromo.classList.add('active');
+            document.getElementById('promoTitulo').value = '';
+            document.getElementById('promoDesc').value = '';
+            document.getElementById('promoImagen').value = '';
+            document.getElementById('promoInicio').value = '';
+            document.getElementById('promoFin').value = '';
+            document.getElementById('promoActiva').checked = true;
+            document.getElementById('promoTitulo').focus();
+        });
+        cancelPromoBtn.addEventListener('click', ocultarFormPromo);
+
+        savePromoBtn.addEventListener('click', async function() {
+            const titulo = document.getElementById('promoTitulo').value.trim();
+            const desc = document.getElementById('promoDesc').value.trim();
+            if (!titulo || !desc) { mostrarToast('Título y descripción son obligatorios', 'error'); return; }
+            const data = {
+                title: titulo,
+                description: desc,
+                image: document.getElementById('promoImagen').value.trim() || '',
+                startDate: document.getElementById('promoInicio').value || '',
+                endDate: document.getElementById('promoFin').value || '',
+                active: document.getElementById('promoActiva').checked
+            };
+            try {
+                await db.ref('promotions').push(data);
+                mostrarToast('Promoción creada', 'success');
+                ocultarFormPromo();
+            } catch (error) {
+                mostrarToast('Error: ' + error.message, 'error');
+            }
+        });
+
+        window.eliminarPromocion = async function(id) {
+            const confirmado = await mostrarConfirm('Eliminar promoción', `¿Eliminar la promoción "${id}" permanentemente?`);
+            if (!confirmado) return;
+            try {
+                await db.ref('promotions/' + id).remove();
+                mostrarToast('Promoción eliminada', 'success');
+            } catch (error) {
+                mostrarToast('Error: ' + error.message, 'error');
+            }
+        };
+
+        window.editarPromocion = async function(id) {
+            try {
+                const snapshot = await db.ref('promotions/' + id).once('value');
+                const promo = snapshot.val();
+                if (!promo) { mostrarToast('Promoción no encontrada', 'error'); return; }
+                document.getElementById('promoTitulo').value = promo.title || '';
+                document.getElementById('promoDesc').value = promo.description || '';
+                document.getElementById('promoImagen').value = promo.image || '';
+                document.getElementById('promoInicio').value = promo.startDate || '';
+                document.getElementById('promoFin').value = promo.endDate || '';
+                document.getElementById('promoActiva').checked = promo.active !== false;
+                formPromo.classList.add('active');
+                document.getElementById('promoTitulo').focus();
+                window.editandoPromoId = id;
+                formPromo.querySelector('h3').textContent = '✏️ Editando: ' + promo.title;
+                const originalClick = savePromoBtn.onclick;
+                savePromoBtn.onclick = async function() {
+                    const titulo = document.getElementById('promoTitulo').value.trim();
+                    const desc = document.getElementById('promoDesc').value.trim();
+                    if (!titulo || !desc) { mostrarToast('Título y descripción son obligatorios', 'error'); return; }
+                    const data = {
+                        title: titulo,
+                        description: desc,
+                        image: document.getElementById('promoImagen').value.trim() || '',
+                        startDate: document.getElementById('promoInicio').value || '',
+                        endDate: document.getElementById('promoFin').value || '',
+                        active: document.getElementById('promoActiva').checked
+                    };
+                    try {
+                        await db.ref('promotions/' + id).update(data);
+                        mostrarToast('Promoción actualizada', 'success');
+                        ocultarFormPromo();
+                        savePromoBtn.onclick = originalClick;
+                    } catch (error) {
+                        mostrarToast('Error: ' + error.message, 'error');
+                    }
+                };
+                formPromo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (error) {
+                mostrarToast('Error al cargar promoción: ' + error.message, 'error');
+            }
+        };
+
+        // ---- EXCEPCIONES (código abreviado) ----
+        let editandoExcepcionId = null;
+        function cargarExcepciones() {
+            db.ref('excepciones').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    excepcionesActuales = [];
+                    document.getElementById('excepcionList').innerHTML = '<p style="color:#b8d0b8;">No hay excepciones.</p>';
+                    actualizarBotonesEstado();
+                    return;
+                }
+                excepcionesActuales = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                renderExcepciones(excepcionesActuales);
+                actualizarBotonesEstado();
+            });
+        }
+
+        function renderExcepciones(excepciones) {
+            const list = document.getElementById('excepcionList');
+            list.innerHTML = '';
+            if (excepciones.length === 0) { list.innerHTML = '<p style="color:#b8d0b8;">No hay excepciones cargadas.</p>'; return; }
+            excepciones.forEach(ex => {
+                const div = document.createElement('div');
+                div.className = 'excepcion-item';
+                const tipoTexto = ex.tipo === 'cerrado' ? '🔴 Cerrado' : ex.tipo === 'abierto' ? '🟢 Abierto' : '🟡 Horario especial';
+                const rango = ex.fechaInicio && ex.fechaFin ? `${ex.fechaInicio} → ${ex.fechaFin}` : ex.fechaInicio || '';
+                const horario = ex.tipo === 'horario_especial' ? ` ${ex.horaApertura} - ${ex.horaCierre}` : '';
+                const mensaje = ex.mensaje ? ` (${ex.mensaje})` : '';
+                div.innerHTML = `
+                    <div class="info">
+                        <strong>${rango}</strong> — ${tipoTexto} ${horario} ${mensaje}
+                    </div>
+                    <div class="actions">
+                        <button class="btn-editar-excepcion" onclick="editarExcepcion('${ex.id}')" title="Editar excepción">✏️ Editar</button>
+                        <span class="separator">|</span>
+                        <button class="btn-eliminar-excepcion" onclick="eliminarExcepcion('${ex.id}')" title="Eliminar excepción permanentemente">🗑️</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function actualizarBotonesEstado() {
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            const exHoy = excepcionesActuales.find(ex => {
+                if (ex.fechaInicio && ex.fechaFin) {
+                    const inicio = new Date(ex.fechaInicio);
+                    const fin = new Date(ex.fechaFin);
+                    inicio.setHours(0, 0, 0, 0);
+                    fin.setHours(0, 0, 0, 0);
+                    return hoy >= inicio && hoy <= fin;
+                } else if (ex.fechaInicio) {
+                    const inicio = new Date(ex.fechaInicio);
+                    inicio.setHours(0, 0, 0, 0);
+                    return hoy.getTime() === inicio.getTime();
+                }
+                return false;
+            });
+            document.querySelectorAll('.btn-estado').forEach(b => b.classList.remove('activo'));
+            if (exHoy) {
+                if (exHoy.tipo === 'abierto') btnAbrirAhora.classList.add('activo');
+                else if (exHoy.tipo === 'cerrado') btnCerrarAhora.classList.add('activo');
+            }
+        }
+
+        function getHoyStr() {
+            const d = new Date();
+            return d.toISOString().split('T')[0];
+        }
+        async function buscarExcepcionHoy() {
+            const hoyStr = getHoyStr();
+            const snapshot = await db.ref('excepciones').once('value');
+            const data = snapshot.val();
+            if (!data) return null;
+            const keys = Object.keys(data);
+            for (let key of keys) {
+                const ex = data[key];
+                if (ex.fechaInicio && ex.fechaFin) {
+                    const inicio = new Date(ex.fechaInicio);
+                    const fin = new Date(ex.fechaFin);
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    inicio.setHours(0, 0, 0, 0);
+                    fin.setHours(0, 0, 0, 0);
+                    if (hoy >= inicio && hoy <= fin) return { id: key, ...ex };
+                } else if (ex.fechaInicio === hoyStr) return { id: key, ...ex };
+            }
+            return null;
+        }
+
+        async function setEstadoRapido(tipo, mensaje) {
+            const hoyStr = getHoyStr();
+            const exHoy = await buscarExcepcionHoy();
+            const data = { fechaInicio: hoyStr, fechaFin: hoyStr, tipo, mensaje: mensaje || (tipo === 'abierto' ? 'Abierto por excepción' : 'Cerrado por excepción') };
+            try {
+                if (exHoy) await db.ref('excepciones/' + exHoy.id).update(data);
+                else await db.ref('excepciones').push(data);
+                mostrarToast('Estado actualizado', 'success');
+                setTimeout(actualizarBotonesEstado, 500);
+            } catch (error) {
+                mostrarToast('Error: ' + error.message, 'error');
+            }
+        }
+
+        btnAbrirAhora.addEventListener('click', () => setEstadoRapido('abierto', 'Abierto por excepción'));
+        btnCerrarAhora.addEventListener('click', () => setEstadoRapido('cerrado', 'Cerrado por excepción'));
+
+        btnVolverNormal.addEventListener('click', async function() {
+            const exHoy = await buscarExcepcionHoy();
+            if (!exHoy) { mostrarToast('Ya estás en horario normal', 'info'); return; }
+            const confirmado = await mostrarConfirm('Volver al horario normal', '¿Eliminar la excepción de hoy y volver al horario normal?');
+            if (!confirmado) return;
+            try {
+                await db.ref('excepciones/' + exHoy.id).remove();
+                mostrarToast('Horario normal restaurado', 'success');
+                setTimeout(actualizarBotonesEstado, 500);
+            } catch (error) {
+                mostrarToast('Error: ' + error.message, 'error');
+            }
+        });
+
+        window.editarExcepcion = async function(id) {
+            try {
+                const snapshot = await db.ref('excepciones/' + id).once('value');
+                const ex = snapshot.val();
+                if (!ex) { mostrarToast('Excepción no encontrada', 'error'); return; }
+                document.getElementById('exFechaInicio').value = ex.fechaInicio || '';
+                document.getElementById('exFechaFin').value = ex.fechaFin || '';
+                document.getElementById('exTipo').value = ex.tipo || 'cerrado';
+                document.getElementById('exHoraApertura').value = ex.horaApertura || '20:00';
+                document.getElementById('exHoraCierre').value = ex.horaCierre || '00:00';
+                document.getElementById('exMensaje').value = ex.mensaje || '';
+                if (ex.tipo === 'horario_especial') exHorarioEspecial.style.display = 'flex';
+                else exHorarioEspecial.style.display = 'none';
+                formExcepcionTitulo.textContent = '✏️ Editando excepción';
+                window.editandoExcepcionId = id;
+                formExcepcion.classList.add('active');
+                formExcepcion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (error) {
+                mostrarToast('Error al cargar excepción: ' + error.message, 'error');
+            }
+        };
+
+        window.eliminarExcepcion = async function(id) {
+            const confirmado = await mostrarConfirm('Eliminar excepción', '¿Eliminar esta excepción permanentemente?');
+            if (!confirmado) return;
+            try {
+                await db.ref('excepciones/' + id).remove();
+                mostrarToast('Excepción eliminada', 'success');
+                actualizarBotonesEstado();
+            } catch (error) {
+                mostrarToast('Error: ' + error.message, 'error');
+            }
+        };
+
+        exTipo.addEventListener('change', function() {
+            if (this.value === 'horario_especial') exHorarioEspecial.style.display = 'flex';
+            else exHorarioEspecial.style.display = 'none';
+        });
+
+        function mostrarFormExcepcion() {
+            document.getElementById('exFechaInicio').value = '';
+            document.getElementById('exFechaFin').value = '';
+            document.getElementById('exTipo').value = 'cerrado';
+            document.getElementById('exHoraApertura').value = '20:00';
+            document.getElementById('exHoraCierre').value = '00:00';
+            document.getElementById('exMensaje').value = '';
+            exHorarioEspecial.style.display = 'none';
+            formExcepcionTitulo.textContent = '✏️ Nueva excepción';
+            window.editandoExcepcionId = null;
+            formExcepcion.classList.add('active');
+            document.getElementById('exFechaInicio').focus();
+        }
+        function ocultarFormExcepcion() {
+            formExcepcion.classList.remove('active');
+            window.editandoExcepcionId = null;
+        }
+
+        addExcepcionBtn.addEventListener('click', mostrarFormExcepcion);
+        cancelExcepcionBtn.addEventListener('click', ocultarFormExcepcion);
+
+        saveExcepcionBtn.addEventListener('click', async function() {
+            const fechaInicio = document.getElementById('exFechaInicio').value;
+            const fechaFin = document.getElementById('exFechaFin').value || fechaInicio;
+            const tipo = document.getElementById('exTipo').value;
+            const mensaje = document.getElementById('exMensaje').value.trim();
+            if (!fechaInicio) { mostrarToast('La fecha inicio es obligatoria.', 'error'); return; }
+            const data = { fechaInicio, fechaFin, tipo };
+            if (tipo === 'horario_especial') {
+                data.horaApertura = document.getElementById('exHoraApertura').value || '20:00';
+                data.horaCierre = document.getElementById('exHoraCierre').value || '00:00';
+            }
+            if (mensaje) data.mensaje = mensaje;
+            try {
+                if (window.editandoExcepcionId) {
+                    await db.ref('excepciones/' + window.editandoExcepcionId).update(data);
+                    mostrarToast('Excepción actualizada', 'success');
+                } else {
+                    await db.ref('excepciones').push(data);
+                    mostrarToast('Excepción guardada', 'success');
+                }
+                ocultarFormExcepcion();
+            } catch (error) {
+                mostrarToast('Error: ' + error.message, 'error');
+            }
+        });
+
+        // ============================================================
+        //  PEDIDOS
+        // ============================================================
+        let pedidosLoaded = false;
+
+        function cargarPedidos() {
+            db.ref('pedidos').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    pedidosActuales = [];
+                    document.getElementById('pedidoList').innerHTML = '<p style="color:#b8d0b8;">No hay pedidos aún.</p>';
+                    actualizarGraficos();
+                    return;
+                }
+                pedidosActuales = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                pedidosActuales.sort((a, b) => (a.fecha < b.fecha ? 1 : -1));
+                aplicarFiltroPedidos();
+                actualizarGraficos();
+                actualizarSelectorMeses();
+            });
+
+            db.ref('pedidos').on('child_added', (snapshot) => {
+                const nuevoPedido = snapshot.val();
+                if (nuevoPedido && auth.currentUser) {
+                    if (pedidosLoaded) {
+                        mostrarAlerta(nuevoPedido);
+                    }
+                }
+            });
+
+            setTimeout(() => { pedidosLoaded = true; }, 2000);
+        }
+
+        function esFechaHoy(fechaStr) {
+            if (!fechaStr) return false;
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            const fecha = new Date(fechaStr);
+            fecha.setHours(0, 0, 0, 0);
+            return fecha.getTime() === hoy.getTime();
+        }
+
+        function aplicarFiltroPedidos() {
+            const filtroEstadoValue = filtroEstado.value;
+            const soloHoy = filtroHoy.checked;
+
+            let pedidosFiltrados = [...pedidosActuales];
+
+            if (filtroEstadoValue !== 'todos') {
+                pedidosFiltrados = pedidosFiltrados.filter(p => p.estado === filtroEstadoValue);
+            }
+
+            if (soloHoy) {
+                pedidosFiltrados = pedidosFiltrados.filter(p => esFechaHoy(p.fecha));
+            }
+
+            renderPedidos(pedidosFiltrados);
+        }
+
+        filtroEstado.addEventListener('change', aplicarFiltroPedidos);
+        filtroHoy.addEventListener('change', aplicarFiltroPedidos);
+
+        function generarMensajeWhatsApp(pedido, estado) {
+            const nombreCliente = pedido.nombre || 'Cliente';
+            let estadoTexto = '';
+            const envio = pedido.envio || 'Retiro en local';
+            const esEnvio = envio.includes('Entrega') || envio.includes('domicilio') || envio.includes('envío');
+
+            if (esEnvio) {
+                estadoTexto = 'está en manos del repartidor, llega en breve !!';
+            } else {
+                switch (estado) {
+                    case 'pendiente': estadoTexto = 'recibido y está en cola de preparación'; break;
+                    case 'preparando': estadoTexto = 'ya está en preparación. ¡En breve estará listo!'; break;
+                    case 'listo': estadoTexto = 'está listo para retirar. ¡Pasá a buscarlo cuando quieras!'; break;
+                    case 'entregado': estadoTexto = 'ya fue entregado. ¡Gracias por elegirnos!'; break;
+                    case 'cancelado': estadoTexto = 'ha sido cancelado. Si tenés dudas, contactanos.'; break;
+                    default: estadoTexto = 'está siendo procesado';
+                }
+            }
+
+            const direccion = pedido.direccion || '';
+            let totalItems = 0;
+            if (pedido.productos && pedido.productos.length > 0) {
+                totalItems = pedido.productos.reduce((sum, prod) => sum + (prod.cantidad || 0), 0);
+            }
+
+            let mensaje = `🍔 *Tech Classic Burgers* 🍔\n\n`;
+            mensaje += `Hola ${nombreCliente}, tu pedido ${estadoTexto}\n\n`;
+
+            if (esEnvio) {
+                mensaje += `🚚 *Envío a domicilio*\n`;
+                mensaje += `📍 Dirección: ${direccion || 'No especificada'}\n`;
+                if (direccion) {
+                    const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(direccion)}`;
+                    mensaje += `🔗 ${mapsLink}\n`;
+                }
+            } else {
+                mensaje += `📍 Retiro en local\n`;
+                mensaje += `📍 ${ENLACE_LOCAL}\n`;
+            }
+
+            mensaje += `\n📦 *Detalle del pedido (${totalItems} ítems):*\n`;
+            if (pedido.productos && pedido.productos.length > 0) {
+                pedido.productos.forEach(prod => {
+                    mensaje += `* ${prod.cantidad}x ${prod.nombre}`;
+                    if (prod.medallonesExtra) mensaje += ` (+${prod.medallonesExtra} medallones extra)`;
+                    if (prod.toppings) mensaje += ` (${prod.toppings})`;
+                    mensaje += `\n`;
+                });
+            } else {
+                mensaje += `Sin productos.\n`;
+            }
+
+            mensaje += `\n💰 *Total:* $${(pedido.total || 0).toLocaleString()}`;
+            mensaje += `\n\n📲 ¡Gracias por tu pedido!`;
+            return mensaje;
+        }
+
+        function renderPedidos(pedidos) {
+            const list = document.getElementById('pedidoList');
+            list.innerHTML = '';
+            if (pedidos.length === 0) {
+                list.innerHTML = '<p style="color:#b8d0b8;">No hay pedidos con este filtro.</p>';
+                return;
+            }
+            pedidos.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'pedido-item';
+                let fechaStr = 'Fecha desconocida', horaStr = '';
+                if (p.fecha) {
+                    const fechaObj = new Date(p.fecha);
+                    fechaStr = fechaObj.toLocaleDateString('es-AR');
+                    horaStr = fechaObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+                }
+                const total = p.total ? `$${p.total.toLocaleString()}` : '$0';
+                const estadoColor = p.estado === 'pendiente' ? '#ffb703' :
+                                    p.estado === 'preparando' ? '#4caf50' :
+                                    p.estado === 'listo' ? '#2196F3' :
+                                    p.estado === 'entregado' ? '#8aaa8a' : '#f44336';
+
+                let totalItems = 0;
+                if (p.productos && p.productos.length > 0) {
+                    totalItems = p.productos.reduce((sum, prod) => sum + (prod.cantidad || 0), 0);
+                }
+                let itemsText = totalItems > 0 ? `<strong style="color:#ffffff;">(${totalItems} ítems)</strong> ` : '';
+
+                div.innerHTML = `
+                    <div class="info">
+                        <div><strong>${p.nombre || 'Sin nombre'}</strong> (${p.telefono || 'Sin teléfono'})</div>
+                        <div style="font-size:0.8rem;">
+                            <strong style="color:#ffb703;">${fechaStr}</strong> 
+                            <span style="color:#e8f0e8; font-weight:700;">${horaStr}</span> 
+                            · 
+                            <strong style="color:#ffb703;">${total}</strong>
+                        </div>
+                        <div style="font-size:0.8rem; color:#b8d0b8;">
+                            📦 ${itemsText}${p.productos ? p.productos.map(prod => `${prod.cantidad}x ${prod.nombre}`).join(', ') : 'Sin productos'}
+                        </div>
+                        <div style="font-size:0.8rem; color:#b8d0b8;">
+                            💳 ${p.metodoPago || 'N/E'} · 🚚 ${p.envio || 'N/E'}
+                            ${p.direccion ? ` · 📍 ${p.direccion}` : ''}
+                        </div>
+                    </div>
+                    <div class="estado-label" style="color:${estadoColor};">
+                        ${p.estado || 'pendiente'}
+                    </div>
+                    <label style="display:flex; align-items:center; gap:4px; font-size:0.8rem;">
+                        Estado:
+                        <select class="estado-select" data-id="${p.id}">
+                            <option value="pendiente" ${p.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                            <option value="preparando" ${p.estado === 'preparando' ? 'selected' : ''}>Preparando</option>
+                            <option value="listo" ${p.estado === 'listo' ? 'selected' : ''}>Listo</option>
+                            <option value="entregado" ${p.estado === 'entregado' ? 'selected' : ''}>Entregado</option>
+                            <option value="cancelado" ${p.estado === 'cancelado' ? 'selected' : ''}>Cancelado</option>
+                        </select>
+                    </label>
+                    <div class="actions">
+                        <button class="btn-whatsapp" onclick="abrirWhatsApp('${p.id}')" title="Enviar mensaje por WhatsApp">💬 WhatsApp</button>
+                        <button class="btn-eliminar-pedido" onclick="eliminarPedido('${p.id}')" title="Eliminar pedido permanentemente">🗑️</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+
+            document.querySelectorAll('.estado-select').forEach(select => {
+                select.removeEventListener('change', handleEstadoChange);
+                select.addEventListener('change', handleEstadoChange);
+            });
+
+            const wrapper = document.getElementById('pedidoListWrapper');
+            wrapper.style.maxHeight = pedidos.length > 3 ? '480px' : 'auto';
+        }
+
+        window.abrirWhatsApp = function(id) {
+            const pedido = pedidosActuales.find(p => p.id === id);
+            if (!pedido) { mostrarToast('Pedido no encontrado', 'error'); return; }
+            const telefono = pedido.telefono;
+            if (!telefono) { mostrarToast('El pedido no tiene número de teléfono', 'error'); return; }
+            const telefonoLimpio = telefono.replace(/\D/g, '');
+            if (telefonoLimpio.length < 8) { mostrarToast('Número de teléfono inválido', 'error'); return; }
+            const select = document.querySelector(`.estado-select[data-id="${id}"]`);
+            const estado = select ? select.value : pedido.estado || 'pendiente';
+            const mensaje = generarMensajeWhatsApp(pedido, estado);
+            window.open(`https://wa.me/${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        };
+
+        function handleEstadoChange(e) {
+            const select = e.target;
+            const id = select.dataset.id;
+            const nuevoEstado = select.value;
+            db.ref('pedidos/' + id).update({ estado: nuevoEstado })
+                .then(() => mostrarToast('Estado actualizado', 'success'))
+                .catch(err => mostrarToast('Error: ' + err.message, 'error'));
+        }
+
+        window.eliminarPedido = async function(id) {
+            const confirmado = await mostrarConfirm('Eliminar pedido', '¿Eliminar este pedido permanentemente?');
+            if (!confirmado) return;
+            try {
+                await db.ref('pedidos/' + id).remove();
+                mostrarToast('Pedido eliminado', 'success');
+            } catch (error) {
+                mostrarToast('Error: ' + error.message, 'error');
+            }
+        };
+
+        // ============================================================
+        //  GRÁFICOS DE INGRESOS (excluyendo cancelados del monto)
+        // ============================================================
+        let chartDiario, chartSemanal, chartMensual;
+        let mesesDisponibles = [];
+
+        function actualizarSelectorMeses() {
+            const mesesSet = new Set();
+            pedidosActuales.forEach(p => {
+                if (!p.fecha || !p.total) return;
+                const fecha = new Date(p.fecha);
+                const mes = fecha.getFullYear() + '-' + String(fecha.getMonth() + 1).padStart(2, '0');
+                mesesSet.add(mes);
+            });
+            mesesDisponibles = Array.from(mesesSet).sort();
+            const selector = selectorMes;
+            const valorActual = selector.value;
+            selector.innerHTML = '';
+            if (mesesDisponibles.length === 0) {
+                selector.innerHTML = '<option value="">Sin datos</option>';
+                return;
+            }
+            mesesDisponibles.forEach(mes => {
+                const option = document.createElement('option');
+                option.value = mes;
+                const [year, month] = mes.split('-');
+                const nombreMes = new Date(year, month - 1).toLocaleString('es-AR', { month: 'long' });
+                option.textContent = `${nombreMes} ${year}`;
+                selector.appendChild(option);
+            });
+            if (mesesDisponibles.includes(valorActual)) {
+                selector.value = valorActual;
+            } else {
+                selector.value = mesesDisponibles[mesesDisponibles.length - 1];
+            }
+            if (selector.value) {
+                actualizarGraficoMensual(selector.value);
+            }
+        }
+
+        function actualizarGraficoMensual(mesKey) {
+            if (!mesKey) {
+                if (chartMensual) chartMensual.destroy();
+                document.getElementById('totalMensual').textContent = '0';
+                document.getElementById('pedidosMensual').textContent = '0';
+                return;
+            }
+            const pedidosMes = pedidosActuales.filter(p => {
+                if (!p.fecha || !p.total) return false;
+                const fecha = new Date(p.fecha);
+                const mes = fecha.getFullYear() + '-' + String(fecha.getMonth() + 1).padStart(2, '0');
+                return mes === mesKey;
+            });
+            const mapaDia = new Map();
+            const conteoDia = new Map();
+            pedidosMes.forEach(p => {
+                const fecha = new Date(p.fecha);
+                const dia = fecha.getDate();
+                if (p.estado !== 'cancelado') {
+                    mapaDia.set(dia, (mapaDia.get(dia) || 0) + p.total);
+                }
+                conteoDia.set(dia, (conteoDia.get(dia) || 0) + 1);
+            });
+            const dias = Array.from(mapaDia.keys()).sort((a, b) => a - b);
+            const valores = dias.map(d => mapaDia.get(d));
+            const total = valores.reduce((a, b) => a + b, 0);
+            const totalPedidos = Array.from(conteoDia.values()).reduce((a, b) => a + b, 0);
+
+            document.getElementById('totalMensual').textContent = total.toLocaleString();
+            document.getElementById('pedidosMensual').textContent = totalPedidos;
+
+            if (chartMensual) chartMensual.destroy();
+            const ctx = document.getElementById('chartMensual').getContext('2d');
+            chartMensual = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dias.map(d => String(d).padStart(2, '0')),
+                    datasets: [{
+                        label: 'Ingresos diarios',
+                        data: valores,
+                        backgroundColor: '#2196F3',
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#b8d0b8' } },
+                        x: { ticks: { color: '#b8d0b8', maxTicksLimit: 15 } }
+                    }
+                }
+            });
+        }
+
+        function actualizarGraficos() {
+            // Diario
+            const mapaDiario = new Map();
+            const conteoDiario = new Map();
+            pedidosActuales.forEach(p => {
+                if (!p.fecha || !p.total) return;
+                const fecha = new Date(p.fecha);
+                const clave = fecha.toISOString().split('T')[0];
+                if (p.estado !== 'cancelado') {
+                    mapaDiario.set(clave, (mapaDiario.get(clave) || 0) + p.total);
+                }
+                conteoDiario.set(clave, (conteoDiario.get(clave) || 0) + 1);
+            });
+            const diasOrdenados = Array.from(mapaDiario.keys()).sort();
+            const valoresDiarios = diasOrdenados.map(d => mapaDiario.get(d));
+            const totalDiario = valoresDiarios.reduce((a, b) => a + b, 0);
+            const pedidosDiario = Array.from(conteoDiario.values()).reduce((a, b) => a + b, 0);
+            document.getElementById('totalDiario').textContent = totalDiario.toLocaleString();
+            document.getElementById('pedidosDiario').textContent = pedidosDiario;
+
+            if (chartDiario) chartDiario.destroy();
+            const ctxDiario = document.getElementById('chartDiario').getContext('2d');
+            chartDiario = new Chart(ctxDiario, {
+                type: 'bar',
+                data: {
+                    labels: diasOrdenados.map(d => d.slice(5)),
+                    datasets: [{
+                        label: 'Ingresos diarios',
+                        data: valoresDiarios,
+                        backgroundColor: '#ffb703',
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#b8d0b8' } },
+                        x: { ticks: { color: '#b8d0b8', maxTicksLimit: 10 } }
+                    }
+                }
+            });
+
+            // Semanal
+            const hoy = new Date();
+            const semanaInicio = new Date(hoy);
+            semanaInicio.setDate(hoy.getDate() - 6);
+            const semanalMap = new Map();
+            const conteoSemanal = new Map();
+            pedidosActuales.forEach(p => {
+                if (!p.fecha || !p.total) return;
+                const fecha = new Date(p.fecha);
+                if (fecha >= semanaInicio) {
+                    const clave = fecha.toISOString().split('T')[0];
+                    if (p.estado !== 'cancelado') {
+                        semanalMap.set(clave, (semanalMap.get(clave) || 0) + p.total);
+                    }
+                    conteoSemanal.set(clave, (conteoSemanal.get(clave) || 0) + 1);
+                }
+            });
+            const diasSemana = Array.from(semanalMap.keys()).sort();
+            const valoresSemana = diasSemana.map(d => semanalMap.get(d));
+            const totalSemanal = valoresSemana.reduce((a, b) => a + b, 0);
+            const pedidosSemanal = Array.from(conteoSemanal.values()).reduce((a, b) => a + b, 0);
+            document.getElementById('totalSemanal').textContent = totalSemanal.toLocaleString();
+            document.getElementById('pedidosSemanal').textContent = pedidosSemanal;
+
+            if (chartSemanal) chartSemanal.destroy();
+            const ctxSemanal = document.getElementById('chartSemanal').getContext('2d');
+            chartSemanal = new Chart(ctxSemanal, {
+                type: 'bar',
+                data: {
+                    labels: diasSemana.map(d => d.slice(5)),
+                    datasets: [{
+                        label: 'Ingresos semanales',
+                        data: valoresSemana,
+                        backgroundColor: '#4caf50',
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#b8d0b8' } },
+                        x: { ticks: { color: '#b8d0b8', maxTicksLimit: 10 } }
+                    }
+                }
+            });
+
+            // Mensual
+            if (selectorMes.value) {
+                actualizarGraficoMensual(selectorMes.value);
+            }
+        }
+
+        selectorMes.addEventListener('change', function() {
+            if (this.value) {
+                actualizarGraficoMensual(this.value);
+            }
+        });
+
+        // ============================================================
+        //  INICIO
+        // ============================================================
+        // Ya se llama cargarDatos en onAuthStateChanged
+    </script>
+</body>
+</html>
