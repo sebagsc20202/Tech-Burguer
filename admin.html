@@ -400,18 +400,6 @@
             margin: 6px 0;
         }
         .btn-add:hover { background: #388e3c; }
-        .btn-add-separator {
-            background: #ff9800;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            color: #1a1a1a;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin: 6px 0;
-        }
-        .btn-add-separator:hover { background: #e68900; }
         .form-divider { border: none; border-top: 1px solid #2f4a2f; margin: 6px 0 8px; }
 
         /* ===== FILTRO ===== */
@@ -485,7 +473,7 @@
         .estado-rapido .btn-estado.activo { box-shadow: 0 0 0 2px #fff, 0 0 20px rgba(255,255,255,0.2); }
 
         /* ===== LISTAS ===== */
-        .product-item, .promo-item, .excepcion-item {
+        .product-item {
             background: #1f331f;
             border: 1px solid #3a5a3a;
             border-radius: 8px;
@@ -495,6 +483,18 @@
             flex-wrap: wrap;
             align-items: center;
             gap: 8px;
+            transition: background 0.2s, border-color 0.2s;
+            cursor: grab;
+        }
+        .product-item.dragging {
+            opacity: 0.5;
+            border-color: #ffb703;
+            background: #2a3a2a;
+        }
+        .product-item.drag-over {
+            border-color: #ffb703;
+            border-style: dashed;
+            background: #2a4a2a;
         }
         .product-item .name { flex: 2; font-weight: 600; min-width: 100px; }
         .product-item .meta { font-size: 0.75rem; color: #b8d0b8; display: flex; flex-wrap: wrap; gap: 4px; }
@@ -538,20 +538,6 @@
             margin-left: 2px;
         }
         .product-item .actions .btn-eliminar:hover { background: #d32f2f; }
-        .product-item .actions .btn-mover {
-            background: #3a5a3a;
-            color: #e8f0e8;
-            font-size: 1rem;
-            line-height: 1;
-            padding: 2px 8px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .product-item .actions .btn-mover:hover { background: #4a6a4a; }
-        .product-item .actions .btn-mover:disabled { opacity: 0.3; cursor: not-allowed; }
         .product-item .actions .btn-editar {
             background: #2196F3;
             color: #fff;
@@ -576,63 +562,8 @@
             transition: background 0.2s;
         }
         .product-item .actions .btn-guardar:hover { background: #e6a500; }
-
-        .product-item .badge-preview {
-            background: #e63946;
-            color: #fff;
-            padding: 2px 8px;
-            border-radius: 8px;
-            font-size: 0.65rem;
-            font-weight: 600;
-        }
-
-        /* Estilo para separadores */
-        .separador-item {
-            background: #2a3a2a;
-            border: 2px dashed #ffb703;
-            border-radius: 8px;
-            padding: 8px 12px;
-            margin: 6px 0;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-        }
-        .separador-item .separador-texto {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #ffb703;
-            text-align: center;
-            flex: 1;
-            letter-spacing: 1px;
-        }
-        .separador-item .actions {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 6px;
-        }
-        .separador-item .actions .separator {
-            color: #4a6a4a;
-            font-weight: 300;
-            margin: 0 4px 0 8px;
-            font-size: 1rem;
-            user-select: none;
-        }
-        .separador-item .actions .btn-eliminar {
-            background: #f44336;
-            color: #fff;
-            padding: 4px 10px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 700;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .separador-item .actions .btn-eliminar:hover { background: #d32f2f; }
-        .separador-item .actions .btn-mover {
+        /* Botones de mover ya no se necesitan con drag & drop, pero los mantengo por si acaso */
+        .product-item .actions .btn-mover {
             background: #3a5a3a;
             color: #e8f0e8;
             font-size: 1rem;
@@ -644,20 +575,17 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .separador-item .actions .btn-mover:hover { background: #4a6a4a; }
-        .separador-item .actions .btn-mover:disabled { opacity: 0.3; cursor: not-allowed; }
-        .separador-item .actions .btn-editar {
-            background: #2196F3;
+        .product-item .actions .btn-mover:hover { background: #4a6a4a; }
+        .product-item .actions .btn-mover:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .product-item .badge-preview {
+            background: #e63946;
             color: #fff;
-            padding: 4px 10px;
+            padding: 2px 8px;
             border-radius: 8px;
-            border: none;
-            font-weight: 700;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: background 0.2s;
+            font-size: 0.65rem;
+            font-weight: 600;
         }
-        .separador-item .actions .btn-editar:hover { background: #1976D2; }
 
         /* PROMOCIONES */
         .promo-item .info { flex: 1; min-width: 120px; }
@@ -916,7 +844,7 @@
         }
 
         @media (max-width: 600px) {
-            .product-item, .promo-item, .excepcion-item, .pedido-item, .separador-item {
+            .product-item, .promo-item, .excepcion-item, .pedido-item {
                 flex-direction: column;
                 align-items: stretch;
             }
@@ -924,8 +852,7 @@
             .product-item .actions,
             .promo-item .actions,
             .excepcion-item .actions,
-            .pedido-item .actions,
-            .separador-item .actions {
+            .pedido-item .actions {
                 margin-left: 0;
                 justify-content: flex-end;
             }
@@ -936,15 +863,13 @@
             .estado-rapido { flex-direction: column; }
             .product-item .actions .separator,
             .promo-item .actions .separator,
-            .excepcion-item .actions .separator,
-            .separador-item .actions .separator {
+            .excepcion-item .actions .separator {
                 display: none;
             }
             .product-item .actions .btn-eliminar,
             .promo-item .actions .btn-eliminar-promo,
             .excepcion-item .actions .btn-eliminar-excepcion,
-            .pedido-item .actions .btn-eliminar-pedido,
-            .separador-item .actions .btn-eliminar {
+            .pedido-item .actions .btn-eliminar-pedido {
                 margin-left: 0;
                 width: 100%;
                 text-align: center;
@@ -952,9 +877,7 @@
             }
             .product-item .actions .btn-mover,
             .product-item .actions .btn-editar,
-            .product-item .actions .btn-guardar,
-            .separador-item .actions .btn-mover,
-            .separador-item .actions .btn-editar {
+            .product-item .actions .btn-guardar {
                 flex: 1;
                 text-align: center;
             }
@@ -1154,10 +1077,7 @@
             <!-- ===== 4️⃣ PRODUCTOS ===== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
                 <h2>📋 Productos</h2>
-                <div style="display:flex; gap:6px;">
-                    <button class="btn-add" id="addProductBtn">➕ Nuevo</button>
-                    <button class="btn-add-separator" id="addSeparatorBtn">➕ Separador</button>
-                </div>
+                <button class="btn-add" id="addProductBtn">➕ Nuevo</button>
             </div>
             <div class="filtro-container">
                 <label for="filtroCategoria">🔍 Filtrar:</label>
@@ -1165,14 +1085,14 @@
             </div>
             <div id="formProducto" class="form-producto">
                 <h3 id="formProductoTitulo">✏️ Nuevo producto</h3>
-                <div class="form-group" id="prodNombreGroup"><label for="prodNombre">Nombre <span class="required">*</span></label><input type="text" id="prodNombre" placeholder="Ej: Doble Cheddar" /></div>
-                <div class="form-group hidden" id="prodPrecioGroup"><label for="prodPrecio">Precio <span class="required">*</span></label><input type="text" id="prodPrecio" placeholder="Ej: 15000" /></div>
-                <div class="form-group hidden" id="prodDescGroup"><label for="prodDesc">Descripción</label><textarea id="prodDesc" placeholder="Ej: Doble medallón 120gr · doble cheddar · salsa Tech."></textarea></div>
-                <div class="form-row hidden" id="prodImagenGroup">
+                <div class="form-group"><label for="prodNombre">Nombre <span class="required">*</span></label><input type="text" id="prodNombre" placeholder="Ej: Doble Cheddar" /></div>
+                <div class="form-group"><label for="prodPrecio">Precio <span class="required">*</span></label><input type="text" id="prodPrecio" placeholder="Ej: 15000" /></div>
+                <div class="form-group"><label for="prodDesc">Descripción</label><textarea id="prodDesc" placeholder="Ej: Doble medallón 120gr · doble cheddar · salsa Tech."></textarea></div>
+                <div class="form-row">
                     <div class="form-group"><label for="prodImagen">URL imagen</label><input type="text" id="prodImagen" placeholder="Ej: images/cheddar.jpg" /><span class="hint-text">Imagen de tarjeta</span></div>
                     <div class="form-group"><label for="prodPopupImg">URL popup</label><input type="text" id="prodPopupImg" placeholder="Ej: images/cheddar-popup.jpg" /><span class="hint-text">Imagen ampliada</span></div>
                 </div>
-                <div class="form-row hidden" id="prodCategoriaTiempoGroup">
+                <div class="form-row">
                     <div class="form-group"><label for="prodCategoria">Categoría</label>
                         <select id="prodCategoria">
                             <option value="Hamburguesas">🍔 Hamburguesas</option>
@@ -1180,7 +1100,6 @@
                             <option value="Bebidas">🥤 Bebidas</option>
                             <option value="Postres">🍰 Postres</option>
                             <option value="Otros">📦 Otros</option>
-                            <option value="Separador">📌 Separador</option>
                         </select>
                     </div>
                     <div class="form-group"><label for="prodTiempo">Tiempo (min)</label><input type="number" id="prodTiempo" value="15" min="1" /><span class="hint-text">Tiempo estimado</span></div>
@@ -1189,8 +1108,8 @@
                     <div class="form-group"><label for="prodBadge">Badge</label><input type="text" id="prodBadge" placeholder="Ej: NUEVO, BASE, PROMO" /><span class="hint-text">Etiqueta destacada</span></div>
                     <div class="form-group"><label for="prodId">ID <span class="required">*</span></label><input type="text" id="prodId" placeholder="Ej: doble-cheddar" /><span class="hint-text">🔑 Único, sin espacios. <strong>No editable.</strong></span></div>
                 </div>
-                <hr class="form-divider hidden" id="prodExtrasDivider" />
-                <div class="form-checkbox-group hidden" id="prodExtrasGroup">
+                <hr class="form-divider" />
+                <div class="form-checkbox-group">
                     <label><input type="checkbox" id="prodHasExtras" /> Tiene extras</label>
                     <label><input type="checkbox" id="prodDisponible" checked /> Disponible</label>
                 </div>
@@ -1450,19 +1369,10 @@
         const logoutBtn = document.getElementById('logoutBtn');
 
         const addProductBtn = document.getElementById('addProductBtn');
-        const addSeparatorBtn = document.getElementById('addSeparatorBtn');
         const formProducto = document.getElementById('formProducto');
         const saveProductBtn = document.getElementById('saveProductBtn');
         const cancelProductBtn = document.getElementById('cancelProductBtn');
         const formProductoTitulo = document.getElementById('formProductoTitulo');
-
-        const prodNombreGroup = document.getElementById('prodNombreGroup');
-        const prodPrecioGroup = document.getElementById('prodPrecioGroup');
-        const prodDescGroup = document.getElementById('prodDescGroup');
-        const prodImagenGroup = document.getElementById('prodImagenGroup');
-        const prodCategoriaTiempoGroup = document.getElementById('prodCategoriaTiempoGroup');
-        const prodExtrasDivider = document.getElementById('prodExtrasDivider');
-        const prodExtrasGroup = document.getElementById('prodExtrasGroup');
 
         const addPromoBtn = document.getElementById('addPromoBtn');
         const formPromo = document.getElementById('formPromo');
@@ -1557,11 +1467,8 @@
                 productosCompletos.sort((a, b) => (a.orden !== undefined ? a.orden : 999) - (b.orden !== undefined ? b.orden : 999));
                 const categorias = new Set();
                 productosCompletos.forEach(p => {
-                    if (p.categoria && !p.isSeparador) categorias.add(p.categoria);
+                    if (p.categoria) categorias.add(p.categoria);
                 });
-                if (productosCompletos.some(p => p.isSeparador)) {
-                    categorias.add('Separador');
-                }
                 categoriasUnicas = Array.from(categorias).sort();
                 actualizarOpcionesFiltro();
                 aplicarFiltro();
@@ -1592,7 +1499,7 @@
 
         filtroCategoria.addEventListener('change', aplicarFiltro);
 
-        // ===== FUNCIÓN RENDERIZADO CORREGIDA =====
+        // ===== RENDERIZADO CON DRAG & DROP =====
         function renderProductos(productos) {
             const list = document.getElementById('productList');
             list.innerHTML = '';
@@ -1604,41 +1511,29 @@
             for (let index = 0; index < productos.length; index++) {
                 const p = productos[index];
                 try {
-                    // Escapar ID y nombre
                     const id = p.id ? String(p.id).replace(/['"]/g, '\\$&') : '';
                     const name = p.name ? String(p.name).replace(/['"]/g, '\\$&') : 'Sin nombre';
 
-                    // Detectar separador: por isSeparador o por categoría
-                    const esSeparador = (p.isSeparador === true) || (p.categoria === 'Separador');
-
-                    if (esSeparador) {
-                        const div = document.createElement('div');
-                        div.className = 'separador-item';
-                        const isFirst = index === 0;
-                        const isLast = index === productos.length - 1;
-                        div.innerHTML = `
-                            <div class="separador-texto">${name || 'Separador'}</div>
-                            <div class="actions">
-                                <button class="btn-mover" onclick="moverProducto('${id}', -1)" ${isFirst ? 'disabled' : ''} title="Subir">⬆</button>
-                                <button class="btn-mover" onclick="moverProducto('${id}', 1)" ${isLast ? 'disabled' : ''} title="Bajar">⬇</button>
-                                <button class="btn-editar" onclick="editarProducto('${id}')" title="Editar">✏️</button>
-                                <span class="separator">|</span>
-                                <button class="btn-eliminar" onclick="eliminarProducto('${id}')" title="Eliminar">🗑️</button>
-                            </div>
-                        `;
-                        list.appendChild(div);
-                        continue;
-                    }
-
-                    // Producto normal
                     const div = document.createElement('div');
                     div.className = 'product-item';
+                    div.draggable = true;
+                    div.dataset.id = id;
+
+                    // Eventos drag & drop
+                    div.addEventListener('dragstart', handleDragStart);
+                    div.addEventListener('dragend', handleDragEnd);
+                    div.addEventListener('dragover', handleDragOver);
+                    div.addEventListener('dragenter', handleDragEnter);
+                    div.addEventListener('dragleave', handleDragLeave);
+                    div.addEventListener('drop', handleDrop);
+
                     const badgeHtml = p.badge ? `<span class="badge-preview">${p.badge}</span>` : '';
                     const metaHtml = `<div class="meta">${p.categoria ? `<span>📂 ${p.categoria}</span>` : ''}${p.tiempoPreparacion ? `<span>⏱️ ${p.tiempoPreparacion} min</span>` : ''}</div>`;
                     const isFirst = index === 0;
                     const isLast = index === productos.length - 1;
                     const price = (p.price !== undefined && p.price !== null) ? p.price : 0;
                     const available = p.available !== false;
+
                     div.innerHTML = `
                         <div style="flex:1; min-width:120px;"><div class="name">${name} ${badgeHtml}</div>${metaHtml}</div>
                         <label>💰 <input type="number" value="${price}" data-id="${id}" class="price-input" style="width:90px;" /></label>
@@ -1663,6 +1558,81 @@
             }
         }
 
+        // ----- Variables para drag & drop -----
+        let draggedId = null;
+
+        function handleDragStart(e) {
+            const el = e.currentTarget;
+            draggedId = el.dataset.id;
+            el.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', draggedId);
+        }
+
+        function handleDragEnd(e) {
+            const el = e.currentTarget;
+            el.classList.remove('dragging');
+            // Remover clase drag-over de todos
+            document.querySelectorAll('.product-item.drag-over').forEach(item => item.classList.remove('drag-over'));
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault(); // Necesario para permitir drop
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            const target = e.currentTarget;
+            if (target.dataset.id !== draggedId) {
+                target.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            const target = e.currentTarget;
+            target.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const target = e.currentTarget;
+            target.classList.remove('drag-over');
+
+            const origenId = e.dataTransfer.getData('text/plain');
+            const destinoId = target.dataset.id;
+
+            if (!origenId || !destinoId || origenId === destinoId) return;
+
+            // Intercambiar órdenes
+            intercambiarOrden(origenId, destinoId);
+        }
+
+        // ----- Función para intercambiar órdenes en Firebase -----
+        async function intercambiarOrden(id1, id2) {
+            try {
+                const snapshot = await db.ref('products').once('value');
+                const data = snapshot.val();
+                if (!data) return;
+
+                const producto1 = data[id1];
+                const producto2 = data[id2];
+                if (!producto1 || !producto2) return;
+
+                const orden1 = producto1.orden !== undefined ? producto1.orden : 999;
+                const orden2 = producto2.orden !== undefined ? producto2.orden : 999;
+
+                const updates = {};
+                updates['products/' + id1 + '/orden'] = orden2;
+                updates['products/' + id2 + '/orden'] = orden1;
+                await db.ref().update(updates);
+                mostrarToast('Orden actualizado', 'success');
+            } catch (error) {
+                mostrarToast('Error al reordenar: ' + error.message, 'error');
+            }
+        }
+
+        // ---- Funciones de movimiento (botones) ----
         window.moverProducto = async function(id, direccion) {
             const snapshot = await db.ref('products').once('value');
             const data = snapshot.val();
@@ -1683,7 +1653,7 @@
             await db.ref().update(updates);
         };
 
-        // =========== VARIABLE GLOBAL PARA CONTROLAR EDICIÓN ===========
+        // ---- CRUD productos ----
         let editandoProductoId = null;
 
         window.editarProducto = async function(id) {
@@ -1692,20 +1662,6 @@
                 const producto = snapshot.val();
                 if (!producto) { mostrarToast('Producto no encontrado', 'error'); return; }
 
-                const esSeparador = (producto.isSeparador === true) || (producto.categoria === 'Separador');
-                if (esSeparador) {
-                    setModoFormulario('separador');
-                    document.getElementById('prodNombre').value = producto.name || '';
-                    document.getElementById('prodId').value = producto.id || '';
-                    document.getElementById('prodId').readOnly = true;
-                    editandoProductoId = id;
-                    formProductoTitulo.textContent = '✏️ Editando separador: ' + (producto.name || '');
-                    formProducto.classList.add('active');
-                    formProducto.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    return;
-                }
-
-                setModoFormulario('producto');
                 document.getElementById('prodNombre').value = producto.name || '';
                 document.getElementById('prodPrecio').value = producto.price || '';
                 document.getElementById('prodDesc').value = producto.desc || '';
@@ -1732,7 +1688,7 @@
             if (!confirmado) return;
             try {
                 await db.ref('products/' + id).remove();
-                mostrarToast('Elemento eliminado', 'success');
+                mostrarToast('Producto eliminado', 'success');
             } catch (error) {
                 mostrarToast('Error al eliminar: ' + error.message, 'error');
             }
@@ -1772,29 +1728,10 @@
             });
         }
 
-        let modoFormulario = 'producto';
-
-        function setModoFormulario(modo) {
-            modoFormulario = modo;
-            const esSeparador = modo === 'separador';
-            prodPrecioGroup.classList.toggle('hidden', esSeparador);
-            prodDescGroup.classList.toggle('hidden', esSeparador);
-            prodImagenGroup.classList.toggle('hidden', esSeparador);
-            prodCategoriaTiempoGroup.classList.toggle('hidden', esSeparador);
-            prodExtrasDivider.classList.toggle('hidden', esSeparador);
-            prodExtrasGroup.classList.toggle('hidden', esSeparador);
-            if (esSeparador) {
-                formProductoTitulo.textContent = editandoProductoId ? '✏️ Editando separador' : '✏️ Nuevo separador';
-            } else {
-                formProductoTitulo.textContent = editandoProductoId ? '✏️ Editando producto' : '✏️ Nuevo producto';
-            }
-        }
-
         function ocultarFormProducto() {
             formProducto.classList.remove('active');
             editandoProductoId = null;
             document.getElementById('prodId').readOnly = false;
-            setModoFormulario('producto');
             document.getElementById('prodNombre').value = '';
             document.getElementById('prodPrecio').value = '';
             document.getElementById('prodDesc').value = '';
@@ -1806,121 +1743,55 @@
             document.getElementById('prodId').value = '';
             document.getElementById('prodHasExtras').checked = false;
             document.getElementById('prodDisponible').checked = true;
-            modoFormulario = 'producto';
         }
 
-        function mostrarFormProducto(modo = 'producto') {
-            document.getElementById('prodNombre').value = '';
-            document.getElementById('prodPrecio').value = '';
-            document.getElementById('prodDesc').value = '';
-            document.getElementById('prodImagen').value = '';
-            document.getElementById('prodPopupImg').value = '';
-            document.getElementById('prodCategoria').value = 'Hamburguesas';
-            document.getElementById('prodTiempo').value = 15;
-            document.getElementById('prodBadge').value = '';
-            document.getElementById('prodId').value = '';
-            document.getElementById('prodId').readOnly = false;
-            document.getElementById('prodHasExtras').checked = false;
-            document.getElementById('prodDisponible').checked = true;
-            editandoProductoId = null;
-            setModoFormulario(modo);
+        addProductBtn.addEventListener('click', () => {
+            ocultarFormProducto(); // limpiar
+            formProductoTitulo.textContent = '✏️ Nuevo producto';
             formProducto.classList.add('active');
             document.getElementById('prodNombre').focus();
-        }
+        });
 
-        addProductBtn.addEventListener('click', () => mostrarFormProducto('producto'));
-        addSeparatorBtn.addEventListener('click', () => mostrarFormProducto('separador'));
         cancelProductBtn.addEventListener('click', ocultarFormProducto);
 
         saveProductBtn.addEventListener('click', async function() {
             const nombre = document.getElementById('prodNombre').value.trim();
             let id = document.getElementById('prodId').value.trim().toLowerCase().replace(/\s+/g, '-');
-            const esSeparador = modoFormulario === 'separador';
+            const precio = parseInt(document.getElementById('prodPrecio').value.trim());
+            const desc = document.getElementById('prodDesc').value.trim() || '';
+            const imagen = document.getElementById('prodImagen').value.trim() || 'images/placeholder.jpg';
+            const popupImg = document.getElementById('prodPopupImg').value.trim() || imagen;
+            const categoria = document.getElementById('prodCategoria').value;
+            const tiempoPreparacion = parseInt(document.getElementById('prodTiempo').value) || 15;
+            const badge = document.getElementById('prodBadge').value.trim() || null;
+            const hasExtras = document.getElementById('prodHasExtras').checked;
+            const disponible = document.getElementById('prodDisponible').checked;
 
-            if (!nombre) { mostrarToast('El nombre es obligatorio.', 'error'); return; }
+            if (!nombre || !precio || !id) { mostrarToast('Nombre, precio e ID son obligatorios.', 'error'); return; }
+            if (isNaN(precio) || precio <= 0) { mostrarToast('Ingresá un precio válido.', 'error'); return; }
+            if (!/^[a-z0-9\-]+$/.test(id)) { mostrarToast('El ID solo puede contener letras minúsculas, números y guiones. Sin espacios.', 'error'); return; }
 
-            if (!id) {
-                if (esSeparador) {
-                    id = 'separador-' + Date.now();
-                } else {
-                    id = nombre.toLowerCase().replace(/\s+/g, '-');
-                }
-            }
-            if (!/^[a-z0-9\-]+$/.test(id)) {
-                mostrarToast('El ID solo puede contener letras minúsculas, números y guiones. Sin espacios.', 'error');
-                return;
-            }
-
-            // Verificar duplicado solo si es NUEVO (no edición)
-            if (!editandoProductoId) {
-                const exist = await db.ref('products/' + id).once('value');
-                if (exist.exists()) {
-                    // Si es separador y el ID ya existe, generar uno nuevo con timestamp
-                    if (esSeparador) {
-                        const nuevoId = 'separador-' + Date.now();
-                        mostrarToast(`El ID "${id}" ya existe. Se usará "${nuevoId}"`, 'info');
-                        id = nuevoId;
-                        document.getElementById('prodId').value = id; // actualizar el campo visual
-                    } else {
-                        mostrarToast('Ya existe un producto con ese ID. Usá otro.', 'error');
-                        return;
-                    }
-                }
-            } else {
-                // Si estamos editando y el ID cambió (no debería), verificar duplicado
-                const originalSnapshot = await db.ref('products/' + editandoProductoId).once('value');
-                const original = originalSnapshot.val();
-                if (original && original.id && original.id !== id) {
-                    const exist = await db.ref('products/' + id).once('value');
-                    if (exist.exists()) {
-                        mostrarToast('Ya existe un elemento con ese ID. Usá otro.', 'error');
-                        return;
-                    }
-                }
-            }
-
-            // Construir objeto base
-            let nuevoProducto = {
+            const nuevoProducto = {
                 id,
                 name: nombre,
-                categoria: esSeparador ? 'Separador' : document.getElementById('prodCategoria').value,
+                price: precio,
+                desc: desc,
+                imagen: imagen,
+                popupImg: popupImg,
+                categoria,
+                tiempoPreparacion,
+                badge,
+                hasExtras,
+                available: disponible
             };
-
-            // Forzar isSeparador según el modo
-            if (esSeparador) {
-                nuevoProducto.isSeparador = true;
-                nuevoProducto.price = null;
-                nuevoProducto.desc = '';
-                nuevoProducto.imagen = '';
-                nuevoProducto.popupImg = '';
-                nuevoProducto.tiempoPreparacion = null;
-                nuevoProducto.badge = '';
-                nuevoProducto.hasExtras = false;
-                nuevoProducto.available = true;
-                // Asegurar categoría
-                nuevoProducto.categoria = 'Separador';
-            } else {
-                nuevoProducto.isSeparador = false;
-                const precio = parseInt(document.getElementById('prodPrecio').value.trim());
-                if (!precio || precio <= 0) { mostrarToast('Ingresá un precio válido.', 'error'); return; }
-                nuevoProducto.price = precio;
-                nuevoProducto.desc = document.getElementById('prodDesc').value.trim() || '';
-                nuevoProducto.imagen = document.getElementById('prodImagen').value.trim() || 'images/placeholder.jpg';
-                nuevoProducto.popupImg = document.getElementById('prodPopupImg').value.trim() || nuevoProducto.imagen;
-                nuevoProducto.tiempoPreparacion = parseInt(document.getElementById('prodTiempo').value) || 15;
-                nuevoProducto.badge = document.getElementById('prodBadge').value.trim() || null;
-                nuevoProducto.hasExtras = document.getElementById('prodHasExtras').checked;
-                nuevoProducto.available = document.getElementById('prodDisponible').checked;
-                // La categoría ya se asignó arriba
-            }
 
             try {
                 if (editandoProductoId) {
                     // Actualizar
                     await db.ref('products/' + editandoProductoId).update(nuevoProducto);
-                    mostrarToast('Elemento actualizado', 'success');
+                    mostrarToast('Producto actualizado', 'success');
                 } else {
-                    // Crear: asignar orden al final
+                    // Crear
                     const snapshot = await db.ref('products').orderByChild('orden').once('value');
                     const data = snapshot.val();
                     let maxOrden = 0;
@@ -1929,8 +1800,10 @@
                         prods.forEach(p => { if (p.orden !== undefined && p.orden > maxOrden) maxOrden = p.orden; });
                     }
                     nuevoProducto.orden = maxOrden + 1;
+                    const exist = await db.ref('products/' + id).once('value');
+                    if (exist.exists()) { mostrarToast('Ya existe un producto con ese ID. Usá otro.', 'error'); return; }
                     await db.ref('products/' + id).set(nuevoProducto);
-                    mostrarToast('Elemento creado', 'success');
+                    mostrarToast('Producto creado', 'success');
                 }
                 ocultarFormProducto();
             } catch (error) {
@@ -2833,10 +2706,8 @@
             // 2. Ventas por categoría
             const productCategoryMap = {};
             productosCompletos.forEach(p => {
-                if (!p.isSeparador) {
-                    productCategoryMap[p.name] = p.categoria || 'Sin categoría';
-                    if (p.id) productCategoryMap[p.id] = p.categoria || 'Sin categoría';
-                }
+                productCategoryMap[p.name] = p.categoria || 'Sin categoría';
+                if (p.id) productCategoryMap[p.id] = p.categoria || 'Sin categoría';
             });
 
             const categoryCount = {};
