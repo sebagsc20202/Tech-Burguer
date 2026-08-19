@@ -31,12 +31,10 @@
         h2 { color: #ffb703; margin: 10px 0 5px; border-bottom: 1px solid #2f4a2f; padding-bottom: 4px; }
 
         /* ===== SCROLLBAR PERSONALIZADA ===== */
-        /* Firefox */
         * {
             scrollbar-width: thin;
             scrollbar-color: #ffb703 #1f331f;
         }
-        /* WebKit (Chrome, Edge, Safari) */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -131,6 +129,36 @@
         }
         .btn-fullscreen:hover {
             background: #2f4a2f;
+        }
+
+        /* ===== BADGE DE ESTADO ===== */
+        #adminStatusBadge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: #2a2a2a;
+            color: #b8d0b8;
+            border: 2px solid #3a5a3a;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        #adminStatusBadge.abierto {
+            border-color: #4caf50;
+            background: #1e3a1e;
+            color: #a5d6a7;
+        }
+        #adminStatusBadge.cerrado {
+            border-color: #f44336;
+            background: #3a1e1e;
+            color: #ef9a9a;
+        }
+        #adminStatusBadge.casi {
+            border-color: #ffb703;
+            background: #3a3a1e;
+            color: #ffd54f;
         }
 
         /* ===== TOAST ===== */
@@ -951,6 +979,8 @@
             <div class="panel-header">
                 <span class="user-info">👤 <strong id="userEmail">admin@techburgers.com</strong></span>
                 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                    <!-- ===== BADGE DE ESTADO ===== -->
+                    <span id="adminStatusBadge">⏳ Cargando...</span>
                     <button class="btn-fullscreen" id="btnFullscreen" title="Pantalla completa">⛶ Pantalla completa</button>
                     <button class="btn-logout" id="logoutBtn">🚪 Cerrar sesión</button>
                 </div>
@@ -1412,6 +1442,7 @@
                 ocultarFormPromo();
                 ocultarFormExcepcion();
                 actualizarBotonesEstado();
+                // Badge se actualiza dentro de actualizarBotonesEstado
             } else {
                 authSection.style.display = 'block';
                 adminPanel.classList.remove('active');
@@ -1423,7 +1454,6 @@
                 db.ref('excepciones').off();
                 db.ref('pedidos').off();
                 ocultarAlerta();
-                // Si estaba en fullscreen, salir
                 if (document.fullscreenElement) {
                     document.exitFullscreen().catch(() => {});
                 }
@@ -1445,6 +1475,10 @@
             cargarPromociones();
             cargarExcepciones();
             cargarPedidos();
+            // Escuchar cambios en estado_local para actualizar badge
+            db.ref('estado_local').on('value', () => {
+                actualizarBotonesEstado();
+            });
         }
 
         // ---- PRODUCTOS ----
@@ -1857,6 +1891,7 @@
             });
         }
 
+        // ===== FUNCIÓN ACTUALIZAR BOTONES DE ESTADO Y BADGE =====
         function actualizarBotonesEstado() {
             const hoy = new Date();
             hoy.setHours(0, 0, 0, 0);
@@ -1879,12 +1914,96 @@
                 if (exHoy.tipo === 'abierto') btnAbrirAhora.classList.add('activo');
                 else if (exHoy.tipo === 'cerrado') btnCerrarAhora.classList.add('activo');
             }
+
+            // --- ACTUALIZAR BADGE DE ESTADO ---
+            const badge = document.getElementById('adminStatusBadge');
+            if (!badge) return;
+
+            // Calcular estado
+            const now = new Date();
+            const dia = now.getDay();
+            const hora = now.getHours();
+            const minutos = now.getMinutes();
+            const horaMin = hora + minutos / 60;
+            const hoyStr = getHoyStr();
+
+            let estado = 'cerrado';
+            let mensajesExtra = [];
+
+            if (excepcionesActuales.length > 0) {
+                const excepcionesActivas = excepcionesActuales.filter(ex => {
+                    if (ex.fechaInicio && ex.fechaFin) {
+                        return hoyStr >= ex.fechaInicio && hoyStr <= ex.fechaFin;
+                    } else if (ex.fechaInicio) {
+                        return hoyStr === ex.fechaInicio;
+                    }
+                    return false;
+                });
+
+                if (excepcionesActivas.length > 0) {
+                    const hayCerrado = excepcionesActivas.some(ex => ex.tipo === 'cerrado');
+                    const hayHorarioEspecial = excepcionesActivas.some(ex => ex.tipo === 'horario_especial');
+                    const hayAbierto = excepcionesActivas.some(ex => ex.tipo === 'abierto');
+
+                    excepcionesActivas.forEach(ex => {
+                        if (ex.mensaje) mensajesExtra.push(ex.mensaje);
+                        else if (ex.tipo === 'cerrado') mensajesExtra.push('Cerrado');
+                        else if (ex.tipo === 'abierto') mensajesExtra.push('Abierto');
+                        else if (ex.tipo === 'horario_especial') mensajesExtra.push(`Horario especial: ${ex.horaApertura} - ${ex.horaCierre}`);
+                    });
+
+                    if (hayCerrado) estado = 'cerrado';
+                    else if (hayHorarioEspecial) {
+                        const ex = excepcionesActivas.find(e => e.tipo === 'horario_especial');
+                        if (ex && ex.horaApertura && ex.horaCierre) {
+                            const [hA, mA] = ex.horaApertura.split(':').map(Number);
+                            const [hC, mC] = ex.horaCierre.split(':').map(Number);
+                            const apertura = hA + mA / 60;
+                            const cierre = hC + mC / 60;
+                            estado = (horaMin >= apertura && horaMin < cierre) ? 'abierto' : 'cerrado';
+                        } else estado = 'cerrado';
+                    } else if (hayAbierto) estado = 'abierto';
+                    else estado = 'cerrado';
+                } else {
+                    // Si hay excepciones pero ninguna activa hoy, usar horario normal
+                    if (dia === 1) estado = 'cerrado';
+                    else if (horaMin >= 20 && horaMin < 23.5) estado = 'abierto';
+                    else if (horaMin >= 23.5 && horaMin < 24) estado = 'casi';
+                    else estado = 'cerrado';
+                }
+            } else {
+                // Sin excepciones: horario normal
+                if (dia === 1) estado = 'cerrado';
+                else if (horaMin >= 20 && horaMin < 23.5) estado = 'abierto';
+                else if (horaMin >= 23.5 && horaMin < 24) estado = 'casi';
+                else estado = 'cerrado';
+            }
+
+            let texto = '⏳ Cargando...';
+            let clase = '';
+            if (estado === 'abierto') {
+                texto = '🟢 ABIERTO';
+                clase = 'abierto';
+            } else if (estado === 'casi') {
+                texto = '🟡 CASI CERRANDO';
+                clase = 'casi';
+            } else {
+                texto = '🔴 CERRADO';
+                clase = 'cerrado';
+            }
+            if (mensajesExtra.length > 0) {
+                texto += ' · ' + mensajesExtra.join(' | ');
+            }
+            badge.textContent = texto;
+            badge.className = 'abierto cerrado casi'; // reset classes
+            if (clase) badge.classList.add(clase);
         }
 
         function getHoyStr() {
             const d = new Date();
             return d.toISOString().split('T')[0];
         }
+
         async function buscarExcepcionHoy() {
             const hoyStr = getHoyStr();
             const snapshot = await db.ref('excepciones').once('value');
@@ -2079,7 +2198,6 @@
 
             let pedidosFiltrados = [...pedidosActuales];
 
-            // Si se seleccionó un estado (no vacío), filtrar
             if (filtroEstadoValue && filtroEstadoValue !== '') {
                 pedidosFiltrados = pedidosFiltrados.filter(p => p.estado === filtroEstadoValue);
             }
@@ -2089,8 +2207,6 @@
             }
 
             renderPedidos(pedidosFiltrados);
-
-            // Actualizar título con el contador (sin paréntesis)
             pedidosTitulo.textContent = `📦 Pedidos ${pedidosFiltrados.length}`;
         }
 
@@ -2364,10 +2480,8 @@
             const hoy = new Date();
             hoy.setHours(0, 0, 0, 0);
 
-            // Filtrar pedidos de hoy (incluyendo cancelados para el contador, pero no para el monto)
             const pedidosHoy = pedidosActuales.filter(p => esFechaHoy(p.fecha));
 
-            // Agrupar por día (solo será hoy)
             const mapaDiario = new Map();
             const conteoDiario = new Map();
 
@@ -2392,7 +2506,6 @@
             if (chartDiario) chartDiario.destroy();
             const ctxDiario = document.getElementById('chartDiario').getContext('2d');
             if (diasOrdenados.length === 0) {
-                // Si no hay pedidos hoy, mostramos un gráfico vacío con una barra en cero.
                 chartDiario = new Chart(ctxDiario, {
                     type: 'bar',
                     data: {
