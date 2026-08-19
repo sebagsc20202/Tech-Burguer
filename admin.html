@@ -1456,7 +1456,6 @@
         const cancelProductBtn = document.getElementById('cancelProductBtn');
         const formProductoTitulo = document.getElementById('formProductoTitulo');
 
-        // Elementos del formulario que se ocultan/muestran según modo
         const prodNombreGroup = document.getElementById('prodNombreGroup');
         const prodPrecioGroup = document.getElementById('prodPrecioGroup');
         const prodDescGroup = document.getElementById('prodDescGroup');
@@ -1593,6 +1592,7 @@
 
         filtroCategoria.addEventListener('change', aplicarFiltro);
 
+        // ===== FUNCIÓN RENDERIZADO CORREGIDA =====
         function renderProductos(productos) {
             const list = document.getElementById('productList');
             list.innerHTML = '';
@@ -1604,10 +1604,14 @@
             for (let index = 0; index < productos.length; index++) {
                 const p = productos[index];
                 try {
-                    const id = p.id ? p.id.replace(/['"]/g, '\\$&') : '';
-                    const name = p.name ? p.name.replace(/['"]/g, '\\$&') : 'Sin nombre';
+                    // Escapar ID y nombre
+                    const id = p.id ? String(p.id).replace(/['"]/g, '\\$&') : '';
+                    const name = p.name ? String(p.name).replace(/['"]/g, '\\$&') : 'Sin nombre';
 
-                    if (p.isSeparador) {
+                    // Detectar separador: por isSeparador o por categoría
+                    const esSeparador = (p.isSeparador === true) || (p.categoria === 'Separador');
+
+                    if (esSeparador) {
                         const div = document.createElement('div');
                         div.className = 'separador-item';
                         const isFirst = index === 0;
@@ -1626,13 +1630,14 @@
                         continue;
                     }
 
+                    // Producto normal
                     const div = document.createElement('div');
                     div.className = 'product-item';
                     const badgeHtml = p.badge ? `<span class="badge-preview">${p.badge}</span>` : '';
                     const metaHtml = `<div class="meta">${p.categoria ? `<span>📂 ${p.categoria}</span>` : ''}${p.tiempoPreparacion ? `<span>⏱️ ${p.tiempoPreparacion} min</span>` : ''}</div>`;
                     const isFirst = index === 0;
                     const isLast = index === productos.length - 1;
-                    const price = p.price !== undefined && p.price !== null ? p.price : 0;
+                    const price = (p.price !== undefined && p.price !== null) ? p.price : 0;
                     const available = p.available !== false;
                     div.innerHTML = `
                         <div style="flex:1; min-width:120px;"><div class="name">${name} ${badgeHtml}</div>${metaHtml}</div>
@@ -1687,13 +1692,13 @@
                 const producto = snapshot.val();
                 if (!producto) { mostrarToast('Producto no encontrado', 'error'); return; }
 
-                const esSeparador = producto.isSeparador || false;
+                const esSeparador = (producto.isSeparador === true) || (producto.categoria === 'Separador');
                 if (esSeparador) {
                     setModoFormulario('separador');
                     document.getElementById('prodNombre').value = producto.name || '';
                     document.getElementById('prodId').value = producto.id || '';
                     document.getElementById('prodId').readOnly = true;
-                    editandoProductoId = id;   // <-- ASIGNACIÓN CORRECTA
+                    editandoProductoId = id;
                     formProductoTitulo.textContent = '✏️ Editando separador: ' + (producto.name || '');
                     formProducto.classList.add('active');
                     formProducto.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1713,7 +1718,7 @@
                 document.getElementById('prodId').readOnly = true;
                 document.getElementById('prodHasExtras').checked = producto.hasExtras || false;
                 document.getElementById('prodDisponible').checked = producto.available !== false;
-                editandoProductoId = id;   // <-- ASIGNACIÓN CORRECTA
+                editandoProductoId = id;
                 formProductoTitulo.textContent = '✏️ Editando: ' + producto.name;
                 formProducto.classList.add('active');
                 formProducto.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1846,20 +1851,26 @@
                 return;
             }
 
-            // ===== CORRECCIÓN: Solo verificar duplicado si NO estamos editando =====
+            // Verificar duplicado solo si es NUEVO (no edición)
             if (!editandoProductoId) {
                 const exist = await db.ref('products/' + id).once('value');
                 if (exist.exists()) {
-                    mostrarToast('Ya existe un elemento con ese ID. Usá otro.', 'error');
-                    return;
+                    // Si es separador y el ID ya existe, generar uno nuevo con timestamp
+                    if (esSeparador) {
+                        const nuevoId = 'separador-' + Date.now();
+                        mostrarToast(`El ID "${id}" ya existe. Se usará "${nuevoId}"`, 'info');
+                        id = nuevoId;
+                        document.getElementById('prodId').value = id; // actualizar el campo visual
+                    } else {
+                        mostrarToast('Ya existe un producto con ese ID. Usá otro.', 'error');
+                        return;
+                    }
                 }
             } else {
-                // Si estamos editando, y el ID ha cambiado (aunque sea readonly, por si acaso), verificamos que el nuevo ID no exista
-                // pero como el ID es readonly no debería cambiar. Aun así, por seguridad:
+                // Si estamos editando y el ID cambió (no debería), verificar duplicado
                 const originalSnapshot = await db.ref('products/' + editandoProductoId).once('value');
                 const original = originalSnapshot.val();
                 if (original && original.id && original.id !== id) {
-                    // El ID cambió (no debería pasar), verificamos si el nuevo ID ya existe
                     const exist = await db.ref('products/' + id).once('value');
                     if (exist.exists()) {
                         mostrarToast('Ya existe un elemento con ese ID. Usá otro.', 'error');
@@ -1868,14 +1879,16 @@
                 }
             }
 
+            // Construir objeto base
             let nuevoProducto = {
                 id,
                 name: nombre,
-                isSeparador: esSeparador,
                 categoria: esSeparador ? 'Separador' : document.getElementById('prodCategoria').value,
             };
 
+            // Forzar isSeparador según el modo
             if (esSeparador) {
+                nuevoProducto.isSeparador = true;
                 nuevoProducto.price = null;
                 nuevoProducto.desc = '';
                 nuevoProducto.imagen = '';
@@ -1884,7 +1897,10 @@
                 nuevoProducto.badge = '';
                 nuevoProducto.hasExtras = false;
                 nuevoProducto.available = true;
+                // Asegurar categoría
+                nuevoProducto.categoria = 'Separador';
             } else {
+                nuevoProducto.isSeparador = false;
                 const precio = parseInt(document.getElementById('prodPrecio').value.trim());
                 if (!precio || precio <= 0) { mostrarToast('Ingresá un precio válido.', 'error'); return; }
                 nuevoProducto.price = precio;
@@ -1895,15 +1911,16 @@
                 nuevoProducto.badge = document.getElementById('prodBadge').value.trim() || null;
                 nuevoProducto.hasExtras = document.getElementById('prodHasExtras').checked;
                 nuevoProducto.available = document.getElementById('prodDisponible').checked;
-                nuevoProducto.categoria = document.getElementById('prodCategoria').value;
+                // La categoría ya se asignó arriba
             }
 
             try {
                 if (editandoProductoId) {
-                    // Actualizar (no se modifica el ID, pero si cambió, ya lo verificamos)
+                    // Actualizar
                     await db.ref('products/' + editandoProductoId).update(nuevoProducto);
                     mostrarToast('Elemento actualizado', 'success');
                 } else {
+                    // Crear: asignar orden al final
                     const snapshot = await db.ref('products').orderByChild('orden').once('value');
                     const data = snapshot.val();
                     let maxOrden = 0;
