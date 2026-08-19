@@ -916,6 +916,12 @@
         const db = firebase.database();
 
         // ============================================================
+        //  CONSTANTES DE DIRECCIÓN
+        // ============================================================
+        const DIRECCION_LOCAL = 'Av. Always 1234'; // Cambiar por la dirección real del local
+        const ENLACE_LOCAL = 'https://bit.ly/4xOCf1o'; // Enlace acortado a la ubicación en Google Maps
+
+        // ============================================================
         //  TOAST NOTIFICATIONS
         // ============================================================
         let toastTimeout = null;
@@ -1741,12 +1747,9 @@
 
         filtroEstado.addEventListener('change', aplicarFiltroPedidos);
 
-        // Función para generar mensaje de WhatsApp según estado y tipo de envío
+        // ===== NUEVA FUNCIÓN PARA GENERAR MENSAJE DE WHATSAPP =====
         function generarMensajeWhatsApp(pedido, estado) {
             const nombreCliente = pedido.nombre || 'Cliente';
-            let mensaje = '';
-
-            // Determinar estado amigable
             let estadoTexto = '';
             switch (estado) {
                 case 'pendiente':
@@ -1768,28 +1771,42 @@
                     estadoTexto = 'está siendo procesado';
             }
 
-            // Personalizar según tipo de envío
             const envio = pedido.envio || 'Retiro en local';
             const direccion = pedido.direccion || '';
+            const esEnvio = envio.includes('Entrega') || envio.includes('domicilio') || envio.includes('envío');
 
-            if (envio.includes('Entrega') || envio.includes('domicilio')) {
-                mensaje = `🍔 *Tech Classic Burgers* 🍔\n\nHola ${nombreCliente}, tu pedido ${estadoTexto}\n\n🚚 *Envío a domicilio*\n📍 Dirección: ${direccion || 'No especificada'}\n\n📦 *Detalle del pedido:*\n`;
+            let mensaje = `🍔 *Tech Classic Burgers* 🍔\n\n`;
+            mensaje += `Hola ${nombreCliente}, tu pedido ${estadoTexto}\n\n`;
+
+            if (esEnvio) {
+                mensaje += `🚚 *Envío a domicilio*\n`;
+                mensaje += `📍 Dirección: ${direccion || 'No especificada'}\n`;
+                if (direccion) {
+                    // Enlace de Google Maps con ruta iniciada (desde la ubicación actual)
+                    const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(direccion)}`;
+                    mensaje += `🔗 ${mapsLink}\n`;
+                }
             } else {
-                mensaje = `🍔 *Tech Classic Burgers* 🍔\n\nHola ${nombreCliente}, tu pedido ${estadoTexto}\n\n📍 *Retiro en local*\n📍 Dirección: https://bit.ly/4xOCf1o\n\n📦 *Detalle del pedido:*\n`;
+                mensaje += `📍 *Retiro en local*\n`;
+                mensaje += `📍 Dirección: ${DIRECCION_LOCAL}\n`;
+                mensaje += `🔗 ${ENLACE_LOCAL}\n`;
             }
 
-            // Agregar productos
+            mensaje += `\n📦 *Detalle del pedido:*\n`;
             if (pedido.productos && pedido.productos.length > 0) {
                 pedido.productos.forEach(prod => {
-                    mensaje += `• ${prod.cantidad}x ${prod.nombre}`;
+                    mensaje += `* ${prod.cantidad}x ${prod.nombre}`;
                     if (prod.medallonesExtra) mensaje += ` (+${prod.medallonesExtra} medallones extra)`;
                     if (prod.toppings) mensaje += ` (${prod.toppings})`;
                     mensaje += `\n`;
                 });
+            } else {
+                mensaje += `Sin productos.\n`;
             }
 
             mensaje += `\n💰 *Total:* $${(pedido.total || 0).toLocaleString()}`;
             mensaje += `\n\n📲 ¡Gracias por tu pedido!`;
+
             return mensaje;
         }
 
@@ -1819,7 +1836,6 @@
                                     p.estado === 'listo' ? '#2196F3' :
                                     p.estado === 'entregado' ? '#8aaa8a' : '#f44336';
 
-                // Construir el HTML con fecha y total en amarillo, hora en blanco
                 div.innerHTML = `
                     <div class="info">
                         <div><strong>${p.nombre || 'Sin nombre'}</strong> (${p.telefono || 'Sin teléfono'})</div>
@@ -1860,13 +1876,11 @@
                 list.appendChild(div);
             });
 
-            // Event listeners para cambios de estado
             document.querySelectorAll('.estado-select').forEach(select => {
                 select.removeEventListener('change', handleEstadoChange);
                 select.addEventListener('change', handleEstadoChange);
             });
 
-            // Ajustar scroll wrapper si hay más de 3 pedidos
             const wrapper = document.getElementById('pedidoListWrapper');
             if (pedidos.length > 3) {
                 wrapper.style.maxHeight = '480px';
@@ -1887,13 +1901,11 @@
                 mostrarToast('El pedido no tiene número de teléfono', 'error');
                 return;
             }
-            // Limpiar teléfono (solo dígitos)
             const telefonoLimpio = telefono.replace(/\D/g, '');
             if (telefonoLimpio.length < 8) {
                 mostrarToast('Número de teléfono inválido', 'error');
                 return;
             }
-            // Obtener el estado actual (del select)
             const select = document.querySelector(`.estado-select[data-id="${id}"]`);
             const estado = select ? select.value : pedido.estado || 'pendiente';
 
