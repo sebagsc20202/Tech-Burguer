@@ -1747,33 +1747,40 @@
 
         filtroEstado.addEventListener('change', aplicarFiltroPedidos);
 
-        // ===== FUNCIÓN PARA GENERAR MENSAJE DE WHATSAPP (con total de ítems) =====
+        // ===== FUNCIÓN PARA GENERAR MENSAJE DE WHATSAPP (con total de ítems y mensaje específico para envío) =====
         function generarMensajeWhatsApp(pedido, estado) {
             const nombreCliente = pedido.nombre || 'Cliente';
             let estadoTexto = '';
-            switch (estado) {
-                case 'pendiente':
-                    estadoTexto = 'recibido y está en cola de preparación';
-                    break;
-                case 'preparando':
-                    estadoTexto = 'ya está en preparación. ¡En breve estará listo!';
-                    break;
-                case 'listo':
-                    estadoTexto = 'está listo para retirar. ¡Pasá a buscarlo cuando quieras!';
-                    break;
-                case 'entregado':
-                    estadoTexto = 'ya fue entregado. ¡Gracias por elegirnos!';
-                    break;
-                case 'cancelado':
-                    estadoTexto = 'ha sido cancelado. Si tenés dudas, contactanos.';
-                    break;
-                default:
-                    estadoTexto = 'está siendo procesado';
+            const envio = pedido.envio || 'Retiro en local';
+            const esEnvio = envio.includes('Entrega') || envio.includes('domicilio') || envio.includes('envío');
+
+            // Si es envío a domicilio, usamos el mensaje fijo
+            if (esEnvio) {
+                estadoTexto = 'está en manos del repartidor, llega en breve !!';
+            } else {
+                // Para retiro en local, mantenemos el comportamiento original según el estado
+                switch (estado) {
+                    case 'pendiente':
+                        estadoTexto = 'recibido y está en cola de preparación';
+                        break;
+                    case 'preparando':
+                        estadoTexto = 'ya está en preparación. ¡En breve estará listo!';
+                        break;
+                    case 'listo':
+                        estadoTexto = 'está listo para retirar. ¡Pasá a buscarlo cuando quieras!';
+                        break;
+                    case 'entregado':
+                        estadoTexto = 'ya fue entregado. ¡Gracias por elegirnos!';
+                        break;
+                    case 'cancelado':
+                        estadoTexto = 'ha sido cancelado. Si tenés dudas, contactanos.';
+                        break;
+                    default:
+                        estadoTexto = 'está siendo procesado';
+                }
             }
 
-            const envio = pedido.envio || 'Retiro en local';
             const direccion = pedido.direccion || '';
-            const esEnvio = envio.includes('Entrega') || envio.includes('domicilio') || envio.includes('envío');
 
             // Calcular total de ítems
             let totalItems = 0;
@@ -1846,7 +1853,6 @@
                     totalItems = p.productos.reduce((sum, prod) => sum + (prod.cantidad || 0), 0);
                 }
 
-                // Mostrar total de items en la descripción
                 const itemsText = totalItems > 0 ? ` (${totalItems} ítems)` : '';
 
                 div.innerHTML = `
