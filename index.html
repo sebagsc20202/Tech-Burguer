@@ -1643,6 +1643,14 @@
                 alert('Ingresá la dirección de entrega.');
                 return;
             }
+
+            // === VALIDACIÓN OBLIGATORIA DE MÉTODO DE PAGO ===
+            if (!pagoSeleccionado) {
+                alert('⚠️ Seleccioná un método de pago (Efectivo, Transferencia o QR).');
+                return;
+            }
+            // ================================================
+
             if (generarResumen()) {
                 resumenModal.classList.add('active');
             }
@@ -1789,8 +1797,6 @@
                 alert('Agregá al menos un producto con cantidad > 0.');
                 return;
             }
-
-            // === ELIMINADA LA LÍNEA DE PAPAS GRATIS ===
 
             const pagoValue = pagoSeleccionado || 'No especificado';
             mensaje += `\n\n💳 *Pago:* ${pagoValue}`;
